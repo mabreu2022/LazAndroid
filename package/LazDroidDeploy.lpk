@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="5">
+    <PathDelim Value="\"/>
+    <Name Value="LazDroidDeploy"/>
+    <Type Value="DesignTime"/>
+    <Author Value="LazDroid Team / Advanced Android Pascal Architect"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+      <Parsing>
+        <SyntaxOptions>
+          <SyntaxMode Value="ObjFPC"/>
+          <UseAnsiStrings Value="True"/>
+        </SyntaxOptions>
+      </Parsing>
+      <Linking>
+        <Debugging>
+          <GenerateDebugInfo Value="False"/>
+        </Debugging>
+      </Linking>
+    </CompilerOptions>
+    <Description Value="Open Tool para Lazarus IDE que automatiza a compilação cruzada, montagem do scaffold Android, empacotamento com Gradle e deploy via ADB sobre USB com um clique."/>
+    <License Value="MIT"/>
+    <Version Major="1" Minor="0" Release="0" Build="1"/>
+    <Files Count="7">
+      <Item1>
+        <Filename Value="LazDroidDeploy_Reg.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="LazDroidDeploy_Reg"/>
+      </Item1>
+      <Item2>
+        <Filename Value="LazDroidConfig.pas"/>
+        <UnitName Value="LazDroidConfig"/>
+      </Item2>
+      <Item3>
+        <Filename Value="LazDroidConfigFrame.pas"/>
+        <UnitName Value="LazDroidConfigFrame"/>
+      </Item3>
+      <Item4>
+        <Filename Value="LazDroidDeviceManager.pas"/>
+        <UnitName Value="LazDroidDeviceManager"/>
+      </Item4>
+      <Item5>
+        <Filename Value="LazDroidDeviceSelectDlg.pas"/>
+        <UnitName Value="LazDroidDeviceSelectDlg"/>
+      </Item5>
+      <Item6>
+        <Filename Value="LazDroidProcessRunner.pas"/>
+        <UnitName Value="LazDroidProcessRunner"/>
+      </Item6>
+      <Item7>
+        <Filename Value="LazDroidPipeline.pas"/>
+        <UnitName Value="LazDroidPipeline"/>
+      </Item7>
+    </Files>
+    <RequiredPkgs Count="3">
+      <Item1>
+        <PackageName Value="IDEIntf"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="LCL"/>
+      </Item2>
+      <Item3>
+        <PackageName Value="FCL"/>
+      </Item3>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

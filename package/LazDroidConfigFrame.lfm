@@ -1,0 +1,280 @@
+object LazDroidOptionsFrame: TLazDroidOptionsFrame
+  Left = 0
+  Height = 560
+  Top = 0
+  Width = 640
+  ClientHeight = 560
+  ClientWidth = 640
+  TabOrder = 0
+  DesignLeft = 320
+  DesignTop = 200
+  object pnlTop: TPanel
+    Left = 0
+    Height = 44
+    Top = 0
+    Width = 640
+    Align = alTop
+    BevelOuter = bvNone
+    ClientHeight = 44
+    ClientWidth = 640
+    TabOrder = 0
+    object btnAutoDetect: TButton
+      Left = 8
+      Height = 28
+      Top = 8
+      Width = 180
+      Caption = 'Autodetectar Ferramentas'
+      OnClick = btnAutoDetectClick
+      TabOrder = 0
+    end
+    object lblInfo: TLabel
+      Left = 200
+      Height = 15
+      Top = 14
+      Width = 350
+      Caption = 'Localiza automaticamente Android SDK, NDK, ADB e FPC instalados.'
+      ParentColor = False
+    end
+  end
+  object grpPaths: TGroupBox
+    Left = 8
+    Height = 160
+    Top = 48
+    Width = 624
+    Anchors = [akTop, akLeft, akRight]
+    Caption = ' Caminhos do SDK / NDK / Java '
+    ClientHeight = 140
+    ClientWidth = 620
+    TabOrder = 1
+    object lblSdk: TLabel
+      Left = 12
+      Height = 15
+      Top = 8
+      Width = 92
+      Caption = 'Android SDK Root:'
+      ParentColor = False
+    end
+    object edtSdk: TDirectoryEdit
+      Left = 12
+      Height = 23
+      Top = 24
+      Width = 596
+      ShowHidden = False
+      ButtonWidth = 23
+      NumGlyphs = 1
+      Anchors = [akTop, akLeft, akRight]
+      MaxLength = 0
+      TabOrder = 0
+    end
+    object lblNdk: TLabel
+      Left = 12
+      Height = 15
+      Top = 50
+      Width = 95
+      Caption = 'Android NDK Root:'
+      ParentColor = False
+    end
+    object edtNdk: TDirectoryEdit
+      Left = 12
+      Height = 23
+      Top = 66
+      Width = 596
+      ShowHidden = False
+      ButtonWidth = 23
+      NumGlyphs = 1
+      Anchors = [akTop, akLeft, akRight]
+      MaxLength = 0
+      TabOrder = 1
+    end
+    object lblAdb: TLabel
+      Left = 12
+      Height = 15
+      Top = 92
+      Width = 79
+      Caption = 'Executável ADB:'
+      ParentColor = False
+    end
+    object edtAdb: TFileNameEdit
+      Left = 12
+      Height = 23
+      Top = 108
+      Width = 290
+      DialogOptions = []
+      Filter = 'Executáveis (*.exe)|*.exe|Todos os arquivos (*.*)|*.*'
+      FilterIndex = 0
+      HideDirectories = False
+      ButtonWidth = 23
+      NumGlyphs = 1
+      MaxLength = 0
+      TabOrder = 2
+    end
+    object lblJava: TLabel
+      Left = 312
+      Height = 15
+      Top = 92
+      Width = 111
+      Caption = 'Java JDK / JBR Home:'
+      ParentColor = False
+    end
+    object edtJava: TDirectoryEdit
+      Left = 312
+      Height = 23
+      Top = 108
+      Width = 296
+      ShowHidden = False
+      ButtonWidth = 23
+      NumGlyphs = 1
+      Anchors = [akTop, akLeft, akRight]
+      MaxLength = 0
+      TabOrder = 3
+    end
+  end
+  object grpFpc: TGroupBox
+    Left = 8
+    Height = 144
+    Top = 216
+    Width = 624
+    Anchors = [akTop, akLeft, akRight]
+    Caption = ' Compilador Cruzado Free Pascal (FPC) '
+    ClientHeight = 124
+    ClientWidth = 620
+    TabOrder = 2
+    object lblFpcA64: TLabel
+      Left = 12
+      Height = 15
+      Top = 8
+      Width = 176
+      Caption = 'Compilador AArch64 (ppca64):'
+      ParentColor = False
+    end
+    object edtFpcA64: TFileNameEdit
+      Left = 12
+      Height = 23
+      Top = 24
+      Width = 596
+      DialogOptions = []
+      Filter = 'Executáveis (*.exe)|*.exe|Todos os arquivos (*.*)|*.*'
+      FilterIndex = 0
+      HideDirectories = False
+      ButtonWidth = 23
+      NumGlyphs = 1
+      Anchors = [akTop, akLeft, akRight]
+      MaxLength = 0
+      TabOrder = 0
+    end
+    object lblFpcArm: TLabel
+      Left = 12
+      Height = 15
+      Top = 50
+      Width = 163
+      Caption = 'Compilador ARMv7 (ppcarm):'
+      ParentColor = False
+    end
+    object edtFpcArm: TFileNameEdit
+      Left = 12
+      Height = 23
+      Top = 66
+      Width = 596
+      DialogOptions = []
+      Filter = 'Executáveis (*.exe)|*.exe|Todos os arquivos (*.*)|*.*'
+      FilterIndex = 0
+      HideDirectories = False
+      ButtonWidth = 23
+      NumGlyphs = 1
+      Anchors = [akTop, akLeft, akRight]
+      MaxLength = 0
+      TabOrder = 1
+    end
+    object lblExtraFlags: TLabel
+      Left = 12
+      Height = 15
+      Top = 92
+      Width = 99
+      Caption = 'Flags Extras do FPC:'
+      ParentColor = False
+    end
+    object edtExtraFlags: TEdit
+      Left = 120
+      Height = 23
+      Top = 90
+      Width = 488
+      Anchors = [akTop, akLeft, akRight]
+      TabOrder = 2
+      Text = '-O3 -Xs -XX'
+    end
+  end
+  object grpProject: TGroupBox
+    Left = 8
+    Height = 180
+    Top = 368
+    Width = 624
+    Anchors = [akTop, akLeft, akRight]
+    Caption = ' Scaffold Android & Configuração de Pacote '
+    ClientHeight = 160
+    ClientWidth = 620
+    TabOrder = 3
+    object lblScaffold: TLabel
+      Left = 12
+      Height = 15
+      Top = 8
+      Width = 143
+      Caption = 'Diretório Raiz do Scaffold:'
+      ParentColor = False
+    end
+    object edtScaffold: TDirectoryEdit
+      Left = 12
+      Height = 23
+      Top = 24
+      Width = 596
+      ShowHidden = False
+      ButtonWidth = 23
+      NumGlyphs = 1
+      Anchors = [akTop, akLeft, akRight]
+      MaxLength = 0
+      TabOrder = 0
+    end
+    object lblPackage: TLabel
+      Left = 12
+      Height = 15
+      Top = 54
+      Width = 126
+      Caption = 'Package ID (Application):'
+      ParentColor = False
+    end
+    object edtPackage: TEdit
+      Left = 12
+      Height = 23
+      Top = 70
+      Width = 290
+      TabOrder = 1
+      Text = 'com.lazarus.android.demo'
+    end
+    object lblActivity: TLabel
+      Left = 312
+      Height = 15
+      Top = 54
+      Width = 107
+      Caption = 'Nome da Activity:'
+      ParentColor = False
+    end
+    object edtActivity: TEdit
+      Left = 312
+      Height = 23
+      Top = 70
+      Width = 296
+      Anchors = [akTop, akLeft, akRight]
+      TabOrder = 2
+      Text = 'android.app.NativeActivity'
+    end
+    object chkAutoLogcat: TCheckBox
+      Left = 12
+      Height = 19
+      Top = 106
+      Width = 330
+      Caption = 'Iniciar monitoramento do Logcat automaticamente após launch'
+      Checked = True
+      State = cbChecked
+      TabOrder = 3
+    end
+  end
+end

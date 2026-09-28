@@ -1,0 +1,121 @@
+object LazDroidDeviceSelectForm: TLazDroidDeviceSelectForm
+  Left = 450
+  Height = 420
+  Top = 250
+  Width = 520
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsDialog
+  Caption = 'Selecionar Dispositivo Android para Deploy'
+  ClientHeight = 420
+  ClientWidth = 520
+  OnShow = FormShow
+  Position = poScreenCenter
+  LCLVersion = '2.2.0.4'
+  object pnlBottom: TPanel
+    Left = 0
+    Height = 50
+    Top = 370
+    Width = 520
+    Align = alBottom
+    BevelOuter = bvNone
+    ClientHeight = 50
+    ClientWidth = 520
+    TabOrder = 0
+    object btnDeploy: TBitBtn
+      Left = 296
+      Height = 32
+      Top = 9
+      Width = 120
+      Anchors = [akTop, akRight]
+      Caption = 'Deploy & Run'
+      Default = True
+      Kind = bkOK
+      ModalResult = 1
+      TabOrder = 0
+    end
+    object btnCancel: TBitBtn
+      Left = 424
+      Height = 32
+      Top = 9
+      Width = 88
+      Anchors = [akTop, akRight]
+      Cancel = True
+      Caption = 'Cancelar'
+      Kind = bkCancel
+      ModalResult = 2
+      TabOrder = 1
+    end
+    object btnRefresh: TButton
+      Left = 12
+      Height = 32
+      Top = 9
+      Width = 100
+      Caption = 'Atualizar'
+      OnClick = btnRefreshClick
+      TabOrder = 2
+    end
+  end
+  object grpDevices: TGroupBox
+    Left = 12
+    Height = 190
+    Top = 12
+    Width = 496
+    Align = alTop
+    BorderSpacing.Around = 12
+    Caption = ' Dispositivos Conectados via USB / Wi-Fi '
+    ClientHeight = 170
+    ClientWidth = 492
+    TabOrder = 1
+    object lstDevices: TListBox
+      Left = 8
+      Height = 136
+      Top = 8
+      Width = 476
+      Align = alClient
+      BorderSpacing.Around = 8
+      ItemHeight = 0
+      OnDblClick = lstDevicesDblClick
+      OnSelectionChange = lstDevicesSelectionChange
+      TabOrder = 0
+    end
+    object lblStatus: TLabel
+      Left = 8
+      Height = 15
+      Top = 152
+      Width = 476
+      Align = alBottom
+      BorderSpacing.Around = 8
+      Caption = 'Buscando dispositivos...'
+      Font.Color = clGray
+      ParentColor = False
+      ParentFont = False
+    end
+  end
+  object pnlInfo: TPanel
+    Left = 12
+    Height = 150
+    Top = 208
+    Width = 496
+    Align = alClient
+    BorderSpacing.Left = 12
+    BorderSpacing.Right = 12
+    BorderSpacing.Bottom = 6
+    BevelInner = bvLowered
+    ClientHeight = 150
+    ClientWidth = 496
+    Color = clWindow
+    ParentColor = False
+    TabOrder = 2
+    object lblDetails: TLabel
+      Left = 12
+      Height = 126
+      Top = 12
+      Width = 472
+      Align = alClient
+      BorderSpacing.Around = 12
+      Caption = 'Informações do dispositivo...'
+      ParentColor = False
+      WordWrap = True
+    end
+  end
+end

@@ -1,0 +1,41 @@
+# Free Pascal & Lazarus compiler outputs
+lib/
+**/lib/
+backup/
+**/backup/
+*.ppu
+*.o
+*.or
+*.compiled
+*.bak
+*.~*
+*.lps
+
+# Gradle build cache & outputs
+.gradle/
+**/.gradle/
+build/
+**/build/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Local Android SDK/NDK configuration (machine-specific)
+local.properties
+**/local.properties
+
+# Native compiled shared libraries (generated during build)
+scaffold/app/src/main/jniLibs/**/*.so
+!scaffold/app/src/main/jniLibs/**/.gitkeep
+
+# Heavy binaries & extracted toolchain archives
+tools/*.exe
+tools/*.zip
+tools/fpc_extracted/
+tools/innoextract/
+
+# OS & IDE temporary files
+.DS_Store
+Thumbs.db
+desktop.ini
