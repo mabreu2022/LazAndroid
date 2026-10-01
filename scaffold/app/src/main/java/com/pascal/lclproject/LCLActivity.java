@@ -90,6 +90,24 @@ public class LCLActivity extends Activity implements SensorEventListener, Locati
 
       return super.deleteSurroundingText(leftLength, rightLength);
     }
+
+    @Override public boolean performEditorAction(int actionCode)
+    {
+      Log.i("lclapp", "LCLInputConnection.performEditorAction: " + actionCode);
+      int eventResult = LCLOnKey(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER, null, 13);
+      ProcessEventResult(eventResult);
+      eventResult = LCLOnKey(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER, null, 13);
+      ProcessEventResult(eventResult);
+      return true;
+    }
+
+    @Override public boolean sendKeyEvent(KeyEvent event)
+    {
+      Log.v("lclapp", "LCLInputConnection.sendKeyEvent: keyCode=" + event.getKeyCode() + " action=" + event.getAction());
+      int eventResult = LCLOnKey(event.getAction(), event.getKeyCode(), event, event.getUnicodeChar());
+      ProcessEventResult(eventResult);
+      return true;
+    }
   }
 
   // -------------------------------------------
@@ -191,9 +209,9 @@ public class LCLActivity extends Activity implements SensorEventListener, Locati
     @Override public InputConnection onCreateInputConnection(EditorInfo outAttrs)
     {
       outAttrs.actionLabel = null;
-      outAttrs.label = "Test text";
-      outAttrs.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
-      outAttrs.imeOptions = EditorInfo.IME_ACTION_DONE;
+      outAttrs.label = "LCL Text";
+      outAttrs.inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
+      outAttrs.imeOptions = EditorInfo.IME_ACTION_DONE | EditorInfo.IME_FLAG_NO_EXTRACT_UI;
       return new LCLInputConnection(this, true);
     }
 
@@ -503,14 +521,40 @@ public class LCLActivity extends Activity implements SensorEventListener, Locati
 
   public void LCLDoHideVirtualKeyboard()
   {
-    InputMethodManager localInputManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-    localInputManager.hideSoftInputFromWindow(lclsurface.getWindowToken(), 0);
+    runOnUiThread(new Runnable()
+    {
+      @Override public void run()
+      {
+        if (lclsurface != null)
+        {
+          InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+          if (imm != null)
+          {
+            imm.hideSoftInputFromWindow(lclsurface.getWindowToken(), 0);
+          }
+        }
+      }
+    });
   };
 
   public void LCLDoShowVirtualKeyboard()
   {
-    InputMethodManager localInputManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-    localInputManager.showSoftInput(lclsurface, 0);
+    runOnUiThread(new Runnable()
+    {
+      @Override public void run()
+      {
+        if (lclsurface != null)
+        {
+          lclsurface.setFocusableInTouchMode(true);
+          lclsurface.requestFocus();
+          InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+          if (imm != null)
+          {
+            imm.showSoftInput(lclsurface, InputMethodManager.SHOW_FORCED);
+          }
+        }
+      }
+    });
   };
 
   // SensorEventListener overrides

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="12"/>
+    <PathDelim Value="\"/>
+    <General>
+      <Flags>
+        <MainUnitHasCreateFormStatements Value="False"/>
+        <MainUnitHasTitleStatement Value="False"/>
+        <MainUnitHasScaledStatement Value="False"/>
+      </Flags>
+      <SessionStorage Value="InProjectDir"/>
+      <Title Value="demo4"/>
+      <Scaled Value="True"/>
+      <UseAppBundle Value="False"/>
+      <ResourceType Value="res"/>
+    </General>
+    <MacroValues Count="1">
+      <Macro1 Name="LCLWidgetType" Value="customdrawn"/>
+    </MacroValues>
+    <BuildModes>
+      <Item Name="Default" Default="True"/>
+      <SharedMatrixOptions Count="1">
+        <Item1 ID="994126361044" Modes="Default" Type="IDEMacro" MacroName="LCLWidgetType" Value="customdrawn"/>
+      </SharedMatrixOptions>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+    <RunParams>
+      <FormatVersion Value="2"/>
+    </RunParams>
+    <RequiredPackages>
+      <Item>
+        <PackageName Value="LCL"/>
+      </Item>
+      <Item>
+        <PackageName Value="LazDroidControls"/>
+      </Item>
+    </RequiredPackages>
+    <Units>
+      <Unit>
+        <Filename Value="demo4.lpr"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Unit1"/>
+      </Unit>
+    </Units>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <PathDelim Value="\"/>
+    <Target>
+      <Filename Value="..\scaffold\app\src\main\jniLibs\arm64-v8a\liblazapp.so"/>
+    </Target>
+    <SearchPaths>
+      <IncludeFiles Value="$(ProjOutDir);..\package"/>
+      <OtherUnitFiles Value="$(LazarusDir)\lcl\units\$(TargetCPU)-$(TargetOS)\customdrawn;$(LazarusDir)\lcl\units\$(TargetCPU)-$(TargetOS);$(LazarusDir)\components\lazutils\lib\$(TargetCPU)-$(TargetOS);$(LazarusDir)\components\freetype\lib\$(TargetCPU)-$(TargetOS);$(LazarusDir)\packager\units\$(TargetCPU)-$(TargetOS);..\package;..\package\lib\$(TargetCPU)-$(TargetOS)"/>
+      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+    </SearchPaths>
+    <CodeGeneration>
+      <RelocatableUnit Value="True"/>
+      <TargetCPU Value="aarch64"/>
+      <TargetOS Value="android"/>
+      <Optimizations>
+        <OptimizationLevel Value="2"/>
+      </Optimizations>
+    </CodeGeneration>
+    <Linking>
+      <Debugging>
+        <GenerateDebugInfo Value="True"/>
+        <DebugInfoType Value="dsDwarf2Set"/>
+      </Debugging>
+      <Options>
+        <ExecutableType Value="Library"/>
+      </Options>
+    </Linking>
+    <Other>
+      <CustomOptions Value="-dLCL -dLCLcustomdrawn"/>
+    </Other>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions>
+      <Item>
+        <Name Value="EAbort"/>
+      </Item>
+      <Item>
+        <Name Value="ECodetoolError"/>
+      </Item>
+      <Item>
+        <Name Value="EFOpenError"/>
+      </Item>
+    </Exceptions>
+  </Debugging>
+</CONFIG>

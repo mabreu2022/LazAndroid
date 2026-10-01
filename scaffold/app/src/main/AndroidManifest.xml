@@ -20,6 +20,7 @@
             android:exported="true"
             android:showWhenLocked="true"
             android:turnScreenOn="true"
+            android:windowSoftInputMode="adjustResize"
             android:configChanges="orientation|keyboardHidden|screenSize|screenLayout|smallestScreenSize|uiMode">
 
             <intent-filter>

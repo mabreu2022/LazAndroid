@@ -39,3 +39,4 @@ tools/innoextract/
 .DS_Store
 Thumbs.db
 desktop.ini
+**/packagefiles.xml

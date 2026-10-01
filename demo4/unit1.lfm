@@ -1,0 +1,140 @@
+object Form1: TForm1
+  Left = 450
+  Height = 640
+  Top = 150
+  Width = 360
+  Caption = 'LazDroid Mobile Showcase'
+  ClientHeight = 640
+  ClientWidth = 360
+  Color = 16382457
+  Font.Color = clBlack
+  Font.Height = -13
+  Font.Name = 'Segoe UI'
+  OnCreate = FormCreate
+  OnResize = FormResize
+  LCLVersion = '2.2.6.0'
+  object appBar: TLazDroidAppBar
+    Left = 0
+    Height = 56
+    Top = 0
+    Width = 360
+    Align = alTop
+    BarColor = 2365972
+    Title = 'VendaForce Mobile'
+    Subtitle = 'Painel do Representante'
+    TitleColor = clWhite
+    SubtitleColor = 11579568
+    OnBackClick = appBarBackClick
+    OnActionClick = appBarActionClick
+  end
+  object bottomNav: TLazDroidBottomNav
+    Left = 0
+    Height = 56
+    Top = 584
+    Width = 360
+    Align = alBottom
+    ActiveIndex = 0
+    ActiveColor = 14251782
+    InactiveColor = 9671571
+    BarColor = 1579032
+    OnTabSelected = bottomNavTabSelected
+  end
+  object cardMetrics: TLazDroidCard
+    Left = 16
+    Height = 92
+    Top = 68
+    Width = 328
+    CardColor = clWhite
+    BorderColor = 14737632
+    CornerRadius = 12
+    object lblMeta: TLabel
+      Left = 16
+      Height = 15
+      Top = 12
+      Width = 95
+      Caption = 'VENDAS DO MÊS'
+      Font.Color = 8421504
+      Font.Height = -11
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object lblTotalVendido: TLabel
+      Left = 16
+      Height = 32
+      Top = 30
+      Width = 148
+      Caption = 'R$ 23.530,50'
+      Font.Color = 1118481
+      Font.Height = -24
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object lblSubMeta: TLabel
+      Left = 16
+      Height = 15
+      Top = 66
+      Width = 140
+      Caption = 'Meta: R$ 30.000 (78% atingido)'
+      Font.Color = 6710886
+      Font.Height = -11
+      Font.Name = 'Segoe UI'
+      ParentColor = False
+      ParentFont = False
+    end
+    object badgeStatus: TLazDroidBadge
+      Left = 240
+      Height = 24
+      Top = 12
+      Width = 72
+      Caption = 'Online'
+      Style = bsSuccess
+    end
+  end
+  object edtBusca: TLazDroidEdit
+    Left = 16
+    Height = 48
+    Top = 172
+    Width = 328
+    Placeholder = 'Buscar clientes ou pedidos...'
+    CornerRadius = 8
+    BorderColor = 13684944
+    FocusedColor = 14251782
+    OnChange = edtBuscaChange
+  end
+  object btnNovoPedido: TLazDroidButton
+    Left = 16
+    Height = 46
+    Top = 230
+    Width = 158
+    Caption = '+ Novo Pedido'
+    Variant = bvPrimary
+    CornerRadius = 10
+    OnClick = btnNovoPedidoClick
+  end
+  object btnSincronizar: TLazDroidButton
+    Left = 182
+    Height = 46
+    Top = 230
+    Width = 162
+    Caption = 'Sincronizar'
+    Variant = bvSuccess
+    CornerRadius = 10
+    OnClick = btnSincronizarClick
+  end
+  object listVendas: TLazDroidListView
+    Left = 16
+    Height = 280
+    Top = 288
+    Width = 328
+    ItemHeight = 64
+    ItemBgColor = clWhite
+    AltItemBgColor = 16382457
+    SelectedBgColor = 14737632
+    DividerColor = 15066597
+    OnItemClick = listVendasItemClick
+  end
+end

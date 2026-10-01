@@ -87,10 +87,10 @@ Após reiniciar a IDE, configure os diretórios dos compiladores e ferramentas:
 
 ## 5. Primeiro Deploy em 1-Clique
 
-1. No Lazarus, abra o projeto de demonstração:
-   ```
-   d:\Projetos AntiGravity\LazarusAndroid\demo\LazAndroidDemo.lpi
-   ```
+1. No Lazarus, abra qualquer um dos projetos de demonstração:
+   - `demo/LazAndroidDemo.lpi` — Aplicação comercial completa (Login + Vendas + SQLite)
+   - `demo2/project1.lpi` — Exemplo minimalista com botão e diálogo
+   - `demo3/demo3.lpi` — Exemplo multi-aba com TPageControl, TTabSheet, TPanel, TEdit, TLabel
 2. Inicie o deploy de qualquer uma das três formas:
    - Pressione o atalho: **`Ctrl + Shift + F9`**
    - Acesse o menu: **`Run  ->  Deploy & Run on Android Device (USB)`**
@@ -102,5 +102,27 @@ Após reiniciar a IDE, configure os diretórios dos compiladores e ferramentas:
    - **Estágio 3/6**: Gradle Wrapper compila e assina o APK em modo Debug (`app-debug.apk`).
    - **Estágio 4/6**: ADB transfere e instala o pacote no celular (`adb install -r -d`).
    - **Estágio 5/6**: ADB dispara a Intent da Activity (`am start`).
-   - **Estágio 6/6**: O console de logs do Logcat canaliza as mensagens `LazApp` e erros do Android diretamente para a janela de mensagens da IDE!
+   - **Estágio 6/6**: O console de logs do Logcat canaliza as mensagens `lclapp` diretamente para a janela de mensagens da IDE!
 5. Olhe para a tela do seu celular: a aplicação Pascal nativa inicializará em tela cheia com a interface renderizada diretamente no buffer de vídeo!
+
+---
+
+## 6. Criando um Novo Aplicativo Android do Zero
+
+Com o pacote instalado, você pode criar projetos Android visuais diretamente pelo assistente do Lazarus:
+
+1. Acesse o menu:
+   ```
+   Arquivo  ->  Novo...  (ou Projeto -> Novo Projeto...)
+   ```
+2. Na lista de tipos de projeto, selecione:
+   ```
+   Aplicação Android (LazDroid)
+   ```
+3. A IDE criará automaticamente:
+   - O arquivo `.lpr` configurado como biblioteca (`library`), exportando `JNI_OnLoad` e configurando `CDWidgetset.ActivityClassName`.
+   - O formulário visual inicial `Unit1.pas` (`TForm1`) aberto no Form Designer.
+   - O `LCLWidgetType` configurado como `customdrawn` e arquitetura alvo `aarch64-android`.
+4. Desenhe seus botões, caixas de texto e painéis no Form Designer normalmente.
+5. Salve o projeto em uma pasta de sua preferência e pressione **`Ctrl + Shift + F9`**!
+

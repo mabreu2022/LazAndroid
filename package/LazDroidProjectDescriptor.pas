@@ -185,8 +185,9 @@ begin
 
   AProject.MainFile.SetSourceText(NewSource, True);
 
-  // Vincula a dependência da LCL
+  // Vincula a dependência da LCL e dos componentes mobile LazDroid
   AProject.AddPackageDependency('LCL');
+  AProject.AddPackageDependency('LazDroidControls');
 
   // Configura todas as opções de compilador, widgetset CustomDrawn e build target
   ConfigureProjectAndroidCustomDrawn(AProject);

@@ -1,71 +1,77 @@
-# LazDroid-Deploy — IDE Plugin & Pipeline de Deploy Android para Lazarus
+# LazDroid-Deploy — Arquitetura da Solução e Pipeline Android
 
 ## 1. Visão Geral da Arquitetura
 
-O **LazDroid-Deploy** transforma a experiência de desenvolvimento móvel no Lazarus IDE, proporcionando um ciclo *"Edit & Run (F9)"* idêntico ao do Delphi/Android Studio. Ele orquestra o compilador cruzado Free Pascal (FPC), a injeção em scaffolding Android nativo (`NativeActivity`), o empacotador Gradle e o ADB sobre USB.
+O **LazDroid-Deploy** transforma a experiência de desenvolvimento móvel no Lazarus IDE, proporcionando um ciclo *"Edit, Design & Run (Ctrl+Shift+F9)"* com formulários visuais reais da **LCL (Lazarus Component Library)**. Ele orquestra o compilador cruzado Free Pascal (FPC), a injeção na camada host Android com suporte a LCL CustomDrawn (`com.pascal.lclproject.LCLActivity`), o empacotador Gradle e o ADB sobre USB.
 
 ```mermaid
 graph TD
     subgraph LazarusIDE ["Lazarus IDE (Design-Time & Run-Time)"]
-        UI["Menu Run & Toolbar Button<br/>'Deploy & Run on Android Device'"]
-        Opts["IDE Options Editor<br/>(SDK, NDK, JDK, FPC Paths)"]
-        MsgWin["Lazarus Messages Window<br/>(IDEMsgIntf Real-Time Feedback)"]
-        DevPick["Device Selector Dialog<br/>(Auto-detect USB Devices)"]
+        UI["Menu Run & Botão na Barra de Ferramentas<br/>'Deploy & Run on Android Device'"]
+        NewPrj["Menu Arquivo -> Novo...<br/>'Aplicação Android (LazDroid)'"]
+        Opts["Editor de Opções da IDE<br/>(Caminhos do SDK, NDK, JDK, FPC)"]
+        MsgWin["Janela de Mensagens do Lazarus<br/>(Feedback em Tempo Real)"]
+        DevPick["Diálogo Seletor de Aparelhos<br/>(Detecção Automática USB)"]
     end
 
-    subgraph LazDroidPackage ["LazDroid-Deploy Package (LazDroidDeploy.lpk)"]
-        Reg["LazDroidDeploy_Reg.pas<br/>(IDE Registration)"]
-        Cfg["LazDroidConfig.pas<br/>(LazConfigStorage XML)"]
-        DevMgr["LazDroidDeviceManager.pas<br/>(ADB Query & ABI Resolver)"]
-        Pipe["LazDroidPipeline.pas<br/>(6-Stage Async Orchestrator)"]
-        Proc["LazDroidProcessRunner.pas<br/>(Threaded CLI Executor + Pipe Reader)"]
+    subgraph LazDroidPackage ["Pacote LazDroid-Deploy (LazDroidDeploy.lpk)"]
+        Reg["LazDroidDeploy_Reg.pas<br/>(Registro de Menus e Comandos)"]
+        Desc["LazDroidProjectDescriptor.pas<br/>(Template de Novo Projeto LCL)"]
+        Cfg["LazDroidConfig.pas<br/>(Armazenamento em XML)"]
+        DevMgr["LazDroidDeviceManager.pas<br/>(ADB Query & Resolução de ABI)"]
+        Pipe["LazDroidPipeline.pas<br/>(Orquestrador Assíncrono em 6 Estágios)"]
+        Proc["LazDroidProcessRunner.pas<br/>(Thread com Leitura de Pipes)"]
     end
 
-    subgraph ToolchainHost ["Host Toolchain (Windows/Linux/macOS)"]
-        FPC["FPC Cross-Compiler<br/>(ppca64 / ppcarm -Tandroid)"]
-        Gradle["Gradle Wrapper<br/>(gradlew assembleDebug)"]
+    subgraph ToolchainHost ["Toolchain do Sistema Hospedeiro (Windows)"]
+        FPC["Compilador Cruzado FPC ARM64<br/>(ppcrossa64.exe -Tandroid -Paarch64)"]
+        Gradle["Gradle Wrapper<br/>(gradlew.bat assembleDebug)"]
         ADB["Android Debug Bridge<br/>(adb.exe)"]
     end
 
-    subgraph AndroidTarget ["Dispositivo Físico Android (USB)"]
-        DeviceApp["App Process (PID)<br/>com.lazarus.android.demo"]
-        NativeAct["android.app.NativeActivity"]
-        SoLib["liblazapp.so<br/>(ANativeActivity_onCreate)"]
-        Surface["ANativeWindow Surface & Input Queue"]
-        LogcatPipe["Logcat Daemon<br/>(TAG: LazApp / AndroidRuntime)"]
+    subgraph AndroidTarget ["Dispositivo Android Físico (USB)"]
+        DeviceApp["Processo do Aplicativo<br/>com.lazarus.android.*"]
+        JavaHost["Host: com.pascal.lclproject.LCLActivity<br/>(Gerenciamento de Janela, DPI, Lifecycle)"]
+        LclSurface["LCLSurface (View)<br/>(Buffer Bitmap ARGB8888 + Touch)"]
+        SoLib["liblazapp.so<br/>(LCL CustomDrawn Android + Forms LCL)"]
+        SqliteLib["libsqlite.so<br/>(Motor SQLite Nativo)"]
+        LogcatPipe["Daemon do Logcat<br/>(TAG: lclapp / AndroidRuntime)"]
     end
 
     %% Conexões
     UI -->|Dispara| Pipe
+    NewPrj -->|Cria Projeto| Desc
     DevPick -->|Seleciona Alvo| Pipe
-    Opts -->|Fornece Paths| Cfg
+    Opts -->|Configurações| Cfg
     Cfg --> Pipe
 
     Pipe -->|1. Detecta & ABI| DevMgr
     DevMgr -->|adb devices -l| ADB
 
-    Pipe -->|2. Cross-Compile .so| Proc
-    Proc -->|fpc -Tandroid -Paarch64| FPC
+    Pipe -->|2. Compila Binário Pascal| Proc
+    Proc -->|ppcrossa64 -fPIC -dLCLcustomdrawn| FPC
 
-    Pipe -->|3. Assemble APK| Proc
-    Proc -->|./gradlew assembleDebug| Gradle
+    Pipe -->|3. Gera APK| Proc
+    Proc -->|gradlew assembleDebug| Gradle
 
-    Pipe -->|4. Install APK| Proc
+    Pipe -->|4. Instala APK| Proc
     Proc -->|adb -s SERIAL install -r -d| ADB
 
-    Pipe -->|5. Launch Activity| Proc
+    Pipe -->|5. Dispara Activity| Proc
     Proc -->|adb -s SERIAL shell am start| ADB
 
-    Pipe -->|6. Monitor Logs| Proc
-    Proc -->|adb logcat -s LazApp:*| ADB
+    Pipe -->|6. Monitora Logs| Proc
+    Proc -->|adb logcat -s lclapp:*| ADB
 
-    ADB -->|Instala & Dispara| DeviceApp
-    DeviceApp --> NativeAct
-    NativeAct --> SoLib
-    SoLib --> Surface
-    SoLib -->|__android_log_print| LogcatPipe
+    ADB -->|Instala & Executa| DeviceApp
+    DeviceApp --> JavaHost
+    JavaHost --> LclSurface
+    JavaHost -->|JNI_OnLoad / System.loadLibrary| SoLib
+    JavaHost -->|System.loadLibrary| SqliteLib
+    SoLib -->|LCLDrawToBitmap| LclSurface
+    SoLib -->|__android_log_write| LogcatPipe
 
-    Proc -->|Log Streaming| MsgWin
+    Proc -->|Streaming de Mensagens| MsgWin
     LogcatPipe -->|Eventos em Tempo Real| ADB
     ADB -->|Stdout Streaming| Proc
 ```
@@ -74,7 +80,7 @@ graph TD
 
 ## 2. Pipeline de Orquestração em 6 Estágios
 
-A esteira de execução implementada em `LazDroidPipeline.pas` opera em background thread não-bloqueante (`TThread` / `TProcess` com pipes assíncronos), emitindo mensagens categorizadas para a IDE:
+A esteira de execução implementada em [`LazDroidPipeline.pas`](file:///d:/Projetos%20AntiGravity/LazarusAndroid/package/LazDroidPipeline.pas) opera em background thread não-bloqueante (`TThread` / `TProcess` com pipes assíncronos), emitindo mensagens categorizadas para a IDE:
 
 ```mermaid
 sequenceDiagram
@@ -93,27 +99,27 @@ sequenceDiagram
     rect rgb(240, 248, 255)
     Note over Pipe,ADB: Estágio 1: Pre-Check & Detecção de Dispositivo
     Pipe->>ADB: adb devices -l / getprop ro.product.cpu.abi
-    ADB-->>Pipe: Dispositivo '0A1B2C3D' pronto (ABI: arm64-v8a)
-    Pipe-->>IDE: Msg: "Dispositivo ativo: Samsung Galaxy S23 [arm64-v8a]"
+    ADB-->>Pipe: Dispositivo conectado e autorizado (ABI: arm64-v8a)
+    Pipe-->>IDE: Msg: "Dispositivo ativo: Xiaomi/Samsung [arm64-v8a]"
     end
 
     rect rgb(255, 250, 240)
     Note over Pipe,FPC: Estágio 2: Compilação Cruzada Pascal -> .so
-    Pipe->>FPC: fpc -Tandroid -Paarch64 -O3 -fPIC -FE<scaffold>/app/src/main/jniLibs/arm64-v8a/
+    Pipe->>FPC: ppcrossa64 -Tandroid -Paarch64 -fPIC -dLCLcustomdrawn -FE<scaffold>/app/src/main/jniLibs/arm64-v8a/
     FPC-->>Pipe: Compilação concluída: liblazapp.so (ExitCode: 0)
     Pipe-->>IDE: Msg: "Binário liblazapp.so gerado com sucesso!"
     end
 
     rect rgb(240, 255, 240)
     Note over Pipe,Grad: Estágio 3: Empacotamento Debug do APK
-    Pipe->>Grad: ./gradlew assembleDebug --parallel
+    Pipe->>Grad: gradlew.bat assembleDebug --no-daemon
     Grad-->>Pipe: BUILD SUCCESSFUL (app-debug.apk gerado)
-    Pipe-->>IDE: Msg: "APK montado: app/build/outputs/apk/debug/app-debug.apk"
+    Pipe-->>IDE: Msg: "APK montado: app-debug.apk"
     end
 
     rect rgb(255, 245, 245)
     Note over Pipe,Cel: Estágio 4: Instalação no Celular
-    Pipe->>ADB: adb -s 0A1B2C3D install -r -d app-debug.apk
+    Pipe->>ADB: adb -s SERIAL install -r -d app-debug.apk
     ADB->>Cel: Transfere e instala APK
     Cel-->>ADB: Success
     ADB-->>Pipe: Install Success (ExitCode: 0)
@@ -122,17 +128,30 @@ sequenceDiagram
 
     rect rgb(245, 240, 255)
     Note over Pipe,Cel: Estágio 5: Inicialização da Activity
-    Pipe->>ADB: adb -s 0A1B2C3D shell am start -n com.lazarus.android.demo/android.app.NativeActivity
+    Pipe->>ADB: adb -s SERIAL shell am start -n com.lazarus.android.*/com.pascal.lclproject.LCLActivity
     ADB->>Cel: Iniciar Intent
     Cel-->>ADB: Starting: Intent { cmp=... }
-    Pipe-->>IDE: Msg: "Aplicação inicializada na tela do celular!"
+    Pipe-->>IDE: Msg: "Aplicação LCL inicializada na tela do celular!"
     end
 
     rect rgb(235, 255, 255)
     Note over Pipe,Cel: Estágio 6: Streaming de Logcat
-    Pipe->>ADB: adb -s 0A1B2C3D logcat -v time -s LazApp:* AndroidRuntime:E
-    Cel-->>ADB: Logs em tempo real (__android_log_print)
+    Pipe->>ADB: adb -s SERIAL logcat -v time -s lclapp:* AndroidRuntime:E
+    Cel-->>ADB: Logs em tempo real (__android_log_write)
     ADB-->>Pipe: Linhas de Log
     Pipe-->>IDE: IDEMessagesWindow.AddCustomMessage(LogLine)
     end
 ```
+
+---
+
+## 3. Renderização LCL e Integração JNI
+
+1. **Host Android (`LCLActivity.java`)**:
+   - Cria uma subclasse de `View` chamada `LCLSurface`.
+   - Gerencia a orientação, resolução e densidade DPI da tela.
+   - Fornece um bitmap compartilhado em memória (`Bitmap.Config.ARGB_8888`).
+2. **Ponte Pascal (`customdrawn_android.pas` / `customdrawnobject_android.inc`)**:
+   - Implementa a função nativa `LCLDrawToBitmap(width, height, bitmap)`.
+   - A LCL renderiza toda a árvore de componentes visuais (`TForm`, `TButton`, `TPanel`, etc.) diretamente sobre a superfície do bitmap através do drawer `customdrawndrawers`.
+   - Os eventos de toque (`MotionEvent`) são interceptados na classe Java e direcionados via JNI para `LCLOnTouch(x, y, action)`, que mapeia para `MouseDown`, `MouseMove` e `MouseUp` da LCL.

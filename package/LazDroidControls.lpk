@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="5">
+    <PathDelim Value="\"/>
+    <Name Value="LazDroidControls"/>
+    <Type Value="RunAndDesignTime"/>
+    <Author Value="LazDroid Team"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+      <Parsing>
+        <SyntaxOptions>
+          <SyntaxMode Value="ObjFPC"/>
+          <UseAnsiStrings Value="True"/>
+        </SyntaxOptions>
+      </Parsing>
+    </CompilerOptions>
+    <Description Value="Paleta de componentes mobile touch-first para LazDroid / Lazarus (AppBar, Button, Edit, Card, Badge, BottomNav, ListView)"/>
+    <License Value="MIT"/>
+    <Version Major="1" Minor="0" Release="0" Build="1"/>
+    <Files Count="1">
+      <Item1>
+        <Filename Value="LazDroidMobileControls.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="LazDroidMobileControls"/>
+      </Item1>
+    </Files>
+    <RequiredPkgs Count="2">
+      <Item1>
+        <PackageName Value="LCL"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="FCL"/>
+      </Item2>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>
