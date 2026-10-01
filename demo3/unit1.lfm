@@ -1,0 +1,530 @@
+object Form1: TForm1
+  Left = 0
+  Height = 800
+  Top = 0
+  Width = 480
+  Caption = 'Cadastro de Clientes'
+  ClientHeight = 800
+  ClientWidth = 480
+  Color = 16119285
+  Font.CharSet = DEFAULT_CHARSET
+  Font.Color = clBlack
+  Font.Height = -16
+  Font.Name = 'Segoe UI'
+  OnCreate = FormCreate
+  OnResize = FormResize
+  Position = poDefault
+  Scaled = False
+  WindowState = wsMaximized
+  LCLVersion = '4.8.0.0'
+  object pnlHeader: TPanel
+    Left = 0
+    Height = 130
+    Top = 0
+    Width = 480
+    Align = alTop
+    BevelOuter = bvNone
+    Color = 14201481
+    ParentBackground = False
+    TabOrder = 0
+    object lblHeaderTitulo: TLabel
+      Left = 20
+      Height = 35
+      Top = 20
+      Width = 440
+      Caption = 'CADASTRO DE CLIENTES'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = 11141120
+      Font.Height = -26
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object lblHeaderSub: TLabel
+      Left = 20
+      Height = 25
+      Top = 65
+      Width = 440
+      Caption = 'Gestão Mobile de Clientes e Contatos'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = 5526612
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      ParentColor = False
+      ParentFont = False
+    end
+  end
+  object pgcClientes: TPageControl
+    Left = 0
+    Height = 670
+    Top = 130
+    Width = 480
+    ActivePage = tabLista
+    Align = alClient
+    Font.CharSet = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    OnChange = pgcClientesChange
+    ParentFont = False
+    TabHeight = 70
+    TabIndex = 0
+    TabOrder = 1
+    object tabLista: TTabSheet
+      Caption = 'Clientes'
+      ClientHeight = 592
+      ClientWidth = 472
+      object pnlCardCliente: TPanel
+        Left = 20
+        Height = 360
+        Top = 20
+        Width = 432
+        BevelColor = 14737632
+        BevelWidth = 2
+        Color = clWhite
+        ParentBackground = False
+        TabOrder = 0
+        object lblCardNome: TLabel
+          Left = 20
+          Height = 35
+          Top = 20
+          Width = 392
+          Caption = 'Nome do Cliente'
+          Font.CharSet = DEFAULT_CHARSET
+          Font.Color = 11141120
+          Font.Height = -22
+          Font.Name = 'Segoe UI'
+          Font.Style = [fsBold]
+          ParentColor = False
+          ParentFont = False
+        end
+        object lblCardDoc: TLabel
+          Left = 20
+          Height = 25
+          Top = 70
+          Width = 392
+          Caption = 'Documento: -'
+          Font.CharSet = DEFAULT_CHARSET
+          Font.Color = 3355443
+          Font.Height = -16
+          Font.Name = 'Segoe UI'
+          ParentColor = False
+          ParentFont = False
+        end
+        object lblCardTel: TLabel
+          Left = 20
+          Height = 25
+          Top = 110
+          Width = 392
+          Caption = 'WhatsApp: -'
+          Font.CharSet = DEFAULT_CHARSET
+          Font.Color = 3355443
+          Font.Height = -16
+          Font.Name = 'Segoe UI'
+          ParentColor = False
+          ParentFont = False
+        end
+        object lblCardCidade: TLabel
+          Left = 20
+          Height = 25
+          Top = 150
+          Width = 392
+          Caption = 'Cidade: -'
+          Font.CharSet = DEFAULT_CHARSET
+          Font.Color = 3355443
+          Font.Height = -16
+          Font.Name = 'Segoe UI'
+          ParentColor = False
+          ParentFont = False
+        end
+        object lblCardLimite: TLabel
+          Left = 20
+          Height = 28
+          Top = 195
+          Width = 392
+          Caption = 'Limite: R$ 0,00'
+          Font.CharSet = DEFAULT_CHARSET
+          Font.Color = 32768
+          Font.Height = -18
+          Font.Name = 'Segoe UI'
+          Font.Style = [fsBold]
+          ParentColor = False
+          ParentFont = False
+        end
+        object lblCardIndice: TLabel
+          Left = 20
+          Height = 22
+          Top = 245
+          Width = 392
+          Caption = 'Cliente 1 de 1'
+          Font.CharSet = DEFAULT_CHARSET
+          Font.Color = 8421504
+          Font.Height = -14
+          Font.Name = 'Segoe UI'
+          ParentColor = False
+          ParentFont = False
+        end
+      end
+      object btnAnterior: TButton
+        Left = 20
+        Height = 70
+        Top = 395
+        Width = 205
+        Caption = '◀ Anterior'
+        Font.CharSet = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold]
+        OnClick = btnAnteriorClick
+        ParentFont = False
+        TabOrder = 1
+      end
+      object btnProximo: TButton
+        Left = 247
+        Height = 70
+        Top = 395
+        Width = 205
+        Caption = 'Próximo ▶'
+        Font.CharSet = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold]
+        OnClick = btnProximoClick
+        ParentFont = False
+        TabOrder = 2
+      end
+      object btnNovo: TButton
+        Left = 20
+        Height = 85
+        Top = 480
+        Width = 432
+        Caption = '+ NOVO CLIENTE'
+        Font.CharSet = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -18
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold]
+        OnClick = btnNovoClick
+        ParentFont = False
+        TabOrder = 3
+      end
+      object btnEditar: TButton
+        Left = 20
+        Height = 70
+        Top = 580
+        Width = 205
+        Caption = 'EDITAR'
+        Font.CharSet = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold]
+        OnClick = btnEditarClick
+        ParentFont = False
+        TabOrder = 4
+      end
+      object btnExcluir: TButton
+        Left = 247
+        Height = 70
+        Top = 580
+        Width = 205
+        Caption = 'EXCLUIR'
+        Font.CharSet = DEFAULT_CHARSET
+        Font.Color = clRed
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold]
+        OnClick = btnExcluirClick
+        ParentFont = False
+        TabOrder = 5
+      end
+    end
+    object tabCadastro: TTabSheet
+      Caption = 'Novo / Editar'
+      ClientHeight = 592
+      ClientWidth = 472
+      object lblTituloForm: TLabel
+        Left = 20
+        Height = 35
+        Top = 15
+        Width = 432
+        Caption = 'DADOS DO CLIENTE'
+        Font.CharSet = DEFAULT_CHARSET
+        Font.Color = 11141120
+        Font.Height = -22
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+      end
+      object lblNome: TLabel
+        Left = 20
+        Height = 25
+        Top = 60
+        Width = 432
+        Caption = 'Nome Completo / Razão Social:'
+        Font.CharSet = DEFAULT_CHARSET
+        Font.Color = 4210752
+        Font.Height = -15
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+      end
+      object edtNome: TEdit
+        Left = 20
+        Height = 55
+        Top = 90
+        Width = 432
+        Font.CharSet = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        ParentFont = False
+        TabOrder = 0
+      end
+      object lblCpf: TLabel
+        Left = 20
+        Height = 25
+        Top = 155
+        Width = 432
+        Caption = 'CPF ou CNPJ:'
+        Font.CharSet = DEFAULT_CHARSET
+        Font.Color = 4210752
+        Font.Height = -15
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+      end
+      object edtCpf: TEdit
+        Left = 20
+        Height = 55
+        Top = 185
+        Width = 432
+        Font.CharSet = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        ParentFont = False
+        TabOrder = 1
+      end
+      object lblTelefone: TLabel
+        Left = 20
+        Height = 25
+        Top = 250
+        Width = 432
+        Caption = 'Telefone / WhatsApp:'
+        Font.CharSet = DEFAULT_CHARSET
+        Font.Color = 4210752
+        Font.Height = -15
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+      end
+      object edtTelefone: TEdit
+        Left = 20
+        Height = 55
+        Top = 280
+        Width = 432
+        Font.CharSet = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        ParentFont = False
+        TabOrder = 2
+      end
+      object lblCidade: TLabel
+        Left = 20
+        Height = 25
+        Top = 345
+        Width = 432
+        Caption = 'Cidade - UF:'
+        Font.CharSet = DEFAULT_CHARSET
+        Font.Color = 4210752
+        Font.Height = -15
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+      end
+      object edtCidade: TEdit
+        Left = 20
+        Height = 55
+        Top = 375
+        Width = 432
+        Font.CharSet = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        ParentFont = False
+        TabOrder = 3
+      end
+      object lblLimite: TLabel
+        Left = 20
+        Height = 25
+        Top = 440
+        Width = 432
+        Caption = 'Limite de Crédito (R$):'
+        Font.CharSet = DEFAULT_CHARSET
+        Font.Color = 4210752
+        Font.Height = -15
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+      end
+      object edtLimite: TEdit
+        Left = 20
+        Height = 55
+        Top = 470
+        Width = 432
+        Font.CharSet = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        ParentFont = False
+        TabOrder = 4
+      end
+      object btnSalvar: TButton
+        Left = 20
+        Height = 85
+        Top = 540
+        Width = 432
+        Caption = '✓ SALVAR CLIENTE'
+        Font.CharSet = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -18
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold]
+        OnClick = btnSalvarClick
+        ParentFont = False
+        TabOrder = 5
+      end
+      object btnCancelar: TButton
+        Left = 20
+        Height = 65
+        Top = 640
+        Width = 432
+        Caption = 'CANCELAR'
+        Font.CharSet = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -15
+        Font.Name = 'Segoe UI'
+        OnClick = btnCancelarClick
+        ParentFont = False
+        TabOrder = 6
+      end
+    end
+    object tabEstatisticas: TTabSheet
+      Caption = 'Estatísticas'
+      ClientHeight = 592
+      ClientWidth = 472
+      object lblStatTitulo: TLabel
+        Left = 20
+        Height = 35
+        Top = 20
+        Width = 432
+        Caption = 'RESUMO DA CARTEIRA'
+        Font.CharSet = DEFAULT_CHARSET
+        Font.Color = 11141120
+        Font.Height = -22
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+      end
+      object pnlStat1: TPanel
+        Left = 20
+        Height = 90
+        Top = 75
+        Width = 432
+        BevelColor = 14737632
+        Color = clWhite
+        ParentBackground = False
+        TabOrder = 0
+        object lblTotalCount: TLabel
+          Left = 20
+          Height = 30
+          Top = 30
+          Width = 392
+          Caption = 'Total de Clientes: 0'
+          Font.CharSet = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -18
+          Font.Name = 'Segoe UI'
+          Font.Style = [fsBold]
+          ParentColor = False
+          ParentFont = False
+        end
+      end
+      object pnlStat2: TPanel
+        Left = 20
+        Height = 90
+        Top = 180
+        Width = 432
+        BevelColor = 14737632
+        Color = clWhite
+        ParentBackground = False
+        TabOrder = 1
+        object lblTotalVolume: TLabel
+          Left = 20
+          Height = 30
+          Top = 30
+          Width = 392
+          Caption = 'Volume Total de Crédito: R$ 0,00'
+          Font.CharSet = DEFAULT_CHARSET
+          Font.Color = 32768
+          Font.Height = -18
+          Font.Name = 'Segoe UI'
+          Font.Style = [fsBold]
+          ParentColor = False
+          ParentFont = False
+        end
+      end
+      object pnlStat3: TPanel
+        Left = 20
+        Height = 90
+        Top = 285
+        Width = 432
+        BevelColor = 14737632
+        Color = clWhite
+        ParentBackground = False
+        TabOrder = 2
+        object lblMediaVolume: TLabel
+          Left = 20
+          Height = 30
+          Top = 30
+          Width = 392
+          Caption = 'Média por Cliente: R$ 0,00'
+          Font.CharSet = DEFAULT_CHARSET
+          Font.Color = 11141120
+          Font.Height = -18
+          Font.Name = 'Segoe UI'
+          Font.Style = [fsBold]
+          ParentColor = False
+          ParentFont = False
+        end
+      end
+      object btnRestaurar: TButton
+        Left = 20
+        Height = 80
+        Top = 400
+        Width = 432
+        Caption = 'RESTAURAR BASE DE EXEMPLO'
+        Font.CharSet = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold]
+        OnClick = btnRestaurarClick
+        ParentFont = False
+        TabOrder = 3
+      end
+    end
+  end
+end

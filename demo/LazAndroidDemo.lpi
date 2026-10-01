@@ -5,7 +5,6 @@
     <PathDelim Value="\"/>
     <General>
       <Flags>
-        <MainUnitHasCreateFormStatements Value="False"/>
         <MainUnitHasTitleStatement Value="False"/>
         <MainUnitHasScaledStatement Value="False"/>
       </Flags>
@@ -15,33 +14,7 @@
       <ResourceType Value="res"/>
     </General>
     <BuildModes>
-      <Item Name="Default" Default="True">
-        <CompilerOptions>
-          <Version Value="11"/>
-          <PathDelim Value="\"/>
-          <Target>
-            <Filename Value="..\scaffold\app\src\main\jniLibs\arm64-v8a\liblazapp.so"/>
-          </Target>
-          <SearchPaths>
-            <IncludeFiles Value="$(ProjOutDir)"/>
-            <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
-          </SearchPaths>
-          <CodeGeneration>
-            <RelocatableUnit Value="True"/>
-            <Optimizations>
-              <OptimizationLevel Value="3"/>
-            </Optimizations>
-          </CodeGeneration>
-          <Linking>
-            <Debugging>
-              <GenerateDebugInfo Value="False"/>
-            </Debugging>
-            <Options>
-              <ExecutableType Value="Library"/>
-            </Options>
-          </Linking>
-        </CompilerOptions>
-      </Item>
+      <Item Name="Default" Default="True"/>
       <Item Name="Android AArch64">
         <CompilerOptions>
           <Version Value="11"/>
@@ -58,12 +31,14 @@
             <TargetCPU Value="aarch64"/>
             <TargetOS Value="android"/>
             <Optimizations>
-              <OptimizationLevel Value="3"/>
+              <OptimizationLevel Value="2"/>
             </Optimizations>
           </CodeGeneration>
           <Linking>
             <Debugging>
-              <GenerateDebugInfo Value="False"/>
+              <GenerateDebugInfo Value="True"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
+              <UseLineInfoUnit Value="True"/>
             </Debugging>
             <Options>
               <ExecutableType Value="Library"/>
@@ -87,12 +62,14 @@
             <TargetCPU Value="arm"/>
             <TargetOS Value="android"/>
             <Optimizations>
-              <OptimizationLevel Value="3"/>
+              <OptimizationLevel Value="2"/>
             </Optimizations>
           </CodeGeneration>
           <Linking>
             <Debugging>
-              <GenerateDebugInfo Value="False"/>
+              <GenerateDebugInfo Value="True"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
+              <UseLineInfoUnit Value="True"/>
             </Debugging>
             <Options>
               <ExecutableType Value="Library"/>
@@ -108,17 +85,40 @@
     <RunParams>
       <FormatVersion Value="2"/>
     </RunParams>
+    <RequiredPackages>
+      <Item>
+        <PackageName Value="LCL"/>
+      </Item>
+    </RequiredPackages>
     <Units>
       <Unit>
         <Filename Value="LazAndroidDemo.lpr"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="AndroidLog.pas"/>
+        <Filename Value="FormLogin.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FormLogin"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="FormVendas.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FormVendas"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="SalesDatabase.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="AndroidNativeActivity.pas"/>
+        <Filename Value="SalesData.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="AndroidLog.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
     </Units>
@@ -141,6 +141,9 @@
         <ExecutableType Value="Library"/>
       </Options>
     </Linking>
+    <Other>
+      <CustomOptions Value="-dLCL -dLCLcustomdrawn"/>
+    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions>

@@ -1,0 +1,380 @@
+object frmVendas: TFormVendas
+  Left = 0
+  Height = 800
+  Top = 0
+  Width = 480
+  Caption = 'VendaForce Mobile - Painel do Representante'
+  ClientHeight = 800
+  ClientWidth = 480
+  Color = 16775418
+  Font.CharSet = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
+  OnCreate = FormCreate
+  OnResize = FormResize
+  OnShow = FormShow
+  Position = poDefault
+  Scaled = False
+  WindowState = wsMaximized
+  LCLVersion = '4.8.0.0'
+  object pnlHeader: TPanel
+    Left = 0
+    Height = 84
+    Top = 0
+    Width = 400
+    Align = alTop
+    BevelOuter = bvNone
+    Color = 8473615
+    ParentBackground = False
+    TabOrder = 0
+    object lblAppTitle: TLabel
+      Left = 16
+      Height = 25
+      Top = 10
+      Width = 230
+      Caption = 'VENDAFORCE MOBILE'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -19
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object lblSyncPill: TLabel
+      Left = 256
+      Height = 18
+      Top = 14
+      Width = 130
+      Alignment = taRightJustify
+      Caption = '● ERP Sincronizado'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = 12908677
+      Font.Height = -11
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object lblVendedor: TLabel
+      Left = 16
+      Height = 16
+      Top = 42
+      Width = 368
+      AutoSize = False
+      Caption = 'Representante: Carlos Eduardo Silva (REP-4029) • Rota Zona Sul'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = 16382450
+      Font.Height = -11
+      Font.Name = 'Segoe UI'
+      ParentColor = False
+      ParentFont = False
+    end
+    object lblStatus: TLabel
+      Left = 16
+      Height = 15
+      Top = 62
+      Width = 368
+      AutoSize = False
+      Caption = '● SQLite: vendas.db (6 Clientes | 8 Produtos | 3 Pedidos)'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = 12908677
+      Font.Height = -10
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+  end
+  object pnlMetaCard: TPanel
+    Left = 14
+    Height = 130
+    Top = 94
+    Width = 372
+    BevelColor = 8473615
+    BevelWidth = 1
+    Color = 6239488
+    ParentBackground = False
+    TabOrder = 1
+    object lblMetaTitulo: TLabel
+      Left = 14
+      Height = 15
+      Top = 10
+      Width = 180
+      Caption = 'META MENSAL (OUTUBRO)'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = 16382450
+      Font.Height = -11
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object lblMetaValores: TLabel
+      Left = 14
+      Height = 28
+      Top = 30
+      Width = 240
+      Caption = 'R$ 142.800 / R$ 180k'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -20
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object lblMetaPercent: TLabel
+      Left = 280
+      Height = 24
+      Top = 30
+      Width = 78
+      Alignment = taRightJustify
+      Caption = '79.3%'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = 12908677
+      Font.Height = -19
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object pbMeta: TProgressBar
+      Left = 14
+      Height = 12
+      Top = 68
+      Width = 344
+      Position = 79
+      TabOrder = 0
+    end
+    object lblTicketMedio: TLabel
+      Left = 14
+      Height = 15
+      Top = 92
+      Width = 150
+      Caption = 'Ticket Médio: R$ 3.850,00'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = 16382450
+      Font.Height = -11
+      Font.Name = 'Segoe UI'
+      ParentColor = False
+      ParentFont = False
+    end
+    object lblComissao: TLabel
+      Left = 200
+      Height = 15
+      Top = 92
+      Width = 158
+      Alignment = taRightJustify
+      Caption = 'Comissão: R$ 7.140,00'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = 12908677
+      Font.Height = -11
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+  end
+  object pnlMetricasGrid: TPanel
+    Left = 14
+    Height = 80
+    Top = 232
+    Width = 372
+    BevelColor = 16638682
+    Color = clWhite
+    ParentBackground = False
+    TabOrder = 2
+    object lblVendasHoje: TLabel
+      Left = 14
+      Height = 18
+      Top = 10
+      Width = 160
+      Caption = 'Vendas Hoje: R$ 12.450'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = 4877312
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object lblPedidosEmitidos: TLabel
+      Left = 190
+      Height = 18
+      Top = 10
+      Width = 168
+      Caption = 'Pedidos: 4 emitidos'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = 8473615
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object lblVisitasHoje: TLabel
+      Left = 14
+      Height = 16
+      Top = 44
+      Width = 160
+      Caption = 'Visitas: 2 de 6 realizadas'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = 7105648
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      ParentColor = False
+      ParentFont = False
+    end
+    object lblPositivacao: TLabel
+      Left = 190
+      Height = 16
+      Top = 44
+      Width = 168
+      Caption = 'Positivação: 82% no mês'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = 4877312
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+  end
+  object pnlClientes: TPanel
+    Left = 14
+    Height = 224
+    Top = 320
+    Width = 372
+    BevelColor = 16638682
+    Color = clWhite
+    ParentBackground = False
+    TabOrder = 3
+    object lblRoteiroTitulo: TLabel
+      Left = 14
+      Height = 16
+      Top = 8
+      Width = 240
+      Caption = 'ROTEIRO PRIORITÁRIO (SQLITE):'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = 8473615
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object btnCliente1: TButton
+      Left = 12
+      Height = 42
+      Top = 30
+      Width = 348
+      Caption = '1. Supermercado Central (Matriz) [R$ 18.200 disp.]'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      OnClick = btnCliente1Click
+      ParentFont = False
+      TabOrder = 0
+    end
+    object btnCliente2: TButton
+      Left = 12
+      Height = 42
+      Top = 76
+      Width = 348
+      Caption = '2. Distribuidora Sao Paulo [R$ 42.500 disp.]'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      OnClick = btnCliente2Click
+      ParentFont = False
+      TabOrder = 1
+    end
+    object btnCliente3: TButton
+      Left = 12
+      Height = 42
+      Top = 122
+      Width = 348
+      Caption = '3. Mercearia Pinheiros [R$ 14.800 disp.]'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      OnClick = btnCliente3Click
+      ParentFont = False
+      TabOrder = 2
+    end
+    object btnCliente4: TButton
+      Left = 12
+      Height = 42
+      Top = 168
+      Width = 348
+      Caption = '4. Super Alvorada [R$ 24.350 disp.]'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      OnClick = btnCliente4Click
+      ParentFont = False
+      TabOrder = 3
+    end
+  end
+  object pnlAcoes: TPanel
+    Left = 14
+    Height = 176
+    Top = 552
+    Width = 372
+    BevelColor = 16638682
+    Color = clWhite
+    ParentBackground = False
+    TabOrder = 4
+    object btnNovoPedido: TButton
+      Left = 12
+      Height = 48
+      Top = 10
+      Width = 348
+      Caption = '+ NOVO PEDIDO (CATÁLOGO SQLITE)'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      OnClick = btnNovoPedidoClick
+      ParentFont = False
+      TabOrder = 0
+    end
+    object btnCarrinho: TButton
+      Left = 12
+      Height = 48
+      Top = 64
+      Width = 348
+      Caption = 'CARRINHO (1 ITEM - R$ 137,75)'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      OnClick = btnCarrinhoClick
+      ParentFont = False
+      TabOrder = 1
+    end
+    object btnSincronizar: TButton
+      Left = 12
+      Height = 48
+      Top = 118
+      Width = 348
+      Caption = 'TRANSMITIR AO ERP (GRAVAR SQLITE)'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      OnClick = btnSincronizarClick
+      ParentFont = False
+      TabOrder = 2
+    end
+  end
+end

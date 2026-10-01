@@ -10,7 +10,7 @@ unit LazDroidPipeline;
 interface
 
 uses
-  Classes, SysUtils, Forms, FileUtil, LazDroidConfig, LazDroidDeviceManager,
+  Classes, SysUtils, Forms, Controls, Dialogs, FileUtil, LazDroidConfig, LazDroidDeviceManager,
   LazDroidProcessRunner, LazIDEIntf, ProjectIntf;
 
 type
@@ -39,12 +39,17 @@ type
     FActiveDevice: TAndroidDevice;
     FTargetAbi: TAndroidAbi;
     FSelectedSerial: string;
+    FIsDebugMode: Boolean;
     FActiveRunner: TLazDroidProcessThread;
     FLogcatRunner: TLazDroidProcessThread;
+    FGdbServerRunner: TLazDroidProcessThread;
     FIsRunning: Boolean;
     FCancelRequested: Boolean;
     FScaffoldPath: string;
     FOutputApkPath: string;
+    FCurrentAppTitle: string;
+    FCurrentPackageName: string;
+    FOverwriteConfirmed: Boolean;
 
     FOnStageChange: TOnStageChange;
     FOnPipelineFinish: TOnPipelineFinish;
@@ -57,6 +62,7 @@ type
     procedure RunPackaging;
     procedure RunDeploy;
     procedure RunLaunch;
+    procedure SetupGdbServer;
     procedure StartLogcat;
 
     procedure HandleProcessFinished(AExitCode: Integer; const AErrorMsg: string);
@@ -66,12 +72,15 @@ type
     constructor Create(ASettings: TLazDroidSettings = nil);
     destructor Destroy; override;
 
-    procedure Start(const ATargetSerial: string = '');
+    procedure Start(const ATargetSerial: string = ''; ADebugMode: Boolean = False);
     procedure Cancel;
 
     property CurrentStage: TPipelineStage read FCurrentStage;
     property ActiveDevice: TAndroidDevice read FActiveDevice;
+    property CurrentAppTitle: string read FCurrentAppTitle;
+    property CurrentPackageName: string read FCurrentPackageName;
     property IsRunning: Boolean read FIsRunning;
+    property IsDebugMode: Boolean read FIsDebugMode write FIsDebugMode;
     property OnStageChange: TOnStageChange read FOnStageChange write FOnStageChange;
     property OnPipelineFinish: TOnPipelineFinish read FOnPipelineFinish write FOnPipelineFinish;
   end;
@@ -155,26 +164,126 @@ begin
   end;
 end;
 
+function SanitizePackageIdentifier(const S: string): string;
+var
+  i: Integer;
+  c: Char;
+begin
+  Result := '';
+  for i := 1 to Length(S) do
+  begin
+    c := S[i];
+    if (c in ['a'..'z']) or (c in ['0'..'9']) or (c = '_') then
+      Result := Result + c
+    else if (c in ['A'..'Z']) then
+      Result := Result + LowerCase(c);
+  end;
+  if Result = '' then
+    Result := 'app';
+  if not (Result[1] in ['a'..'z']) then
+    Result := 'app' + Result;
+end;
+
+procedure UpdateScaffoldStringsXml(const AScaffoldDir, AAppName: string);
+var
+  StringsXmlPath: string;
+  Content: string;
+  List: TStringList;
+begin
+  if Trim(AAppName) = '' then Exit;
+  StringsXmlPath := IncludeTrailingPathDelimiter(AScaffoldDir) +
+    'app' + PathDelim + 'src' + PathDelim + 'main' + PathDelim + 'res' + PathDelim + 'values' + PathDelim + 'strings.xml';
+  ForceDirectories(ExtractFilePath(StringsXmlPath));
+  Content := '<?xml version="1.0" encoding="utf-8"?>' + LineEnding +
+             '<resources>' + LineEnding +
+             '    <string name="app_name">' + AAppName + '</string>' + LineEnding +
+             '</resources>' + LineEnding;
+  List := TStringList.Create;
+  try
+    List.Text := Content;
+    List.SaveToFile(StringsXmlPath);
+  finally
+    List.Free;
+  end;
+end;
+
 function TLazDroidPipeline.ResolveTargetProjectFile(out AMainPrjFile: string): Boolean;
+var
+  Prj: TLazProject;
+  CurFile: string;
+  CleanIdent: string;
 begin
   Result := False;
   AMainPrjFile := '';
 
-  if Assigned(LazarusIDE) and Assigned(LazarusIDE.ActiveProject) then
+  if not Assigned(LazarusIDE) or not Assigned(LazarusIDE.ActiveProject) then
   begin
-    AMainPrjFile := LazarusIDE.ActiveProject.MainFile.Filename;
-    Result := FileExists(AMainPrjFile);
+    LogMsg('ERRO: Nenhum projeto ativo aberto no Lazarus IDE.', luError);
+    Exit(False);
   end;
 
-  // Fallback demo caso não haja projeto aberto no editor
+  Prj := LazarusIDE.ActiveProject;
+
+  // Se o projeto for novo / virtual / não salvo no disco:
+  if Prj.IsVirtual or (Prj.ProjectInfoFile = '') or not FileExists(Prj.MainFile.Filename) then
+  begin
+    LogMsg('O projeto atual ainda não foi salvo em disco.', luWarning);
+    LogMsg('Para compilar para Android, o projeto deve ser salvo primeiro...', luInfo);
+
+    // Abre a janela de salvar projeto do Lazarus
+    if LazarusIDE.DoSaveProject([]) <> mrOk then
+    begin
+      LogMsg('Operação cancelada: O projeto precisa ser salvo antes de compilar para Android.', luWarning);
+      Exit(False);
+    end;
+  end;
+
+  // Garante que todas as alterações abertas no editor sejam salvas no disco
+  LazarusIDE.DoSaveAll([]);
+
+  if Assigned(Prj.MainFile) and FileExists(Prj.MainFile.Filename) then
+  begin
+    AMainPrjFile := Prj.MainFile.Filename;
+    Result := True;
+  end
+  else if (Prj.ProjectInfoFile <> '') then
+  begin
+    CurFile := ChangeFileExt(Prj.ProjectInfoFile, '.lpr');
+    if FileExists(CurFile) then
+    begin
+      AMainPrjFile := CurFile;
+      Result := True;
+    end;
+  end;
+
   if not Result then
   begin
-    AMainPrjFile := 'd:\Projetos AntiGravity\LazarusAndroid\demo\LazAndroidDemo.lpr';
-    Result := FileExists(AMainPrjFile);
+    LogMsg('ERRO FATAL: Não foi possível localizar o arquivo principal (.lpr) do projeto ativo.', luError);
+    LogMsg('Certifique-se de salvar o projeto em uma pasta antes de compilar.', luInfo);
+    Exit(False);
   end;
+
+  // Determina Título e Identificador da Aplicação baseado no projeto ativo carregado na IDE
+  if (Prj.Title <> '') and not SameText(Prj.Title, 'project1') then
+    FCurrentAppTitle := Prj.Title
+  else
+    FCurrentAppTitle := ChangeFileExt(ExtractFileName(AMainPrjFile), '');
+
+  CleanIdent := SanitizePackageIdentifier(FCurrentAppTitle);
+  if (CleanIdent = '') or SameText(CleanIdent, 'project1') then
+    CleanIdent := SanitizePackageIdentifier(ChangeFileExt(ExtractFileName(AMainPrjFile), ''));
+  if CleanIdent = '' then
+    CleanIdent := 'app';
+
+  if SameText(ExtractFileName(AMainPrjFile), 'LazAndroidDemo.lpr') then
+    FCurrentPackageName := DEFAULT_PACKAGE_NAME
+  else if (FSettings.PackageName <> '') and (FSettings.PackageName <> DEFAULT_PACKAGE_NAME) then
+    FCurrentPackageName := FSettings.PackageName
+  else
+    FCurrentPackageName := 'com.lazarus.android.' + CleanIdent;
 end;
 
-procedure TLazDroidPipeline.Start(const ATargetSerial: string);
+procedure TLazDroidPipeline.Start(const ATargetSerial: string; ADebugMode: Boolean);
 begin
   if FIsRunning then
   begin
@@ -182,12 +291,17 @@ begin
     Exit;
   end;
 
+  FIsDebugMode := ADebugMode;
   FIsRunning := True;
   FCancelRequested := False;
+  FOverwriteConfirmed := False;
   FSelectedSerial := ATargetSerial;
 
   LogMsg('=========================================================', luInfo);
-  LogMsg('  INICIANDO PIPELINE LAZDROID-DEPLOY (ANDROID AUTOMATION)', luSuccess);
+  if FIsDebugMode then
+    LogMsg('  INICIANDO PIPELINE LAZDROID-DEPLOY (MODO DEPURAÇÃO GDB)', luSuccess)
+  else
+    LogMsg('  INICIANDO PIPELINE LAZDROID-DEPLOY (ANDROID AUTOMATION)', luSuccess);
   LogMsg('=========================================================', luInfo);
 
   RunPreCheck;
@@ -208,6 +322,12 @@ begin
     FLogcatRunner := nil;
   end;
 
+  if Assigned(FGdbServerRunner) then
+  begin
+    FGdbServerRunner.RequestCancel;
+    FGdbServerRunner := nil;
+  end;
+
   if FIsRunning then
   begin
     FIsRunning := False;
@@ -221,6 +341,7 @@ procedure TLazDroidPipeline.RunPreCheck;
 var
   Errors: string;
   DevFound: Boolean;
+  TargetPrj: string;
 begin
   SetStage(stagePreCheck, 'Validando ambiente e detectando aparelho...');
 
@@ -230,7 +351,20 @@ begin
     LogMsg('Aviso de Validação de Caminhos:' + LineEnding + Errors, luWarning);
   end;
 
-  // Busca do dispositivo
+  // 1. Identifica rigorosamente o projeto ativo carregado na IDE do Lazarus
+  if not ResolveTargetProjectFile(TargetPrj) then
+  begin
+    FIsRunning := False;
+    SetStage(stageFailed, 'Projeto ativo não definido ou não salvo.');
+    if Assigned(FOnPipelineFinish) then
+      FOnPipelineFinish(False, 'Operação cancelada: Salve o projeto antes de compilar para Android.');
+    Exit;
+  end;
+
+  LogMsg(Format('>>> [PROJETO ATIVO NA IDE] %s', [TargetPrj]), luSuccess);
+  LogMsg(Format('>>> Aplicação: "%s" | Pacote Android: %s', [FCurrentAppTitle, FCurrentPackageName]), luInfo);
+
+  // 2. Busca do dispositivo Android
   if FSelectedSerial <> '' then
   begin
     DevFound := FDevManager.IsDeviceConnected(FSelectedSerial);
@@ -273,6 +407,31 @@ begin
     Exit;
   end;
 
+  // 3. Verificação de Sobrescrita:
+  // Se já existe um aplicativo instalado com esse mesmo pacote no aparelho, pergunta ao usuário se quer passar por cima
+  if FDevManager.IsPackageInstalled(FActiveDevice.Serial, FCurrentPackageName) then
+  begin
+    if MessageDlg('LazDroid - Confirmação de Instalação',
+         Format('O aplicativo "%s"' + LineEnding +
+                'Pacote: %s' + LineEnding + LineEnding +
+                'já está instalado no dispositivo conectado (%s).' + LineEnding + LineEnding +
+                'Deseja sobrescrever (passar por cima) da versão existente?',
+                [FCurrentAppTitle, FCurrentPackageName, FActiveDevice.Model]),
+         mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
+    begin
+      LogMsg(Format('Deploy cancelado pelo usuário: O aplicativo "%s" existente no aparelho foi mantido sem alterações.',
+        [FCurrentAppTitle]), luWarning);
+      FIsRunning := False;
+      SetStage(stageIdle, 'Deploy cancelado para preservar aplicativo existente.');
+      if Assigned(FOnPipelineFinish) then
+        FOnPipelineFinish(False, 'Deploy cancelado para manter versão existente.');
+      Exit;
+    end;
+
+    FOverwriteConfirmed := True;
+    LogMsg(Format('Confirmado pelo usuário: A versão existente de "%s" será sobrescrita no aparelho.', [FCurrentAppTitle]), luInfo);
+  end;
+
   // Prosseguir para Estágio 2
   RunPascalBuild;
 end;
@@ -287,6 +446,8 @@ var
   UnitOutDir: string;
   NdkBin: string;
   NdkLib: string;
+  LazDir: string;
+  LclCdDir: string;
   Params: TStringList;
   Env: TStringList;
 begin
@@ -329,6 +490,10 @@ begin
                   'lib' + PathDelim + TargetCpu + '-android';
   ForceDirectories(UnitOutDir);
 
+  // Remove qualquer binário anterior para garantir que um build quebrado nunca empacote versão antiga
+  if FileExists(JniOutDir + PathDelim + DEFAULT_SO_NAME) then
+    DeleteFile(JniOutDir + PathDelim + DEFAULT_SO_NAME);
+
   Params := TStringList.Create;
   Env := TStringList.Create;
   try
@@ -337,7 +502,12 @@ begin
     Params.Add('-fPIC');
     Params.Add('-FE' + JniOutDir);
     Params.Add('-FU' + UnitOutDir);
-    Params.Add('-o' + DEFAULT_SO_NAME);
+    Params.Add('-o' + JniOutDir + PathDelim + DEFAULT_SO_NAME);
+
+    // Símbolos de depuração e números de linha DWARF 2 (estilo Delphi)
+    Params.Add('-gw2');
+    Params.Add('-godwarfsets');
+    Params.Add('-gl');
 
     // Ferramentas binárias do Android NDK (as.exe, ld.exe)
     NdkBin := FSettings.GetNdkToolchainBinForAbi(FTargetAbi);
@@ -356,10 +526,30 @@ begin
       Params.DelimitedText := Params.DelimitedText + ' ' + FSettings.ExtraFpcFlags;
     end;
 
-    // Incluir diretório do projeto nas units
+    // Incluir diretório do projeto nas units e arquivos de inclusão
     Params.Add('-Fu' + ExtractFilePath(PrjFile));
+    Params.Add('-Fi' + ExtractFilePath(PrjFile));
+
+    // Suporte automático a LCL CustomDrawn para Android caso esteja presente no Lazarus
+    LazDir := 'C:\lazarus';
+    if DirectoryExists(LazDir) then
+    begin
+      LclCdDir := LazDir + PathDelim + 'lcl' + PathDelim + 'units' + PathDelim + TargetCpu + '-android' + PathDelim + 'customdrawn';
+      if DirectoryExists(LclCdDir) then
+      begin
+        Params.Add('-Fu' + LclCdDir);
+        Params.Add('-Fu' + LazDir + PathDelim + 'lcl' + PathDelim + 'units' + PathDelim + TargetCpu + '-android');
+        Params.Add('-Fu' + LazDir + PathDelim + 'components' + PathDelim + 'lazutils' + PathDelim + 'lib' + PathDelim + TargetCpu + '-android');
+        Params.Add('-Fu' + LazDir + PathDelim + 'components' + PathDelim + 'freetype' + PathDelim + 'lib' + PathDelim + TargetCpu + '-android');
+        Params.Add('-Fu' + LazDir + PathDelim + 'packager' + PathDelim + 'units' + PathDelim + TargetCpu + '-android');
+        Params.Add('-dLCL');
+        Params.Add('-dLCLcustomdrawn');
+      end;
+    end;
+
     Params.Add(PrjFile);
 
+    LogMsg(Format('>>> [PROJETO ATIVO] Compilando: %s', [PrjFile]), luSuccess);
     LogMsg(Format('Executando FPC: %s com alvo %s (%s)', [CompilerExe, TargetCpu, TargetAbiStr]), luInfo);
 
     FActiveRunner := TLazDroidProcessThread.Create(
@@ -383,8 +573,26 @@ var
   PropLines: TStringList;
   Params: TStringList;
   Env: TStringList;
+  TargetAbiStr: string;
+  ExpectedSo: string;
 begin
   SetStage(stagePackaging, 'Empacotando aplicação Android via Gradle Wrapper...');
+
+  TargetAbiStr := FSettings.AbiToString(FTargetAbi);
+  ExpectedSo := IncludeTrailingPathDelimiter(FScaffoldPath) +
+                'app' + PathDelim + 'src' + PathDelim + 'main' + PathDelim +
+                'jniLibs' + PathDelim + TargetAbiStr + PathDelim + DEFAULT_SO_NAME;
+
+  if not FileExists(ExpectedSo) then
+  begin
+    LogMsg('ERRO FATAL: O binário compilado "' + DEFAULT_SO_NAME + '" não foi encontrado em: ' + ExpectedSo, luError);
+    LogMsg('O compilador FPC pode ter falhado. Verifique as mensagens de erro.', luInfo);
+    FIsRunning := False;
+    SetStage(stageFailed, 'Binário compilado ausente.');
+    if Assigned(FOnPipelineFinish) then
+      FOnPipelineFinish(False, 'Falha ao compilar binário Pascal.');
+    Exit;
+  end;
 
   // Assegura arquivo local.properties no scaffold com caminhos corretos do SDK e NDK
   LocalPropFile := IncludeTrailingPathDelimiter(FScaffoldPath) + 'local.properties';
@@ -420,12 +628,29 @@ begin
   Params := TStringList.Create;
   Env := TStringList.Create;
   try
+    {$IFDEF WINDOWS}
+    GradlewBin := GetEnvironmentVariable('COMSPEC');
+    if GradlewBin = '' then GradlewBin := 'cmd.exe';
+    Params.Add('/c');
+    Params.Add(IncludeTrailingPathDelimiter(FScaffoldPath) + 'gradlew.bat');
+    {$ENDIF}
+
+    // Atualiza o nome da aplicação no strings.xml do scaffold para refletir o projeto carregado no Lazarus
+    UpdateScaffoldStringsXml(FScaffoldPath, FCurrentAppTitle);
+
+    Params.Add('-PappId=' + FCurrentPackageName);
     Params.Add('assembleDebug');
-    Params.Add('--parallel');
     Params.Add('--no-daemon');
 
-    if FSettings.JavaHome <> '' then
-      Env.Add('JAVA_HOME=' + FSettings.JavaHome);
+    // Resolução segura de JAVA_HOME com bin\java.exe garantido
+    if (FSettings.JavaHome <> '') and FileExists(IncludeTrailingPathDelimiter(FSettings.JavaHome) + 'bin' + PathDelim + 'java.exe') then
+      Env.Add('JAVA_HOME=' + FSettings.JavaHome)
+    else if (GetEnvironmentVariable('JAVA_HOME') <> '') and FileExists(IncludeTrailingPathDelimiter(GetEnvironmentVariable('JAVA_HOME')) + 'bin' + PathDelim + 'java.exe') then
+      Env.Add('JAVA_HOME=' + GetEnvironmentVariable('JAVA_HOME'))
+    else if FileExists('C:\Program Files\Eclipse Adoptium\jdk-21.0.7.6-hotspot\bin\java.exe') then
+      Env.Add('JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-21.0.7.6-hotspot')
+    else if FileExists('D:\DesthStrokeIDE\Android\jdk\bin\java.exe') then
+      Env.Add('JAVA_HOME=D:\DesthStrokeIDE\Android\jdk');
 
     if FSettings.AndroidSdkRoot <> '' then
       Env.Add('ANDROID_HOME=' + FSettings.AndroidSdkRoot);
@@ -463,6 +688,27 @@ begin
     Exit;
   end;
 
+  // Verificação de segurança adicional caso o aparelho tenha mudado ou não verificado antes
+  if (not FOverwriteConfirmed) and FDevManager.IsPackageInstalled(FActiveDevice.Serial, FCurrentPackageName) then
+  begin
+    if MessageDlg('LazDroid - Confirmação de Instalação',
+         Format('O aplicativo "%s" com o identificador:' + LineEnding +
+                '  %s' + LineEnding +
+                'já está instalado no aparelho (%s).' + LineEnding + LineEnding +
+                'Deseja sobrescrever (passar por cima) da versão existente?',
+                [FCurrentAppTitle, FCurrentPackageName, FActiveDevice.Model]),
+         mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
+    begin
+      LogMsg(Format('Instalação cancelada pelo usuário. O aplicativo "%s" existente foi mantido.', [FCurrentAppTitle]), luWarning);
+      FIsRunning := False;
+      SetStage(stageIdle, 'Instalação cancelada pelo usuário.');
+      if Assigned(FOnPipelineFinish) then
+        FOnPipelineFinish(False, 'Instalação cancelada pelo usuário.');
+      Exit;
+    end;
+    FOverwriteConfirmed := True;
+  end;
+
   Params := TStringList.Create;
   try
     Params.Add('-s');
@@ -489,11 +735,15 @@ end;
 procedure TLazDroidPipeline.RunLaunch;
 var
   Params: TStringList;
-  ComponentTarget: string;
+  ComponentTarget, TargetAct: string;
 begin
   SetStage(stageLaunch, 'Iniciando Activity principal no dispositivo...');
 
-  ComponentTarget := FSettings.PackageName + '/' + FSettings.ActivityName;
+  TargetAct := Trim(FSettings.ActivityName);
+  if (TargetAct = '') or (TargetAct = 'android.app.NativeActivity') then
+    TargetAct := 'com.pascal.lclproject.LCLActivity';
+
+  ComponentTarget := FCurrentPackageName + '/' + TargetAct;
 
   Params := TStringList.Create;
   try
@@ -519,9 +769,87 @@ begin
   end;
 end;
 
+procedure TLazDroidPipeline.SetupGdbServer;
+var
+  AppPid: string;
+  OutputStr: string;
+  Params: TStringList;
+  Pkg: string;
+  GdbExe: string;
+begin
+  Pkg := Trim(FCurrentPackageName);
+  if Pkg = '' then Pkg := DEFAULT_PACKAGE_NAME;
+
+  LogMsg('=========================================================', luSuccess);
+  LogMsg('  CONFIGURANDO SESSÃO DE DEPURAÇÃO GDB (DELPHI STYLE)    ', luSuccess);
+  LogMsg('=========================================================', luSuccess);
+
+  // 1. Redireciona a porta TCP 5039 do Android para o Windows Host
+  FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'forward', 'tcp:5039', 'tcp:5039'], OutputStr);
+  LogMsg('>>> [DEBUG] Porta TCP 5039 redirecionada via ADB (localhost:5039 <-> celular:5039).', luInfo);
+
+  // 2. Aguarda a inicialização do processo da Activity e detecta o PID
+  Sleep(1200);
+  if FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell', 'pidof', Pkg], OutputStr) = 0 then
+    AppPid := Trim(OutputStr)
+  else
+    AppPid := '';
+
+  if AppPid = '' then
+  begin
+    LogMsg('AVISO: Não foi possível obter o PID de ' + Pkg + ' para attach automático do GDB.', luWarning);
+    Exit;
+  end;
+
+  LogMsg(Format('>>> [DEBUG] Aplicação Android detectada com PID: %s', [AppPid]), luSuccess);
+
+  // 3. Prepara o binário do gdbserver se necessário no diretório da app
+  FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell',
+    'run-as', Pkg, 'cp', '/data/local/tmp/gdbserver', '/data/data/' + Pkg + '/gdbserver'], OutputStr);
+  FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell',
+    'run-as', Pkg, 'chmod', '755', '/data/data/' + Pkg + '/gdbserver'], OutputStr);
+
+  // 4. Inicia o gdbserver em background no dispositivo anexado ao PID
+  if Assigned(FGdbServerRunner) then
+  begin
+    FGdbServerRunner.RequestCancel;
+    FGdbServerRunner := nil;
+  end;
+
+  Params := TStringList.Create;
+  try
+    Params.Add('-s');
+    Params.Add(FActiveDevice.Serial);
+    Params.Add('shell');
+    Params.Add('run-as');
+    Params.Add(Pkg);
+    Params.Add('/data/data/' + Pkg + '/gdbserver');
+    Params.Add(':5039');
+    Params.Add('--attach');
+    Params.Add(AppPid);
+
+    FGdbServerRunner := TLazDroidProcessThread.Create(
+      FSettings.AdbPath,
+      Params,
+      FScaffoldPath
+    );
+    FGdbServerRunner.Start;
+  finally
+    Params.Free;
+  end;
+
+  GdbExe := IncludeTrailingPathDelimiter(FSettings.AndroidNdkRoot) + 'prebuilt\windows-x86_64\bin\gdb.exe';
+
+  LogMsg('>>> [DEBUG] GDB Server ATIVO no celular aguardando conexão em localhost:5039!', luSuccess);
+  LogMsg('>>> [DEBUG] GDB Client NDK: ' + GdbExe, luInfo);
+  LogMsg('>>> [DEBUG] O depurador do Lazarus (ou GDB Client) pode agora conectar em localhost:5039.', luInfo);
+  LogMsg('=========================================================', luSuccess);
+end;
+
 procedure TLazDroidPipeline.StartLogcat;
 var
   Params: TStringList;
+  DummyStr: string;
 begin
   SetStage(stageLogcat, 'Conectado ao Logcat. Monitorando logs da aplicação...');
 
@@ -535,7 +863,7 @@ begin
   end;
 
   // Limpa buffer de logs anterior no aparelho
-  FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'logcat', '-c'], FOutputApkPath);
+  FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'logcat', '-c'], DummyStr);
 
   Params := TStringList.Create;
   try
@@ -545,11 +873,15 @@ begin
     Params.Add('-v');
     Params.Add('time');
     Params.Add('-s');
+    Params.Add('lclapp:*');
     Params.Add('LazApp:*');
-    Params.Add('AndroidRuntime:E');
+    Params.Add('AndroidRuntime:*');
     Params.Add('DEBUG:*');
+    Params.Add('libc:*');
+    Params.Add('System.out:*');
+    Params.Add('*:E');
 
-    LogMsg('Logcat ativo (Filtro: LazApp:* AndroidRuntime:E DEBUG:*)', luLogcat);
+    LogMsg('Logcat ativo (Filtro: lclapp:* LazApp:* AndroidRuntime:* DEBUG:* libc:*)', luLogcat);
 
     FLogcatRunner := TLazDroidProcessThread.Create(
       FSettings.AdbPath,
@@ -589,7 +921,12 @@ begin
     stagePascalBuild: RunPackaging;
     stagePackaging:   RunDeploy;
     stageDeploy:      RunLaunch;
-    stageLaunch:      StartLogcat;
+    stageLaunch:
+    begin
+      if FIsDebugMode then
+        SetupGdbServer;
+      StartLogcat;
+    end;
   end;
 end;
 

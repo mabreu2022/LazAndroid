@@ -8,19 +8,19 @@
     <application
         android:allowBackup="true"
         android:label="@string/app_name"
-        android:hasCode="false"
-        android:hardwareAccelerated="true">
+        android:theme="@style/AppTheme"
+        android:hasCode="true"
+        android:extractNativeLibs="true"
+        android:hardwareAccelerated="false">
 
         <activity
-            android:name="android.app.NativeActivity"
+            android:name="com.pascal.lclproject.LCLActivity"
             android:label="@string/app_name"
+            android:theme="@style/AppTheme"
             android:exported="true"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
             android:configChanges="orientation|keyboardHidden|screenSize|screenLayout|smallestScreenSize|uiMode">
-            
-            <!-- Aponta para liblazapp.so compilada pelo Free Pascal -->
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="lazapp" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

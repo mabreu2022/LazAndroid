@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><title>Detalhes Do Pedido - VendaForce Mobile</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100%;margin:0;padding:0;min-height:100%;}body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "secondary-fixed": "#85f8c4", "error": "#ba1a1a", "on-error-container": "#93000a", "secondary": "#006c4a", "primary-fixed": "#d2e4ff", "surface-container-low": "#f2f3ff", "primary": "#00355f", "surface-bright": "#faf8ff", "secondary-container": "#82f5c1", "on-tertiary": "#ffffff", "tertiary-container": "#733c00", "background": "#faf8ff", "on-tertiary-container": "#ffa658", "tertiary-fixed-dim": "#ffb77d", "surface-container-lowest": "#ffffff", "primary-fixed-dim": "#a0c9ff", "surface-tint": "#2d6197", "tertiary-fixed": "#ffdcc3", "on-surface": "#131b2e", "on-secondary-fixed": "#002114", "outline": "#727780", "inverse-primary": "#a0c9ff", "on-tertiary-fixed": "#2f1500", "tertiary": "#522900", "surface-container-high": "#e2e7ff", "on-surface-variant": "#42474f", "surface": "#faf8ff", "primary-container": "#0f4c81", "on-secondary-fixed-variant": "#005137", "on-primary": "#ffffff", "surface-dim": "#d2d9f4", "on-background": "#131b2e", "on-tertiary-fixed-variant": "#6e3900", "error-container": "#ffdad6", "on-secondary": "#ffffff", "surface-container-highest": "#dae2fd", "on-error": "#ffffff", "on-secondary-container": "#00714e", "secondary-fixed-dim": "#68dba9", "outline-variant": "#c2c7d1", "surface-container": "#eaedff", "surface-variant": "#dae2fd", "on-primary-container": "#8ebdf9", "inverse-surface": "#283044", "on-primary-fixed-variant": "#07497d", "inverse-on-surface": "#eef0ff", "on-primary-fixed": "#001c37" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-lg": "1rem", "space-md": "0.75rem", "margin-tablet": "1.5rem", "margin": "1rem", "space-sm": "0.5rem", "space-xl": "1.5rem", "gutter-compact": "0.5rem", "space-xs": "0.25rem", "gutter": "1rem" }, fontFamily: { "body-lg": ["Inter"], "label-lg": ["Inter"], "label-md": ["Inter"], "headline-lg": ["Inter"], "headline-sm": ["Inter"], "headline-md": ["Inter"], "numeric-table": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"], "display-lg": ["Inter"], "body-sm": ["Inter"] }, fontSize: { "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "700" }], "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "numeric-table": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700" }], "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }] } } } };</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-xs min-w-0"><button aria-label="Voltar" class="w-11 h-11 -ml-2 flex items-center justify-center rounded-full text-on-surface hover:text-primary active:bg-surface-container-high transition-colors" onclick="history.back()" type="button"><span class="material-symbols-outlined text-[24px]">arrow_back</span></button><img alt="Logo VendaForce Mobile" class="h-8 w-auto object-contain flex-shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1V0fzupMpAZCipATgeshU7uMOIvAhRXnuZYmHHn0TPwGeVqYt6gHhNQ0_Ied0v-gqAJnWIHoICTzXkQoAGSn6EOee-SL_MopwP1AjbBwA-RjdQU-fPMeEuxaifqjckmWXiLBmF8zPFax1fi2gQ80kcVkUkyenZhl7rrYn8uuOHGpqw3eEVpiPHmtgxkoCdkem4hd5UWNcHZleOQO8q4JNz5VG05kcaZCzj1g-6l7So_n4tjfTCGylrHNDUA"/><div class="flex flex-col min-w-0 pl-1"><h1 class="font-headline-sm text-headline-sm text-on-surface truncate leading-tight">Detalhes Do Pedido</h1></div></div><div class="flex items-center gap-space-xs flex-shrink-0"><button aria-label="Mais opções" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary active:bg-surface-container-high transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">more_vert</span></button><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDW6PSF0QIHcAqV0Im-OnmkJHxOOuXm_siS-6Jj8qPh_JvsKv4eSOsQlL9zBL1WVtYXOZA_bPrYfX5XzmFfjpeS5Hac0VpPKkle8OPywFqZ4V1gPcN2cLipJORDlukTDCSv_gFkc8biZmMHe_l167iLxSi1VllTla_L5rP-IMf6K9wqqTovNGWWCqTy7X7UOJ2BSQ0XEiB_Yygdw7vs5eL1LMtOtlLDYiEkaDhiMbrolDBUDtYcD3B4rw"/></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-safe bg-surface min-h-screen"><div class="flex flex-col w-full pb-8">
+<!-- Status Banner & Order Identity Hero -->
+<div class="px-margin pt-4 pb-2">
+<div class="bg-surface-container rounded-xl p-space-md shadow-sm relative overflow-hidden">
+<div class="absolute -right-6 -bottom-6 w-24 h-24 bg-secondary-fixed/30 rounded-full blur-xl pointer-events-none"></div>
+<div class="flex items-start justify-between gap-space-sm mb-3">
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Pedido de Venda</span>
+<h2 class="font-headline-md text-headline-md text-primary font-bold tracking-tight">#PED-2024-8942</h2>
+</div>
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary-container text-on-secondary-container shadow-sm flex-shrink-0">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">cloud_done</span>
+<span class="font-label-sm text-label-sm font-semibold">ERP Sincronizado</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2 pt-2 border-none">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-primary">schedule</span>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-outline">Emissão</span>
+<span class="font-body-sm text-body-sm font-medium text-on-surface truncate">Hoje, 11:28</span>
+</div>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-secondary">draw</span>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-outline">Tipo</span>
+<span class="font-body-sm text-body-sm font-medium text-on-surface truncate">Presencial Assinado</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Representative Commission & Profitability Card -->
+<div class="px-margin py-2">
+<div class="bg-primary text-on-primary rounded-xl p-space-md shadow-md flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-11 h-11 rounded-lg bg-on-primary/10 flex items-center justify-center flex-shrink-0 text-on-primary">
+<span class="material-symbols-outlined text-[24px]">payments</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-primary-fixed-dim uppercase tracking-wide">Sua Comissão Garantida</span>
+<div class="flex items-baseline gap-1.5">
+<span class="font-headline-sm text-headline-sm text-on-primary font-bold">R$ 243,20</span>
+<span class="font-label-sm text-label-sm text-secondary-fixed font-semibold">(5,0%)</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-label-sm text-label-sm text-primary-fixed-dim">Rentabilidade</span>
+<span class="inline-flex items-center gap-1 font-label-md text-label-md px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-bold mt-0.5">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+          Margem A
+        </span>
+</div>
+</div>
+</div>
+<!-- Customer Card -->
+<div class="px-margin py-2">
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2 min-w-0">
+<span class="material-symbols-outlined text-[20px] text-primary">storefront</span>
+<span class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant font-bold">Dados do Cliente</span>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-container-high text-primary font-semibold">Conta Ativa</span>
+</div>
+<div class="flex flex-col gap-2">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Supermercado Central Ltda</h3>
+<span class="font-body-sm text-body-sm text-on-surface-variant">CNPJ: 12.345.678/0001-90</span>
+</div>
+<div class="flex items-start gap-2.5 pt-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-primary mt-0.5">location_on</span>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface">Av. Brigadeiro Faria Lima, 2400 - Pinheiros</span>
+<span class="font-body-sm text-body-sm text-outline">São Paulo - SP • CEP 01452-000</span>
+</div>
+</div>
+<div class="flex items-center gap-2.5 pt-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-primary">person</span>
+<span class="font-body-sm text-body-sm text-on-surface"><strong class="font-semibold">Contato:</strong> Sr. Marcos (Comprador Chefe)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Commercial Terms & Logistics -->
+<div class="px-margin py-2">
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-[20px] text-primary">local_shipping</span>
+<span class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant font-bold">Condição Comercial &amp; Logística</span>
+</div>
+<div class="grid grid-cols-1 gap-3">
+<div class="flex items-start gap-3 p-2.5 rounded-lg bg-surface-container-low">
+<span class="material-symbols-outlined text-[20px] text-primary mt-0.5">receipt_long</span>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-outline">Pagamento</span>
+<span class="font-label-md text-label-md text-on-surface">Boleto Bancário (3 parcelas)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Vencimentos: 28 / 42 / 56 dias</span>
+</div>
+</div>
+<div class="flex items-start gap-3 p-2.5 rounded-lg bg-surface-container-low">
+<span class="material-symbols-outlined text-[20px] text-secondary mt-0.5">speed</span>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-outline">Modalidade de Frete &amp; Envio</span>
+<span class="font-label-md text-label-md text-on-surface">Frete CIF (Incluso)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Previsão: 48h úteis • Transportadora Rápido SP</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Collapsible Order Items Extrato -->
+<div class="px-margin py-2">
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+<button class="w-full p-space-md flex items-center justify-between text-left active:bg-surface-container-low transition-colors" id="toggle-items-btn" onclick="toggleItemsList()" type="button">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-primary">inventory_2</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant font-bold">Itens do Pedido (3)</span>
+<span class="font-body-sm text-body-sm text-outline">Toque para ver detalhes unitários</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-lg text-label-lg font-bold text-primary">R$ 4.864,00</span>
+<span class="material-symbols-outlined text-[24px] text-on-surface-variant transition-transform duration-200" id="items-chevron">expand_less</span>
+</div>
+</button>
+<!-- Items List -->
+<div class="flex flex-col px-space-md pb-space-md gap-3" id="items-container">
+<!-- Item 1 -->
+<div class="flex items-center gap-3 p-2 rounded-lg bg-surface-container-low">
+<img class="w-12 h-12 rounded-lg object-cover flex-shrink-0" data-alt="Close-up of premium olive oil glass bottles arranged cleanly in a commercial store warehouse setting with soft industrial lighting and warm amber hues." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHhLzknbNbQOJQgEHtEFDe4GRtKkJPQ-qsJkEj_VOhZT3UfrgLV5N61O_h1MAM_14tc0qMg7sNAWI9LuG2B-a5AwEHjHNT3meDl-4T--rebGFKt0QL_7qb-pUR4X6A3GvrPjb2Yi-ppOw2esbBPLmuBzfGIPfol63cOhPlmMvx4mG6_vt-Mmbue2CzjUexnxm7U2pY72QwG6v20aL9tVEOiY8_WZWW2tx5QkEPAo5q6Q6n00aplJ52pQ"/>
+<div class="flex flex-col flex-1 min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate font-semibold">Azeite de Oliva Extra Virgem 500ml</span>
+<span class="font-body-sm text-body-sm text-outline">SKU: AZ-7721 • Caixa c/ 12 un</span>
+<div class="flex items-center justify-between mt-1">
+<span class="font-body-sm text-body-sm text-on-surface-variant">8 cx × R$ 240,00</span>
+<span class="font-numeric-table text-numeric-table text-on-surface font-bold">R$ 1.920,00</span>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex items-center gap-3 p-2 rounded-lg bg-surface-container-low">
+<img class="w-12 h-12 rounded-lg object-cover flex-shrink-0" data-alt="Stacked vacuum-packed specialty coffee bean bags in rustic craft paper packaging against a bright minimalist retail shelf." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBV8egJz3OhF98pqTEnZw7rY0P8zN1mYKoUR7NZoVKQ5ExAbEFaK-YBjXaHpGzedjkEBn1vIND7MbRp87y-0WsmcPHpU5S-qgjcu_9pWtZvvUvSz6Qpe0nl7_RUX_4LmjQT74TdP_5uC5bB8e7UYwBupilcriqSRdI_4ppXeAL91TJZHELPgKH5nd11P_4Tn4Cooy3ALrDLZSmUY7OAQgw3nPGAbhYME3rpDnhgBWNNB29oo5Gb0a5X8Q"/>
+<div class="flex flex-col flex-1 min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate font-semibold">Café Gourmet Especial Torrado 1kg</span>
+<span class="font-body-sm text-body-sm text-outline">SKU: CF-9042 • Fardo c/ 10 un</span>
+<div class="flex items-center justify-between mt-1">
+<span class="font-body-sm text-body-sm text-on-surface-variant">6 fds × R$ 314,00</span>
+<span class="font-numeric-table text-numeric-table text-on-surface font-bold">R$ 1.884,00</span>
+</div>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="flex items-center gap-3 p-2 rounded-lg bg-surface-container-low">
+<img class="w-12 h-12 rounded-lg object-cover flex-shrink-0" data-alt="Artisanal organic pasta boxes with natural texture neatly displayed in retail boxes under neutral ambient daylight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBngS87pP5LT2Y_57XYAOi_F9gsKDUi-3TgGvFImxf2veY4DlJmikG3EdBFlJAk9zE3KfjWq4N1gRlJqUvdMsmzgb4GQy9E-jBoucjoqcF1EaKiUyUm-dt18fHPqyzNiz8rVYEn2nJI7zIjsCMQRwFNTdWWORic9v7jUM992eDgSZuFiLlYvqUfzfhjsxUL_EaQFB4pwqFWjpCTcArBtzKLSihpFM_8PM5qc1eebng84UIoXlTOhFbUfA"/>
+<div class="flex flex-col flex-1 min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate font-semibold">Massa Artesanal Grano Duro 500g</span>
+<span class="font-body-sm text-body-sm text-outline">SKU: MA-3310 • Caixa c/ 20 un</span>
+<div class="flex items-center justify-between mt-1">
+<span class="font-body-sm text-body-sm text-on-surface-variant">8 cx × R$ 132,50</span>
+<span class="font-numeric-table text-numeric-table text-on-surface font-bold">R$ 1.060,00</span>
+</div>
+</div>
+</div>
+<!-- Subtotal calculation box -->
+<div class="p-3 rounded-lg bg-surface-container flex flex-col gap-1.5 mt-1">
+<div class="flex justify-between items-center text-body-sm font-body-sm text-on-surface-variant">
+<span>Subtotal Bruto</span>
+<span class="font-numeric-table text-numeric-table text-on-surface">R$ 4.864,00</span>
+</div>
+<div class="flex justify-between items-center text-body-sm font-body-sm text-on-surface-variant">
+<span>Frete (CIF)</span>
+<span class="font-label-sm text-label-sm text-secondary font-bold">Grátis</span>
+</div>
+<div class="flex justify-between items-center text-body-sm font-body-sm text-on-surface-variant">
+<span>Descontos Comerciais</span>
+<span class="font-numeric-table text-numeric-table text-on-surface">R$ 0,00</span>
+</div>
+<div class="flex justify-between items-center pt-2 mt-1 border-t border-transparent text-primary">
+<span class="font-label-lg text-label-lg font-bold">Total do Pedido</span>
+<span class="font-headline-sm text-headline-sm font-bold">R$ 4.864,00</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Digital Signature Proof -->
+<div class="px-margin py-2">
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-primary">verified</span>
+<span class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant font-bold">Assinatura Digital Capturada</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+          Válido
+        </span>
+</div>
+<div class="rounded-lg bg-surface-container-low p-4 flex flex-col items-center justify-center relative">
+<!-- Digital Signature Vector Simulation -->
+<div class="w-full h-20 flex items-center justify-center">
+<svg class="w-48 h-16 text-primary" fill="none" viewbox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+<path d="M15 45 C30 15, 45 50, 60 25 C75 5, 80 55, 95 30 C110 10, 115 40, 130 35 C145 30, 160 50, 185 20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+<path d="M70 42 C85 45, 120 40, 150 42" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"></path>
+</svg>
+</div>
+<div class="w-full flex items-center justify-between pt-2 border-t border-transparent text-outline">
+<span class="font-body-sm text-body-sm">Marcos Vinícius de Alencar</span>
+<span class="font-label-sm text-label-sm">IP: 189.120.44.18 • 11:28:44</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Action CTAs -->
+<div class="px-margin pt-4 flex flex-col gap-3">
+<!-- Primary Post-Sale Sharing Actions -->
+<div class="grid grid-cols-2 gap-3">
+<button class="h-12 rounded-lg bg-secondary text-on-secondary font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-sm active:opacity-90 transition-opacity" onclick="triggerFeedback('WhatsApp aberto com PDF do Pedido')" type="button">
+<span class="material-symbols-outlined text-[20px]">share</span>
+<span>WhatsApp</span>
+</button>
+<button class="h-12 rounded-lg bg-surface-container-highest text-on-surface font-label-lg text-label-lg flex items-center justify-center gap-2 active:bg-surface-container-high transition-colors" onclick="triggerFeedback('2ª via enviada com sucesso!')" type="button">
+<span class="material-symbols-outlined text-[20px] text-primary">mail</span>
+<span>Enviar E-mail</span>
+</button>
+</div>
+<!-- Return to Route Button -->
+<button class="h-12 w-full rounded-lg bg-primary-container text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-md active:bg-primary transition-colors" onclick="window.history.back()" type="button">
+<span class="material-symbols-outlined text-[20px]">route</span>
+<span>Voltar ao Roteiro de Hoje</span>
+</button>
+</div>
+<!-- Interactive Toast Notification container -->
+<div class="fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2.5 rounded-full bg-inverse-surface text-inverse-on-surface font-label-md text-label-md shadow-xl flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none translate-y-4 z-50" id="toast">
+<span class="material-symbols-outlined text-[18px] text-secondary-fixed">check_circle</span>
+<span id="toast-text">Mensagem enviada</span>
+</div>
+</div>
+<script>
+  function toggleItemsList() {
+    const container = document.getElementById('items-container');
+    const chevron = document.getElementById('items-chevron');
+    if (!container || !chevron) return;
+    
+    if (container.classList.contains('hidden')) {
+      container.classList.remove('hidden');
+      chevron.style.transform = 'rotate(0deg)';
+    } else {
+      container.classList.add('hidden');
+      chevron.style.transform = 'rotate(180deg)';
+    }
+  }
+
+  function triggerFeedback(message) {
+    const toast = document.getElementById('toast');
+    const toastText = document.getElementById('toast-text');
+    if (!toast || !toastText) return;
+
+    toastText.textContent = message;
+    toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+    toast.classList.add('opacity-100', 'translate-y-0');
+
+    setTimeout(() => {
+      toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+      toast.classList.remove('opacity-100', 'translate-y-0');
+    }, 2400);
+  }
+</script></main></body></html>

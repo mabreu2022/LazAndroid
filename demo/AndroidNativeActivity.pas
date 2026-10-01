@@ -107,6 +107,49 @@ procedure ANativeActivity_setWindowFlags(activity: PANativeActivity;
   addFlags, removeFlags: Cardinal); cdecl;
   external LIB_ANDROID name 'ANativeActivity_setWindowFlags';
 
+const
+  // Tipos de Eventos de Entrada
+  AINPUT_EVENT_TYPE_KEY    = 1;
+  AINPUT_EVENT_TYPE_MOTION = 2;
+
+  // Ações de Toque (Motion)
+  AMOTION_EVENT_ACTION_MASK         = $ff;
+  AMOTION_EVENT_ACTION_DOWN         = 0;
+  AMOTION_EVENT_ACTION_UP           = 1;
+  AMOTION_EVENT_ACTION_MOVE         = 2;
+  AMOTION_EVENT_ACTION_CANCEL       = 3;
+  AMOTION_EVENT_ACTION_POINTER_DOWN = 5;
+  AMOTION_EVENT_ACTION_POINTER_UP   = 6;
+
+type
+  PAInputQueue = Pointer;
+  PAInputEvent = Pointer;
+  PPAInputEvent = ^PAInputEvent;
+
+function AInputQueue_hasEvents(queue: PAInputQueue): LongInt; cdecl;
+  external LIB_ANDROID name 'AInputQueue_hasEvents';
+
+function AInputQueue_getEvent(queue: PAInputQueue; outEvent: PPAInputEvent): LongInt; cdecl;
+  external LIB_ANDROID name 'AInputQueue_getEvent';
+
+function AInputQueue_preDispatchEvent(queue: PAInputQueue; event: PAInputEvent): LongInt; cdecl;
+  external LIB_ANDROID name 'AInputQueue_preDispatchEvent';
+
+procedure AInputQueue_finishEvent(queue: PAInputQueue; event: PAInputEvent; handled: LongInt); cdecl;
+  external LIB_ANDROID name 'AInputQueue_finishEvent';
+
+function AInputEvent_getType(event: PAInputEvent): LongInt; cdecl;
+  external LIB_ANDROID name 'AInputEvent_getType';
+
+function AMotionEvent_getAction(event: PAInputEvent): LongInt; cdecl;
+  external LIB_ANDROID name 'AMotionEvent_getAction';
+
+function AMotionEvent_getX(event: PAInputEvent; pointer_index: size_t): Single; cdecl;
+  external LIB_ANDROID name 'AMotionEvent_getX';
+
+function AMotionEvent_getY(event: PAInputEvent; pointer_index: size_t): Single; cdecl;
+  external LIB_ANDROID name 'AMotionEvent_getY';
+
 implementation
 
 end.

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><title>Novo Pedido - VendaForce Mobile</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100%;margin:0;padding:0;min-height:100%;}body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "secondary-fixed": "#85f8c4", "error": "#ba1a1a", "on-error-container": "#93000a", "secondary": "#006c4a", "primary-fixed": "#d2e4ff", "surface-container-low": "#f2f3ff", "primary": "#00355f", "surface-bright": "#faf8ff", "secondary-container": "#82f5c1", "on-tertiary": "#ffffff", "tertiary-container": "#733c00", "background": "#faf8ff", "on-tertiary-container": "#ffa658", "tertiary-fixed-dim": "#ffb77d", "surface-container-lowest": "#ffffff", "primary-fixed-dim": "#a0c9ff", "surface-tint": "#2d6197", "tertiary-fixed": "#ffdcc3", "on-surface": "#131b2e", "on-secondary-fixed": "#002114", "outline": "#727780", "inverse-primary": "#a0c9ff", "on-tertiary-fixed": "#2f1500", "tertiary": "#522900", "surface-container-high": "#e2e7ff", "on-surface-variant": "#42474f", "surface": "#faf8ff", "primary-container": "#0f4c81", "on-secondary-fixed-variant": "#005137", "on-primary": "#ffffff", "surface-dim": "#d2d9f4", "on-background": "#131b2e", "on-tertiary-fixed-variant": "#6e3900", "error-container": "#ffdad6", "on-secondary": "#ffffff", "surface-container-highest": "#dae2fd", "on-error": "#ffffff", "on-secondary-container": "#00714e", "secondary-fixed-dim": "#68dba9", "outline-variant": "#c2c7d1", "surface-container": "#eaedff", "surface-variant": "#dae2fd", "on-primary-container": "#8ebdf9", "inverse-surface": "#283044", "on-primary-fixed-variant": "#07497d", "inverse-on-surface": "#eef0ff", "on-primary-fixed": "#001c37" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-lg": "1rem", "space-md": "0.75rem", "margin-tablet": "1.5rem", "margin": "1rem", "space-sm": "0.5rem", "space-xl": "1.5rem", "gutter-compact": "0.5rem", "space-xs": "0.25rem", "gutter": "1rem" }, fontFamily: { "body-lg": ["Inter"], "label-lg": ["Inter"], "label-md": ["Inter"], "headline-lg": ["Inter"], "headline-sm": ["Inter"], "headline-md": ["Inter"], "numeric-table": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"], "display-lg": ["Inter"], "body-sm": ["Inter"] }, fontSize: { "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "700" }], "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "numeric-table": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700" }], "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }] } } } };</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-xs min-w-0"><button aria-label="Voltar" class="w-11 h-11 -ml-2 flex items-center justify-center rounded-full text-on-surface hover:text-primary active:bg-surface-container-high transition-colors" onclick="history.back()" type="button"><span class="material-symbols-outlined text-[24px]">arrow_back</span></button><img alt="Logo VendaForce Mobile" class="h-8 w-auto object-contain flex-shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1V0fzupMpAZCipATgeshU7uMOIvAhRXnuZYmHHn0TPwGeVqYt6gHhNQ0_Ied0v-gqAJnWIHoICTzXkQoAGSn6EOee-SL_MopwP1AjbBwA-RjdQU-fPMeEuxaifqjckmWXiLBmF8zPFax1fi2gQ80kcVkUkyenZhl7rrYn8uuOHGpqw3eEVpiPHmtgxkoCdkem4hd5UWNcHZleOQO8q4JNz5VG05kcaZCzj1g-6l7So_n4tjfTCGylrHNDUA"/><div class="flex flex-col min-w-0 pl-1"><h1 class="font-headline-sm text-headline-sm text-on-surface truncate leading-tight">Novo Pedido</h1></div></div><div class="flex items-center gap-space-xs flex-shrink-0"><button aria-label="Mais opções" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary active:bg-surface-container-high transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">more_vert</span></button><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDW6PSF0QIHcAqV0Im-OnmkJHxOOuXm_siS-6Jj8qPh_JvsKv4eSOsQlL9zBL1WVtYXOZA_bPrYfX5XzmFfjpeS5Hac0VpPKkle8OPywFqZ4V1gPcN2cLipJORDlukTDCSv_gFkc8biZmMHe_l167iLxSi1VllTla_L5rP-IMf6K9wqqTovNGWWCqTy7X7UOJ2BSQ0XEiB_Yygdw7vs5eL1LMtOtlLDYiEkaDhiMbrolDBUDtYcD3B4rw"/></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-safe bg-surface min-h-screen"><div class="flex flex-col w-full pb-32">
+<!-- Status Offline/Online Bar -->
+<section class="px-margin pt-space-sm pb-space-xs">
+<div class="flex items-center justify-between bg-surface-container px-space-md py-space-xs rounded-full shadow-sm">
+<div class="flex items-center gap-space-xs">
+<span class="inline-block w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Modo Online</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• Base SP Sincronizada</span>
+</div>
+<div class="flex items-center gap-1 font-label-md text-label-md text-primary">
+<span class="material-symbols-outlined text-[16px]">cloud_done</span>
+<span>Pedido #8492</span>
+</div>
+</div>
+</section>
+<!-- Context Header: Client Details & Credit Badge -->
+<section class="px-margin pt-space-xs">
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm space-y-space-sm">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="min-w-0">
+<div class="flex items-center gap-space-xs mb-1">
+<span class="material-symbols-outlined text-primary text-[18px]">storefront</span>
+<span class="font-label-sm text-label-sm text-primary uppercase">Cliente Ativo</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface truncate">Supermercado Central Ltda</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">CNPJ: 14.820.312/0001-95</p>
+</div>
+<div class="flex flex-col items-end text-right flex-shrink-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Limite Disponível</span>
+<span class="font-headline-sm text-headline-sm text-secondary font-bold">R$ 18.200,00</span>
+<div class="w-20 h-1.5 bg-surface-container rounded-full mt-1 overflow-hidden">
+<div class="h-full bg-secondary rounded-full" style="width: 78%;"></div>
+</div>
+</div>
+</div>
+<!-- Quick Commercial Terms Badges -->
+<div class="grid grid-cols-2 gap-space-xs pt-1">
+<div class="bg-surface-container-low px-space-sm py-1.5 rounded-lg flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-on-surface-variant text-[16px]">sell</span>
+<div class="min-w-0">
+<span class="block font-label-sm text-label-sm text-on-surface-variant truncate">Tabela Aplicada</span>
+<span class="block font-label-md text-label-md text-on-surface truncate">Atacado SP - Tab A</span>
+</div>
+</div>
+<div class="bg-surface-container-low px-space-sm py-1.5 rounded-lg flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-on-surface-variant text-[16px]">calendar_month</span>
+<div class="min-w-0">
+<span class="block font-label-sm text-label-sm text-on-surface-variant truncate">Condição Prazo</span>
+<span class="block font-label-md text-label-md text-on-surface truncate">28/42/56 DDL</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Catalog Search & Barcode Scanner Bar -->
+<section class="px-margin pt-space-md space-y-space-sm">
+<div class="flex items-center gap-space-xs">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">search</span>
+<input class="w-full h-12 pl-10 pr-4 bg-surface-container-lowest rounded-lg font-body-md text-body-md text-on-surface placeholder:text-outline shadow-sm focus:outline-none focus:bg-surface-container-high transition-colors" placeholder="Buscar SKU, código ou descrição..." type="text"/>
+</div>
+<button aria-label="Escanear Código de Barras" class="h-12 w-12 flex-shrink-0 bg-primary-container text-on-primary rounded-lg flex items-center justify-center shadow-sm active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[24px]">barcode_scanner</span>
+</button>
+</div>
+<!-- Category Pills -->
+<div class="flex items-center gap-space-xs overflow-x-auto no-scrollbar py-0.5">
+<button class="flex-shrink-0 px-space-md py-1.5 rounded-full bg-primary text-on-primary font-label-md text-label-md flex items-center gap-1 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">local_fire_department</span>
+        Mais Vendidos
+      </button>
+<button class="flex-shrink-0 px-space-md py-1.5 rounded-full bg-surface-container-lowest text-on-surface font-label-md text-label-md hover:bg-surface-container shadow-sm transition-colors" type="button">
+        Alimentos
+      </button>
+<button class="flex-shrink-0 px-space-md py-1.5 rounded-full bg-surface-container-lowest text-on-surface font-label-md text-label-md hover:bg-surface-container shadow-sm transition-colors" type="button">
+        Bebidas
+      </button>
+<button class="flex-shrink-0 px-space-md py-1.5 rounded-full bg-surface-container-lowest text-on-surface font-label-md text-label-md hover:bg-surface-container shadow-sm transition-colors" type="button">
+        Higiene &amp; Limpeza
+      </button>
+<button class="flex-shrink-0 px-space-md py-1.5 rounded-full bg-surface-container-lowest text-on-surface font-label-md text-label-md hover:bg-surface-container shadow-sm transition-colors" type="button">
+        Mercearia Doce
+      </button>
+</div>
+</section>
+<!-- Items in Cart Header -->
+<section class="px-margin pt-space-lg">
+<div class="flex items-center justify-between mb-space-xs">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface">Carrinho de Pedido</span>
+<span class="bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm px-2 py-0.5 rounded-full">3 SKUs</span>
+</div>
+<button class="font-label-md text-label-md text-primary hover:text-primary-container transition-colors flex items-center gap-0.5" type="button">
+<span class="material-symbols-outlined text-[16px]">delete_sweep</span>
+        Limpar
+      </button>
+</div>
+<!-- Cart Item 1 -->
+<article class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm mb-space-sm">
+<div class="flex gap-space-md">
+<img class="w-16 h-16 rounded-lg object-cover flex-shrink-0 bg-surface-container" data-alt="Saco de café torrado e moído gourmet premium 500 gramas em fundo neutro com grãos de café torrados dispostos suavemente ao lado, iluminação de estúdio comercial com tons quentes terrosos e atmosfera refinada." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIH3jeI5vt2wezZirbq4pvqaspwSbNoFY1PIlESKW5V_qBao4o5r4o8bUxIeBvhenaWZMgGDQSL9l3yOnbzu0xhoEfBICqKBVlO5VWP4PTCE3qNsbXuNtxKZT1Nm8ioFBOCFrMg69pm0udOxBRjWqc6MCx4eEclCNC5zCdwXrZ6ONa7cn7fYn4SrqSrXvb0vkID2Jd8q66NTo8ngWKX_0wvbiMh4tIghnLnj0QHwQWbPXhvTeo5ifZvA"/>
+<div class="flex-1 min-w-0">
+<div class="flex items-start justify-between gap-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface truncate">Café Premium Torrado 500g</h3>
+<button aria-label="Remover item" class="text-outline hover:text-error transition-colors p-1 -mr-1" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Caixa c/ 20 un • SKU: CAF-8802</p>
+<div class="flex items-center gap-space-xs mt-1.5">
+<span class="bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm px-1.5 py-0.5 rounded">Desc. 5%</span>
+<span class="font-body-sm text-body-sm text-outline line-through">R$ 15,26</span>
+<span class="font-label-md text-label-md text-on-surface">R$ 14,50 un</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between mt-space-md pt-space-xs">
+<div>
+<span class="block font-label-sm text-label-sm text-on-surface-variant">Subtotal Item</span>
+<span class="block font-headline-sm text-headline-sm text-primary font-bold">R$ 2.900,00</span>
+</div>
+<!-- Quantity Tactile Stepper -->
+<div class="flex items-center bg-surface-container-low rounded-lg p-1">
+<button aria-label="Diminuir quantidade" class="w-9 h-9 rounded bg-surface-container-lowest text-on-surface flex items-center justify-center shadow-sm active:scale-90 transition-transform" type="button">
+<span class="material-symbols-outlined text-[18px]">remove</span>
+</button>
+<div class="w-12 text-center">
+<span class="font-numeric-table text-numeric-table text-on-surface font-bold">10</span>
+<span class="block text-[9px] font-label-sm text-on-surface-variant leading-none">cx</span>
+</div>
+<button aria-label="Aumentar quantidade" class="w-9 h-9 rounded bg-primary text-on-primary flex items-center justify-center shadow-sm active:scale-90 transition-transform" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Cart Item 2 -->
+<article class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm mb-space-sm">
+<div class="flex gap-space-md">
+<img class="w-16 h-16 rounded-lg object-cover flex-shrink-0 bg-surface-container" data-alt="Garrafa de vidro de azeite de oliva extra virgem importado de 500 mililitros repousando em superfície limpa com folhas de oliveira ao fundo e gotas frescas de óleo dourado com iluminação límpida e profissional." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOu2nHughyI3gAKTZ6fWa8X-QdGFJT1mlNYBsWo97SzfmgNLEY3iYOlHcKithSnHYLG3zVFpr-bQ6-Lzq0XQVCVoOiu6Or8J-etqsWB3XV-N7xOjo7DhR724aLgRWP96JBqlJsuicwWFD_XlIawJ054X73F_kEYAtlxIPKtDCROul1nUrNkqM9x-MwZ4A0a2Sz_V1cVFiaS_OBcR0kB1oh2erCCEibqGloMApON8u3LrBHrPSXEFIY8Q"/>
+<div class="flex-1 min-w-0">
+<div class="flex items-start justify-between gap-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface truncate">Azeite Extra Virgem 500ml</h3>
+<button aria-label="Remover item" class="text-outline hover:text-error transition-colors p-1 -mr-1" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Caixa c/ 12 un • SKU: AZT-1094</p>
+<div class="flex items-center gap-space-xs mt-1.5">
+<span class="font-label-md text-label-md text-on-surface">R$ 28,00 un</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">(R$ 336,00/cx)</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between mt-space-md pt-space-xs">
+<div>
+<span class="block font-label-sm text-label-sm text-on-surface-variant">Subtotal Item</span>
+<span class="block font-headline-sm text-headline-sm text-primary font-bold">R$ 1.680,00</span>
+</div>
+<div class="flex items-center bg-surface-container-low rounded-lg p-1">
+<button aria-label="Diminuir quantidade" class="w-9 h-9 rounded bg-surface-container-lowest text-on-surface flex items-center justify-center shadow-sm active:scale-90 transition-transform" type="button">
+<span class="material-symbols-outlined text-[18px]">remove</span>
+</button>
+<div class="w-12 text-center">
+<span class="font-numeric-table text-numeric-table text-on-surface font-bold">5</span>
+<span class="block text-[9px] font-label-sm text-on-surface-variant leading-none">cx</span>
+</div>
+<button aria-label="Aumentar quantidade" class="w-9 h-9 rounded bg-primary text-on-primary flex items-center justify-center shadow-sm active:scale-90 transition-transform" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Cart Item 3 -->
+<article class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm mb-space-sm">
+<div class="flex gap-space-md">
+<img class="w-16 h-16 rounded-lg object-cover flex-shrink-0 bg-surface-container" data-alt="Embalagem de fardo de arroz agulhinha tipo 1 longo fino de 5 quilos com acabamento plástico profissional brilhante sobre palete de madeira limpo, com fotografia de produto nítida em alta definição." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCw-6o5RQNDcWCXuKoaGPsSOX4kTEDKV1aAoICW5cqxJiY3AadRrMN_f32eQtn8czdBDEpCMbyA2IUeC6_xwFFmYSHqGINeXwoCg-LUOqTlYYzDDd1XdmS-QMsC1MPC94-4PtMrdLC8umU6bv07FAvYepGqHlT4LC2DMINEBlqwi2BY6JZCan-c2XgUS6ST-00DGffTE8JdoWLLHq3-gSukb_7I3AwbB5DAuHn3PDi388VX1wSjgraSbw"/>
+<div class="flex-1 min-w-0">
+<div class="flex items-start justify-between gap-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface truncate">Arroz Tipo 1 Longo Fino 5kg</h3>
+<button aria-label="Remover item" class="text-outline hover:text-error transition-colors p-1 -mr-1" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Fardo c/ 6 un • SKU: ARR-0043</p>
+<div class="flex items-center gap-space-xs mt-1.5">
+<span class="font-label-md text-label-md text-on-surface">R$ 32,90 un</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">(R$ 197,40/fd)</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between mt-space-md pt-space-xs">
+<div>
+<span class="block font-label-sm text-label-sm text-on-surface-variant">Subtotal Item</span>
+<span class="block font-headline-sm text-headline-sm text-primary font-bold">R$ 540,00</span>
+</div>
+<div class="flex items-center bg-surface-container-low rounded-lg p-1">
+<button aria-label="Diminuir quantidade" class="w-9 h-9 rounded bg-surface-container-lowest text-on-surface flex items-center justify-center shadow-sm active:scale-90 transition-transform" type="button">
+<span class="material-symbols-outlined text-[18px]">remove</span>
+</button>
+<div class="w-12 text-center">
+<span class="font-numeric-table text-numeric-table text-on-surface font-bold">2</span>
+<span class="block text-[9px] font-label-sm text-on-surface-variant leading-none">fd</span>
+</div>
+<button aria-label="Aumentar quantidade" class="w-9 h-9 rounded bg-primary text-on-primary flex items-center justify-center shadow-sm active:scale-90 transition-transform" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</article>
+</section>
+<!-- Negotiation / Bonus & Discount Section -->
+<section class="px-margin pt-space-sm">
+<div class="bg-surface-container-low p-space-md rounded-xl space-y-space-sm shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-tertiary-container text-[20px]">percent</span>
+<h3 class="font-label-lg text-label-lg text-on-surface">Negociação Comercial</h3>
+</div>
+<div class="flex items-center gap-1 bg-surface-container-lowest px-2 py-0.5 rounded-full shadow-xs">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="font-label-sm text-label-sm text-secondary font-bold">Margem Segura: 18.5%</span>
+</div>
+</div>
+<div class="flex gap-space-xs">
+<div class="relative flex-1">
+<input class="w-full h-11 px-3 bg-surface-container-lowest rounded-lg font-label-md text-label-md text-on-surface uppercase focus:outline-none" type="text" value="DESCONTO-PARCEIRO-SP"/>
+<span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-secondary text-[18px]">check_circle</span>
+</div>
+<button class="h-11 px-space-md bg-secondary text-on-secondary font-label-md text-label-md rounded-lg active:scale-95 transition-transform" type="button">
+          Aplicado
+        </button>
+</div>
+<!-- Quick Margin Indicator SVG Bar -->
+<div class="pt-1">
+<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant mb-1">
+<span>Margem do Pedido</span>
+<span class="font-bold text-on-surface">18.5% (Mínimo: 14.0%)</span>
+</div>
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary rounded-full" style="width: 74%;"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Commercial Performance / Commission Real-Time Widget -->
+<section class="px-margin pt-space-md">
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">payments</span>
+</div>
+<div>
+<span class="block font-label-sm text-label-sm text-on-surface-variant">Sua Comissão Estimada</span>
+<span class="block font-headline-sm text-headline-sm text-primary font-bold">R$ 243,20</span>
+</div>
+</div>
+<div class="text-right">
+<span class="inline-block bg-primary-container text-on-primary-container font-label-sm text-label-sm px-2 py-0.5 rounded-full font-bold">5.0% rep</span>
+<span class="block font-body-sm text-body-sm text-on-surface-variant mt-0.5">Pagamento em D+30</span>
+</div>
+</div>
+</section>
+<!-- Sticky Bottom Summary & Action Panel -->
+<aside class="fixed bottom-0 left-0 right-0 z-40 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_-4px_16px_rgba(0,0,0,0.08)] pb-safe">
+<div class="max-w-screen-md mx-auto px-margin pt-space-sm pb-space-sm">
+<!-- Order Breakdown Drawer Trigger / Summary -->
+<div class="flex items-center justify-between pb-space-xs text-on-surface-variant">
+<div class="flex items-center gap-space-xs font-body-sm text-body-sm">
+<span>Volumes: <strong>17 cx</strong></span>
+<span>•</span>
+<span>Peso: <strong>232 kg</strong></span>
+</div>
+<div class="font-body-sm text-body-sm">
+<span>Bruto: R$ 5.120,00</span>
+<span class="text-secondary font-bold ml-1">(-R$ 256,00)</span>
+</div>
+</div>
+<!-- Main Total Figure -->
+<div class="flex items-baseline justify-between py-1">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider block">Total Líquido do Pedido</span>
+<span class="font-display-lg text-display-lg text-on-surface font-extrabold leading-none">R$ 4.864,00</span>
+</div>
+<div class="text-right">
+<span class="bg-secondary-container text-on-secondary-container font-label-sm text-label-sm px-2 py-1 rounded-md font-bold">
+            Limite OK (-26.7%)
+          </span>
+</div>
+</div>
+<!-- Thumb Navigation CTAs -->
+<div class="grid grid-cols-5 gap-space-xs pt-space-xs">
+<button class="col-span-2 h-12 bg-surface-container-high hover:bg-surface-container text-primary font-label-lg text-label-lg rounded-lg flex items-center justify-center gap-1 active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[18px]">add_box</span>
+<span class="truncate">Mais Itens</span>
+</button>
+<button class="col-span-3 h-12 bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg rounded-lg flex items-center justify-center gap-2 shadow-md active:scale-95 transition-transform" type="button">
+<span class="truncate font-bold">Fechar Pedido</span>
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</aside>
+</div></main></body></html>

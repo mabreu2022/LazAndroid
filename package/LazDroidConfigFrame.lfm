@@ -264,7 +264,7 @@ object LazDroidOptionsFrame: TLazDroidOptionsFrame
       Width = 296
       Anchors = [akTop, akLeft, akRight]
       TabOrder = 2
-      Text = 'android.app.NativeActivity'
+      Text = 'com.pascal.lclproject.LCLActivity'
     end
     object chkAutoLogcat: TCheckBox
       Left = 12

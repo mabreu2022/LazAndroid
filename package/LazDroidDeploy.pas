@@ -10,7 +10,7 @@ interface
 uses
   LazDroidDeploy_Reg, LazDroidConfig, LazDroidConfigFrame, 
   LazDroidDeviceManager, LazDroidDeviceSelectDlg, LazDroidProcessRunner, 
-  LazDroidPipeline, LazarusPackageIntf;
+  LazDroidPipeline, LazDroidProjectDescriptor, LazarusPackageIntf;
 
 implementation
 

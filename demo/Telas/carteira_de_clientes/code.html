@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><title>Carteira De Clientes - VendaForce Mobile</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100%;margin:0;padding:0;min-height:100%;}body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "secondary-fixed": "#85f8c4", "error": "#ba1a1a", "on-error-container": "#93000a", "secondary": "#006c4a", "primary-fixed": "#d2e4ff", "surface-container-low": "#f2f3ff", "primary": "#00355f", "surface-bright": "#faf8ff", "secondary-container": "#82f5c1", "on-tertiary": "#ffffff", "tertiary-container": "#733c00", "background": "#faf8ff", "on-tertiary-container": "#ffa658", "tertiary-fixed-dim": "#ffb77d", "surface-container-lowest": "#ffffff", "primary-fixed-dim": "#a0c9ff", "surface-tint": "#2d6197", "tertiary-fixed": "#ffdcc3", "on-surface": "#131b2e", "on-secondary-fixed": "#002114", "outline": "#727780", "inverse-primary": "#a0c9ff", "on-tertiary-fixed": "#2f1500", "tertiary": "#522900", "surface-container-high": "#e2e7ff", "on-surface-variant": "#42474f", "surface": "#faf8ff", "primary-container": "#0f4c81", "on-secondary-fixed-variant": "#005137", "on-primary": "#ffffff", "surface-dim": "#d2d9f4", "on-background": "#131b2e", "on-tertiary-fixed-variant": "#6e3900", "error-container": "#ffdad6", "on-secondary": "#ffffff", "surface-container-highest": "#dae2fd", "on-error": "#ffffff", "on-secondary-container": "#00714e", "secondary-fixed-dim": "#68dba9", "outline-variant": "#c2c7d1", "surface-container": "#eaedff", "surface-variant": "#dae2fd", "on-primary-container": "#8ebdf9", "inverse-surface": "#283044", "on-primary-fixed-variant": "#07497d", "inverse-on-surface": "#eef0ff", "on-primary-fixed": "#001c37" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-lg": "1rem", "space-md": "0.75rem", "margin-tablet": "1.5rem", "margin": "1rem", "space-sm": "0.5rem", "space-xl": "1.5rem", "gutter-compact": "0.5rem", "space-xs": "0.25rem", "gutter": "1rem" }, fontFamily: { "body-lg": ["Inter"], "label-lg": ["Inter"], "label-md": ["Inter"], "headline-lg": ["Inter"], "headline-sm": ["Inter"], "headline-md": ["Inter"], "numeric-table": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"], "display-lg": ["Inter"], "body-sm": ["Inter"] }, fontSize: { "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "700" }], "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "numeric-table": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700" }], "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }] } } } };</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0"><img alt="Logo VendaForce Mobile" class="h-8 w-auto object-contain flex-shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1V0fzupMpAZCipATgeshU7uMOIvAhRXnuZYmHHn0TPwGeVqYt6gHhNQ0_Ied0v-gqAJnWIHoICTzXkQoAGSn6EOee-SL_MopwP1AjbBwA-RjdQU-fPMeEuxaifqjckmWXiLBmF8zPFax1fi2gQ80kcVkUkyenZhl7rrYn8uuOHGpqw3eEVpiPHmtgxkoCdkem4hd5UWNcHZleOQO8q4JNz5VG05kcaZCzj1g-6l7So_n4tjfTCGylrHNDUA"/><div class="flex flex-col min-w-0"><div class="flex items-center gap-space-xs"><span class="font-label-md text-label-md text-primary truncate leading-tight">VendaForce</span><span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-secondary-fixed/30 text-secondary font-label-sm text-[10px] leading-none"><span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>Online</span></div><span class="font-label-sm text-label-sm text-on-surface-variant truncate">Carteira De Clientes</span></div></div><div class="flex items-center gap-space-xs flex-shrink-0"><button aria-label="Notificações" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary active:bg-surface-container-high transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">notifications</span></button><button aria-label="Perfil do Representante" class="w-11 h-11 flex items-center justify-center rounded-full hover:opacity-90 active:scale-95 transition-all" type="button"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDW6PSF0QIHcAqV0Im-OnmkJHxOOuXm_siS-6Jj8qPh_JvsKv4eSOsQlL9zBL1WVtYXOZA_bPrYfX5XzmFfjpeS5Hac0VpPKkle8OPywFqZ4V1gPcN2cLipJORDlukTDCSv_gFkc8biZmMHe_l167iLxSi1VllTla_L5rP-IMf6K9wqqTovNGWWCqTy7X7UOJ2BSQ0XEiB_Yygdw7vs5eL1LMtOtlLDYiEkaDhiMbrolDBUDtYcD3B4rw"/></button></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-24 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<!-- Status Roteiro do Dia: Resumo em Card Dinâmico -->
+<div class="px-margin pt-space-md pb-space-xs">
+<div class="bg-primary-container text-on-primary rounded-xl p-space-md shadow-md flex items-center justify-between relative overflow-hidden">
+<div class="absolute -right-4 -bottom-6 w-28 h-28 bg-white/5 rounded-full pointer-events-none"></div>
+<div class="flex flex-col z-10">
+<div class="flex items-center gap-space-xs mb-1">
+<span class="material-symbols-outlined text-[18px] text-secondary-fixed">route</span>
+<span class="font-label-md text-label-md text-secondary-fixed uppercase tracking-wider">Roteiro Ativo</span>
+</div>
+<p class="font-headline-sm text-headline-sm font-bold">2 de 6 clientes visitados</p>
+<p class="font-body-sm text-body-sm text-on-primary-container mt-0.5">Meta diária estimada: R$ 38.500,00</p>
+</div>
+<div class="flex flex-col items-center justify-center bg-white/10 backdrop-blur-md px-3 py-2 rounded-lg z-10">
+<span class="font-headline-md text-headline-md font-bold text-white leading-none">33%</span>
+<span class="font-label-sm text-label-sm text-on-primary-container mt-1">Concluído</span>
+</div>
+</div>
+</div>
+<!-- Search & View Mode Switcher -->
+<div class="px-margin pt-space-sm pb-space-xs flex flex-col gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<!-- Search Input Container -->
+<div class="flex-1 bg-surface-container-lowest rounded-xl shadow-sm flex items-center px-space-md h-12">
+<span class="material-symbols-outlined text-outline text-[20px] mr-2">search</span>
+<input class="w-full bg-transparent font-body-md text-body-md text-on-surface focus:outline-none placeholder:text-outline" id="clientSearchInput" placeholder="Razão Social, CNPJ ou Nome Fantasia..." type="text"/>
+<button aria-label="Limpar busca" class="text-outline hover:text-on-surface transition-colors p-1" type="button">
+<span class="material-symbols-outlined text-[18px]">mic</span>
+</button>
+</div>
+<!-- Map Mode Switch Button -->
+<button aria-label="Alternar para Modo Mapa" class="h-12 px-3.5 bg-surface-container-lowest text-primary rounded-xl shadow-sm flex items-center justify-center gap-1.5 active:scale-95 transition-all" id="toggleViewBtn" type="button">
+<span class="material-symbols-outlined text-[20px]">map</span>
+<span class="font-label-md text-label-md">Mapa</span>
+</button>
+<!-- Advanced Filter Trigger -->
+<button aria-label="Filtros avançados" class="h-12 w-12 bg-surface-container-lowest text-primary rounded-xl shadow-sm flex items-center justify-center active:scale-95 transition-all relative" type="button">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+<span class="w-2 h-2 rounded-full bg-secondary absolute top-3 right-3"></span>
+</button>
+</div>
+<!-- Quick Filter Chips Scrollable Track -->
+<div class="flex items-center gap-space-xs overflow-x-auto no-scrollbar py-1 -mx-margin px-margin">
+<button class="flex items-center gap-1.5 px-3 py-2 rounded-full bg-primary text-on-primary font-label-sm text-label-sm whitespace-nowrap shadow-sm active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>Roteiro de Hoje (6)</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-2 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap shadow-sm active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[16px] text-secondary">verified</span>
+<span>Positivados no Mês</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-2 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap shadow-sm active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[16px] text-tertiary-fixed-dim">warning</span>
+<span>Sem compra &gt; 30 dias</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-2 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap shadow-sm active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[16px] text-primary">credit_score</span>
+<span>Com Limite Liberado</span>
+</button>
+</div>
+</div>
+<!-- Interactive Map View Container (Hidden by default, toggled via script) -->
+<div class="hidden px-margin py-space-sm" id="mapContainer">
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+<div class="w-full h-56 bg-surface-container flex items-center justify-center text-on-surface-variant relative" data-location="Av. Paulista, 1500, Sao Paulo, SP, Brasil" style="">
+<div class="absolute inset-0 bg-primary/5 flex flex-col items-center justify-center pointer-events-none">
+<span class="material-symbols-outlined text-[36px] text-primary animate-bounce">location_on</span>
+<span class="font-label-md text-label-md text-primary mt-1">Carregando roteiro georreferenciado...</span>
+</div>
+</div>
+<div class="p-space-sm flex items-center justify-between bg-surface-container-lowest">
+<span class="font-body-sm text-body-sm text-on-surface-variant">6 paradas programadas • Raio de 12.4 km</span>
+<button class="font-label-sm text-label-sm text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">navigation</span> Otimizar Rota
+        </button>
+</div>
+</div>
+</div>
+<!-- Clientes List Section -->
+<div class="px-margin pt-space-xs pb-space-lg flex flex-col gap-space-md">
+<!-- Card Cliente 1: Supermercado Central Ltda -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col gap-space-sm transition-all hover:shadow-md">
+<!-- Card Top: Tags & Status -->
+<div class="flex items-center justify-between gap-space-xs">
+<div class="flex items-center gap-1.5">
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-primary font-label-sm text-label-sm">#CL-1042</span>
+<span class="px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">alarm</span>
+            Visita às 14:00
+          </span>
+</div>
+<button aria-label="Opções do cliente" class="text-outline hover:text-on-surface p-1 rounded-full" type="button">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+<!-- Corporate Identification -->
+<div class="flex flex-col">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold leading-tight">Supermercado Central Ltda</h2>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="font-body-sm text-body-sm text-on-surface-variant">CNPJ: 12.345.678/0001-90</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="font-body-sm text-body-sm text-secondary font-medium">Grau A</span>
+</div>
+</div>
+<!-- Local & Contact Action Snippet -->
+<div class="bg-surface-container-low rounded-lg p-2.5 flex items-center justify-between">
+<div class="flex items-center gap-2 min-w-0 pr-2">
+<div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[18px]">directions</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate">Av. Paulista, 1500 - Bela Vista</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
+<span>Aprox. 1.8 km de distância</span>
+</span>
+</div>
+</div>
+<div class="flex items-center gap-1 flex-shrink-0">
+<a aria-label="Ligar para cliente" class="w-9 h-9 rounded-lg bg-surface-container-lowest text-primary shadow-sm flex items-center justify-center active:scale-95 transition-transform" href="tel:11987654321">
+<span class="material-symbols-outlined text-[18px]">call</span>
+</a>
+<a aria-label="Abrir WhatsApp" class="w-9 h-9 rounded-lg bg-secondary-fixed text-on-secondary-fixed shadow-sm flex items-center justify-center active:scale-95 transition-transform" href="https://wa.me/5511987654321" target="_blank">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+</a>
+</div>
+</div>
+<!-- Credit Limit Progress Gauge & Last Order Metric -->
+<div class="flex flex-col gap-1.5 pt-1">
+<div class="flex items-center justify-between font-body-sm text-body-sm">
+<span class="text-on-surface-variant">Limite Disponível:</span>
+<span class="font-numeric-table text-numeric-table text-secondary font-semibold">R$ 18.200,00 <span class="text-on-surface-variant font-normal">/ R$ 45k</span></span>
+</div>
+<!-- Segmented track indicator -->
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden flex">
+<div class="bg-secondary h-full rounded-full" style="width: 40%;"></div>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm mt-0.5">
+<span>Última compra: há 7 dias</span>
+<span class="font-numeric-table text-numeric-table text-on-surface">Total: R$ 4.200,00</span>
+</div>
+</div>
+<!-- Actions CTA Grid -->
+<div class="grid grid-cols-2 gap-space-sm pt-2">
+<button class="h-11 rounded-lg bg-surface-container-low text-primary font-label-lg text-label-lg flex items-center justify-center gap-1.5 active:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">pin_drop</span>
+<span>Fazer Check-in</span>
+</button>
+<button class="h-11 rounded-lg bg-primary-container text-on-primary font-label-lg text-label-lg shadow-sm flex items-center justify-center gap-1.5 active:bg-primary transition-all active:scale-[0.98]" type="button">
+<span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
+<span>Novo Pedido</span>
+</button>
+</div>
+</div>
+<!-- Card Cliente 2: Comercial Alvorada Alimentos -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col gap-space-sm transition-all hover:shadow-md">
+<!-- Card Top: Tags & Status -->
+<div class="flex items-center justify-between gap-space-xs">
+<div class="flex items-center gap-1.5">
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-primary font-label-sm text-label-sm">#CL-0891</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">where_to_vote</span>
+            Check-in há 15 min
+          </span>
+</div>
+<span class="inline-flex items-center gap-1 text-secondary font-label-sm text-label-sm">
+<span class="w-2 h-2 rounded-full bg-secondary animate-ping"></span>
+          Em atendimento
+        </span>
+</div>
+<!-- Corporate Identification -->
+<div class="flex flex-col">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold leading-tight">Comercial Alvorada Alimentos</h2>
+</div>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="font-body-sm text-body-sm text-on-surface-variant">CNPJ: 04.912.833/0002-15</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="font-label-sm text-label-sm text-secondary bg-secondary-fixed/40 px-1.5 py-0.2 rounded">Recompra Alta</span>
+</div>
+</div>
+<!-- Local & Contact Action Snippet -->
+<div class="bg-surface-container-low rounded-lg p-2.5 flex items-center justify-between">
+<div class="flex items-center gap-2 min-w-0 pr-2">
+<div class="w-8 h-8 rounded-full bg-secondary/15 text-secondary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[18px]">storefront</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate">Rua Brigadeiro Faria Lima, 280</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Você está no local</span>
+</div>
+</div>
+<div class="flex items-center gap-1 flex-shrink-0">
+<a aria-label="Ligar para Alvorada Alimentos" class="w-9 h-9 rounded-lg bg-surface-container-lowest text-primary shadow-sm flex items-center justify-center active:scale-95 transition-transform" href="tel:11971239845">
+<span class="material-symbols-outlined text-[18px]">call</span>
+</a>
+<a aria-label="WhatsApp Alvorada Alimentos" class="w-9 h-9 rounded-lg bg-secondary-fixed text-on-secondary-fixed shadow-sm flex items-center justify-center active:scale-95 transition-transform" href="https://wa.me/5511971239845" target="_blank">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+</a>
+</div>
+</div>
+<!-- Financial Status Info -->
+<div class="bg-surface-container-highest/40 rounded-lg p-space-sm flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Limite de Crédito Total</span>
+<span class="font-numeric-table text-numeric-table text-secondary font-bold">R$ 60.000,00 100% livre</span>
+</div>
+<div class="flex flex-col text-right">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Último Fechamento</span>
+<span class="font-numeric-table text-numeric-table text-on-surface font-semibold">R$ 12.850,00</span>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="grid grid-cols-2 gap-space-sm pt-1">
+<button class="h-11 rounded-lg bg-surface-container text-on-surface-variant font-label-lg text-label-lg flex items-center justify-center gap-1.5 active:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">assignment_turned_in</span>
+<span>Finalizar Visita</span>
+</button>
+<button class="h-11 rounded-lg bg-primary-container text-on-primary font-label-lg text-label-lg shadow-sm flex items-center justify-center gap-1.5 active:bg-primary transition-all active:scale-[0.98]" type="button">
+<span class="material-symbols-outlined text-[20px]">shopping_cart_checkout</span>
+<span>Montar Pedido</span>
+</button>
+</div>
+</div>
+<!-- Card Cliente 3: Padaria e Conveniência Estrela -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col gap-space-sm transition-all hover:shadow-md">
+<!-- Card Top: Tags & Status -->
+<div class="flex items-center justify-between gap-space-xs">
+<div class="flex items-center gap-1.5">
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-primary font-label-sm text-label-sm">#CL-1502</span>
+<span class="px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">notification_important</span>
+            Sem compra há 42 dias
+          </span>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-semibold">
+          Crédito em Análise
+        </span>
+</div>
+<!-- Corporate Identification -->
+<div class="flex flex-col">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold leading-tight">Padaria e Conveniência Estrela</h2>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="font-body-sm text-body-sm text-on-surface-variant">CNPJ: 33.109.441/0001-08</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Ponto de Venda Tradicional</span>
+</div>
+</div>
+<!-- Local & Contact Action Snippet -->
+<div class="bg-surface-container-low rounded-lg p-2.5 flex items-center justify-between">
+<div class="flex items-center gap-2 min-w-0 pr-2">
+<div class="w-8 h-8 rounded-full bg-tertiary-container/20 text-on-tertiary-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[18px]">alt_route</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate">Rua dos Pinheiros, 742</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">3.4 km do local atual</span>
+</div>
+</div>
+<div class="flex items-center gap-1 flex-shrink-0">
+<a aria-label="Ligar para Padaria Estrela" class="w-9 h-9 rounded-lg bg-surface-container-lowest text-primary shadow-sm flex items-center justify-center active:scale-95 transition-transform" href="tel:11944556677">
+<span class="material-symbols-outlined text-[18px]">call</span>
+</a>
+<a aria-label="WhatsApp Padaria Estrela" class="w-9 h-9 rounded-lg bg-secondary-fixed text-on-secondary-fixed shadow-sm flex items-center justify-center active:scale-95 transition-transform" href="https://wa.me/5511944556677" target="_blank">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+</a>
+</div>
+</div>
+<!-- Alert Bar for Churn Risk / Credit Analysis -->
+<div class="bg-tertiary-fixed/30 rounded-lg p- space-sm p-3 flex items-start gap-2.5">
+<span class="material-symbols-outlined text-[20px] text-tertiary-container flex-shrink-0 mt-0.5">sentiment_dissatisfied</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-tertiary-container font-bold">Risco de Churn Comercial</span>
+<p class="font-body-sm text-body-sm text-on-surface leading-tight mt-0.5">
+            Cliente habitualmente realizava pedidos quinzenais. Sugerida abordagem com tabela promocional de reposição.
+          </p>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="grid grid-cols-2 gap-space-sm pt-1">
+<button class="h-11 rounded-lg bg-surface-container-low text-primary font-label-lg text-label-lg flex items-center justify-center gap-1.5 active:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">manage_search</span>
+<span>Consultar Crédito</span>
+</button>
+<button class="h-11 rounded-lg bg-primary-container text-on-primary font-label-lg text-label-lg shadow-sm flex items-center justify-center gap-1.5 active:bg-primary transition-all active:scale-[0.98]" type="button">
+<span class="material-symbols-outlined text-[20px]">campaign</span>
+<span>Reativar Venda</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Sticky Bottom Primary Floating Action Trigger (Positioned safely above App Shell Nav) -->
+<div class="fixed bottom-20 right-4 z-40">
+<button class="h-14 px-5 rounded-full bg-secondary-container text-on-secondary-container font-label-lg text-label-lg shadow-lg flex items-center gap-2 hover:opacity-95 active:scale-95 transition-all" id="btnNewClient" type="button">
+<span class="material-symbols-outlined text-[24px]">person_add</span>
+<span class="whitespace-nowrap">Novo Cliente</span>
+</button>
+</div>
+<!-- Interactive Client Side Script for Quick Filter Toggles and View Mode -->
+<script>
+    (function initClientPortfolio() {
+      const toggleViewBtn = document.getElementById('toggleViewBtn');
+      const mapContainer = document.getElementById('mapContainer');
+      const searchInput = document.getElementById('clientSearchInput');
+
+      if (toggleViewBtn && mapContainer) {
+        toggleViewBtn.addEventListener('click', function() {
+          const isMapHidden = mapContainer.classList.contains('hidden');
+          if (isMapHidden) {
+            mapContainer.classList.remove('hidden');
+            toggleViewBtn.classList.add('bg-primary', 'text-on-primary');
+            toggleViewBtn.classList.remove('bg-surface-container-lowest', 'text-primary');
+            toggleViewBtn.querySelector('span:last-child').textContent = 'Lista';
+          } else {
+            mapContainer.classList.add('hidden');
+            toggleViewBtn.classList.remove('bg-primary', 'text-on-primary');
+            toggleViewBtn.classList.add('bg-surface-container-lowest', 'text-primary');
+            toggleViewBtn.querySelector('span:last-child').textContent = 'Mapa';
+          }
+        });
+      }
+
+      if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+          const term = e.target.value.toLowerCase();
+          const cards = document.querySelectorAll('.px-margin.pb-space-lg > div');
+          cards.forEach(card => {
+            const content = card.textContent.toLowerCase();
+            card.style.display = content.includes(term) ? 'flex' : 'none';
+          });
+        });
+      }
+    })();
+  </script>
+</div></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.05)]" data-active-classes="text-primary font-label-md"><div class="flex items-center justify-around h-16 px-gutter-compact"><a class="flex flex-col items-center justify-center min-w-[64px] h-12 text-on-surface-variant hover:text-primary transition-colors" data-path="inicio" href="#"><span class="material-symbols-outlined text-[22px]">dashboard</span><span class="font-label-sm text-[11px] leading-tight mt-0.5">Início</span></a><a aria-current="page" class="flex flex-col items-center justify-center min-w-[64px] h-12 transition-colors text-primary font-label-md" data-path="carteira-de-clientes" href="#"><span class="material-symbols-outlined text-[22px]">store</span><span class="font-label-sm text-[11px] leading-tight mt-0.5">Clientes</span></a><a class="flex flex-col items-center justify-center -mt-5 group" data-path="novo-pedido" href="#"><div class="w-12 h-12 rounded-full bg-primary-container text-on-primary shadow-md flex items-center justify-center group-active:scale-95 transition-transform"><span class="material-symbols-outlined text-[24px]">add_shopping_cart</span></div><span class="font-label-sm text-[11px] leading-tight text-primary mt-1">Novo Pedido</span></a><a class="flex flex-col items-center justify-center min-w-[64px] h-12 text-on-surface-variant hover:text-primary transition-colors" data-path="pedidos" href="#"><span class="material-symbols-outlined text-[22px]">receipt_long</span><span class="font-label-sm text-[11px] leading-tight mt-0.5">Pedidos</span></a></div></nav></body></html>

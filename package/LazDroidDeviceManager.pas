@@ -42,6 +42,7 @@ type
     function IsDeviceConnected(const ASerial: string): Boolean;
     function GetFirstReadyDevice(out ADev: TAndroidDevice): Boolean;
     function FormatDeviceDescription(const ADev: TAndroidDevice): string;
+    function IsPackageInstalled(const ASerial, APackageName: string): Boolean;
   end;
 
 implementation
@@ -264,6 +265,34 @@ end;
 function TLazDroidDeviceManager.FormatDeviceDescription(const ADev: TAndroidDevice): string;
 begin
   Result := Format('%s (%s) [%s] - %s', [ADev.Model, ADev.Serial, ADev.PrimaryAbi, ADev.State]);
+end;
+
+function TLazDroidDeviceManager.IsPackageInstalled(const ASerial, APackageName: string): Boolean;
+var
+  OutStr: string;
+  Code: Integer;
+begin
+  Result := False;
+  if (ASerial = '') or (APackageName = '') then Exit;
+
+  // 1. Tenta pm list packages com --user 0 (compatível com Samsung Knox / Dual App / Secure Folder)
+  Code := RunCommandSync(FAdbPath, ['-s', ASerial, 'shell', 'pm', 'list', 'packages', '--user', '0', APackageName], OutStr);
+  if (Code = 0) and (Pos('package:' + APackageName, OutStr) > 0) then
+    Exit(True);
+
+  // 2. Fallback pm list packages padrão (caso o dispositivo não suporte ou não necessite de --user 0)
+  Code := RunCommandSync(FAdbPath, ['-s', ASerial, 'shell', 'pm', 'list', 'packages', APackageName], OutStr);
+  if (Code = 0) and (Pos('package:' + APackageName, OutStr) > 0) then
+    Exit(True);
+
+  // 3. Fallback pm path
+  Code := RunCommandSync(FAdbPath, ['-s', ASerial, 'shell', 'pm', 'path', '--user', '0', APackageName], OutStr);
+  if (Code = 0) and (Pos('package:', OutStr) > 0) then
+    Exit(True);
+
+  Code := RunCommandSync(FAdbPath, ['-s', ASerial, 'shell', 'pm', 'path', APackageName], OutStr);
+  if (Code = 0) and (Pos('package:', OutStr) > 0) then
+    Exit(True);
 end;
 
 end.

@@ -15,7 +15,8 @@ uses
   MenuIntf, IDECommands, LazIDEIntf, IDEOptionsIntf, IDEOptEditorIntf,
   // LazDroid units
   LazDroidConfig, LazDroidConfigFrame, LazDroidDeviceManager,
-  LazDroidDeviceSelectDlg, LazDroidPipeline, LazDroidProcessRunner;
+  LazDroidDeviceSelectDlg, LazDroidPipeline, LazDroidProcessRunner,
+  LazDroidProjectDescriptor;
 
 var
   DroidOptionsIndex: Integer = 1050;
@@ -26,7 +27,9 @@ implementation
 
 var
   CmdDeployAndRun: TIDECommand = nil;
+  CmdDeployAndDebug: TIDECommand = nil;
   CmdCancelDeploy: TIDECommand = nil;
+  CmdConfigureProject: TIDECommand = nil;
   GlobalPipeline: TLazDroidPipeline = nil;
 
 procedure EnsurePipeline;
@@ -35,11 +38,27 @@ begin
     GlobalPipeline := TLazDroidPipeline.Create(DroidConfig);
 end;
 
+procedure DoConfigureProject(Sender: TObject);
+begin
+  if Assigned(LazarusIDE.ActiveProject) then
+  begin
+    ConfigureProjectAndroidCustomDrawn(LazarusIDE.ActiveProject);
+    ShowMessage('Projeto configurado com sucesso para Android (aarch64 / LCL CustomDrawn)!' + LineEnding +
+                'A macro LCLWidgetType foi definida para "customdrawn".');
+  end
+  else
+    ShowMessage('Nenhum projeto ativo no momento para configurar.');
+end;
+
 procedure DoDeployAndRun(Sender: TObject);
 var
   TargetDevice: TAndroidDevice;
 begin
   EnsurePipeline;
+
+  // Garante que o projeto ativo esteja calibrado com LCLWidgetType=customdrawn
+  if Assigned(LazarusIDE.ActiveProject) then
+    ConfigureProjectAndroidCustomDrawn(LazarusIDE.ActiveProject);
 
   if GlobalPipeline.IsRunning then
   begin
@@ -58,7 +77,37 @@ begin
     Exit; // Usuário cancelou ou nenhum aparelho pronto
 
   // Dispara esteira de compilação, empacotamento e deploy
-  GlobalPipeline.Start(TargetDevice.Serial);
+  GlobalPipeline.Start(TargetDevice.Serial, False);
+end;
+
+procedure DoDeployAndDebug(Sender: TObject);
+var
+  TargetDevice: TAndroidDevice;
+begin
+  EnsurePipeline;
+
+  // Garante que o projeto ativo esteja calibrado com LCLWidgetType=customdrawn
+  if Assigned(LazarusIDE.ActiveProject) then
+    ConfigureProjectAndroidCustomDrawn(LazarusIDE.ActiveProject);
+
+  if GlobalPipeline.IsRunning then
+  begin
+    if MessageDlg('LazDroid-Deploy',
+      'O pipeline de deploy Android já está em execução.' + LineEnding +
+      'Deseja cancelar o processo atual?',
+      mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+    begin
+      GlobalPipeline.Cancel;
+    end;
+    Exit;
+  end;
+
+  // Seleciona dispositivo conectado via ADB
+  if not ShowSelectDeviceDialog(TargetDevice) then
+    Exit;
+
+  // Dispara esteira em modo depuração GDB Remote
+  GlobalPipeline.Start(TargetDevice.Serial, True);
 end;
 
 procedure DoCancelDeploy(Sender: TObject);
@@ -78,15 +127,19 @@ procedure Register;
 var
   CmdCategory: TIDECommandCategory;
   RunSection: TIDEMenuSection;
-  ShortcutDeploy, ShortcutCancel: TIDEShortCut;
+  ShortcutDeploy, ShortcutDebug, ShortcutCancel: TIDEShortCut;
 begin
-  // 1. Registrar Categoria de Comandos no IDECommands
+  // 1. Registrar Project Descriptor (Template de Novo Projeto Android na IDE)
+  RegisterProjectTemplate;
+
+  // 2. Registrar Categoria de Comandos no IDECommands
   CmdCategory := IDECommandList.CreateCategory(nil, 'LazDroid', 'LazDroid Android Automation');
 
   ShortcutDeploy := IDEShortCut(VK_F9, [ssCtrl, ssShift]);
+  ShortcutDebug  := IDEShortCut(VK_F9, [ssCtrl]);
   ShortcutCancel := IDEShortCut(VK_CANCEL, [ssCtrl, ssShift]);
 
-  // 2. Registrar Comando IDE com Atalho padrão (Ctrl+Shift+F9)
+  // 3. Registrar Comandos IDE com Atalhos
   CmdDeployAndRun := RegisterIDECommand(
     CmdCategory,
     'ecLazDroidDeployAndRun',
@@ -94,6 +147,15 @@ begin
     ShortcutDeploy,
     nil,
     @DoDeployAndRun
+  );
+
+  CmdDeployAndDebug := RegisterIDECommand(
+    CmdCategory,
+    'ecLazDroidDeployAndDebug',
+    'Deploy & Debug on Android Device (GDB Remote)',
+    ShortcutDebug,
+    nil,
+    @DoDeployAndDebug
   );
 
   CmdCancelDeploy := RegisterIDECommand(
@@ -105,10 +167,28 @@ begin
     @DoCancelDeploy
   );
 
-  // 3. Registrar Itens no Menu 'Run' (Executar) da IDE
+  CmdConfigureProject := RegisterIDECommand(
+    CmdCategory,
+    'ecLazDroidConfigureProject',
+    'Configurar Projeto Atual para Android (LCL CustomDrawn)',
+    CleanIDEShortCut,
+    nil,
+    @DoConfigureProject
+  );
+
+  // 4. Registrar Itens no Menu 'Run' (Executar) da IDE
   RunSection := itmRunBuilding;
   if RunSection = nil then
     RunSection := mnuRun;
+
+  RegisterIDEMenuCommand(
+    RunSection,
+    'itmLazDroidConfigProject',
+    'Configurar Projeto Atual para Android (LCL CustomDrawn)',
+    nil,
+    @DoConfigureProject,
+    CmdConfigureProject
+  );
 
   RegisterIDEMenuCommand(
     RunSection,
@@ -121,6 +201,15 @@ begin
 
   RegisterIDEMenuCommand(
     RunSection,
+    'itmLazDroidDeployDebug',
+    'Deploy & Debug on Android Device (GDB Remote)',
+    nil,
+    @DoDeployAndDebug,
+    CmdDeployAndDebug
+  );
+
+  RegisterIDEMenuCommand(
+    RunSection,
     'itmLazDroidCancel',
     'Cancelar Deploy Android',
     nil,
@@ -128,7 +217,7 @@ begin
     CmdCancelDeploy
   );
 
-  // 4. Registrar Página nas Opções da IDE (Tools -> Options -> Environment)
+  // 5. Registrar Página nas Opções da IDE (Tools -> Options -> Environment)
   DroidOptionsIndex := RegisterIDEOptionsEditor(
     GroupEnvironment,
     TLazDroidOptionsFrame,

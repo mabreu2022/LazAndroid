@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_blank" name="shell-type"/><title>Login Do Representante - VendaForce Mobile</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100%;margin:0;padding:0;min-height:100%;}body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "secondary-fixed": "#85f8c4", "error": "#ba1a1a", "on-error-container": "#93000a", "secondary": "#006c4a", "primary-fixed": "#d2e4ff", "surface-container-low": "#f2f3ff", "primary": "#00355f", "surface-bright": "#faf8ff", "secondary-container": "#82f5c1", "on-tertiary": "#ffffff", "tertiary-container": "#733c00", "background": "#faf8ff", "on-tertiary-container": "#ffa658", "tertiary-fixed-dim": "#ffb77d", "surface-container-lowest": "#ffffff", "primary-fixed-dim": "#a0c9ff", "surface-tint": "#2d6197", "tertiary-fixed": "#ffdcc3", "on-surface": "#131b2e", "on-secondary-fixed": "#002114", "outline": "#727780", "inverse-primary": "#a0c9ff", "on-tertiary-fixed": "#2f1500", "tertiary": "#522900", "surface-container-high": "#e2e7ff", "on-surface-variant": "#42474f", "surface": "#faf8ff", "primary-container": "#0f4c81", "on-secondary-fixed-variant": "#005137", "on-primary": "#ffffff", "surface-dim": "#d2d9f4", "on-background": "#131b2e", "on-tertiary-fixed-variant": "#6e3900", "error-container": "#ffdad6", "on-secondary": "#ffffff", "surface-container-highest": "#dae2fd", "on-error": "#ffffff", "on-secondary-container": "#00714e", "secondary-fixed-dim": "#68dba9", "outline-variant": "#c2c7d1", "surface-container": "#eaedff", "surface-variant": "#dae2fd", "on-primary-container": "#8ebdf9", "inverse-surface": "#283044", "on-primary-fixed-variant": "#07497d", "inverse-on-surface": "#eef0ff", "on-primary-fixed": "#001c37" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-lg": "1rem", "space-md": "0.75rem", "margin-tablet": "1.5rem", "margin": "1rem", "space-sm": "0.5rem", "space-xl": "1.5rem", "gutter-compact": "0.5rem", "space-xs": "0.25rem", "gutter": "1rem" }, fontFamily: { "body-lg": ["Inter"], "label-lg": ["Inter"], "label-md": ["Inter"], "headline-lg": ["Inter"], "headline-sm": ["Inter"], "headline-md": ["Inter"], "numeric-table": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"], "display-lg": ["Inter"], "body-sm": ["Inter"] }, fontSize: { "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "700" }], "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "numeric-table": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700" }], "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }] } } } };</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head><body class="bg-surface font-body-md text-on-surface antialiased flex flex-col min-h-screen"><main class="flex-1 flex flex-col relative w-full pt-safe pb-safe bg-surface min-h-screen"><div class="flex flex-col w-full px-margin pb-space-xl">
+<!-- Status de Conectividade Offline/Online -->
+<div class="w-full flex items-center justify-between py-space-sm mb-space-sm">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed shadow-sm">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider font-semibold">Online • Servidor Sincronizado</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-secondary">cloud_done</span>
+<span>Base v3.8.4</span>
+</div>
+</div>
+<!-- Identidade Visual & Header Brand -->
+<div class="flex flex-col items-center text-center mt-space-xs mb-space-lg">
+<div class="relative w-24 h-24 mb-space-md rounded-2xl bg-surface-container-lowest p-2 shadow-md flex items-center justify-center">
+<img alt="VendaForce SFA Mobile" class="w-full h-full object-contain rounded-xl" src="https://lh3.googleusercontent.com/aida/AEtjO1V-0qXVbYjElvSCJ1_QVj-YJG6KL3WsR605MIAj1wEee0Vx2IcG-ocfovYCIRVac_9TCscjNSME_OmnyubnPouxJvgpVvg_Fa6GkXKilFOj8X3e8Mv8vmlU3GFBTr5bUbvwnPqQn4B5cpRl6p67IRcO-wcNfHRZk-LdBYD60qwOIqR95rCQT8btVun5LkboTcm8rbLUYxwxaDE7IIWqskapQYC0eMJ0C7QCStNTrVZ9U6PxnMxfe7uIErlx"/>
+<div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[14px]">bolt</span>
+</div>
+</div>
+<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm mb-space-xs">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+<span>Força de Vendas SFA Enterprise</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Bem-vindo de volta</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[280px] mt-0.5">
+      Acesse sua conta corporativa para iniciar o roteiro de visitas e pedidos.
+    </p>
+</div>
+<!-- Card do Formulário de Acesso -->
+<div class="w-full bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<!-- Campo: Código da Empresa / Filial -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold flex items-center justify-between">
+<span>Código da Empresa / ID Filial</span>
+<span class="text-on-surface-variant font-label-sm text-label-sm font-normal">Ex: EMP-4029</span>
+</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[20px] pointer-events-none">domain</span>
+<input class="w-full h-12 pl-10 pr-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md placeholder:text-outline focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary transition-all" id="company-code" placeholder="Código ou CNPJ da filial" type="text" value="EMP-4029"/>
+</div>
+</div>
+<!-- Campo: Usuário / E-mail -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold">
+        E-mail Corporativo ou Matrícula
+      </label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[20px] pointer-events-none">badge</span>
+<input class="w-full h-12 pl-10 pr-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md placeholder:text-outline focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary transition-all" id="user-identity" placeholder="seu.nome@empresa.com" type="email" value="carlos.silva@vendaforce.com.br"/>
+</div>
+</div>
+<!-- Campo: Senha com Toggle -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md text-on-surface font-semibold">Senha de Acesso</label>
+<button class="font-label-sm text-label-sm text-primary-container font-semibold active:opacity-70" type="button">
+          Esqueci minha senha
+        </button>
+</div>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[20px] pointer-events-none">lock</span>
+<input class="w-full h-12 pl-10 pr-12 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md placeholder:text-outline focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary transition-all" id="user-password" placeholder="Digite sua senha" type="password" value="••••••••••••"/>
+<button aria-label="Alternar visibilidade da senha" class="absolute right-2 w-9 h-9 rounded-lg flex items-center justify-center text-on-surface-variant active:bg-surface-container-high transition-colors" id="toggle-password-btn" type="button">
+<span class="material-symbols-outlined text-[20px]" id="toggle-password-icon">visibility_off</span>
+</button>
+</div>
+</div>
+<!-- Lembrar Dispositivo & Modo Rápido -->
+<div class="flex items-center justify-between pt-1">
+<label class="flex items-center gap-2 cursor-pointer select-none">
+<input checked="" class="w-5 h-5 rounded bg-surface-container text-primary-container focus:ring-0 cursor-pointer accent-primary-container" id="remember-device" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface font-medium">Lembrar credenciais no aparelho</span>
+</label>
+<span class="material-symbols-outlined text-secondary text-[18px]" title="Criptografia ativa no aparelho">enhanced_encryption</span>
+</div>
+<!-- Botão de Ação Primária -->
+<button class="w-full h-12 rounded-lg bg-primary-container text-on-primary font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-sm active:bg-primary transition-all mt-space-xs" id="btn-login" type="button">
+<span class="material-symbols-outlined text-[20px]">login</span>
+<span>Entrar no Sistema</span>
+</button>
+<!-- Divisor Visual Delicado -->
+<div class="relative flex items-center justify-center my-1">
+<div class="w-full h-[1px] bg-surface-container-high"></div>
+<span class="absolute bg-surface-container-lowest px-3 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">ou acesso expresso</span>
+</div>
+<!-- Botão Biometria / Face ID -->
+<button class="w-full h-12 rounded-lg bg-surface-container-low text-primary font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-sm active:bg-surface-container-high transition-all" id="btn-biometrics" type="button">
+<span class="material-symbols-outlined text-[22px] text-primary-container">fingerprint</span>
+<span>Entrar com Biometria / Touch ID</span>
+</button>
+</div>
+<!-- Informativo de Sincronismo e Modo Offline -->
+<div class="w-full mt-space-md p-space-md rounded-xl bg-surface-container-low flex items-start gap-3 shadow-sm">
+<div class="w-9 h-9 rounded-lg bg-surface-container-highest text-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]">sync</span>
+</div>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Tabelas de Preços e Estoque</span>
+<span class="font-label-sm text-label-sm text-secondary font-semibold">Pronto</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">Último sincronismo: Hoje às 07:30 (Modo Offline apto)</p>
+</div>
+</div>
+<!-- Cartão de Suporte & Central de Ajuda ao Representante -->
+<div class="w-full mt-space-md flex flex-col items-center gap-space-sm text-center">
+<div class="flex items-center justify-center gap-4 text-on-surface-variant font-label-sm text-label-sm">
+<a class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-lowest shadow-sm active:bg-surface-container transition-colors text-on-surface" href="tel:0800000000">
+<span class="material-symbols-outlined text-[16px] text-primary-container">call</span>
+<span>0800 700 8900</span>
+</a>
+<a class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-lowest shadow-sm active:bg-surface-container transition-colors text-secondary font-semibold" href="https://wa.me/">
+<span class="material-symbols-outlined text-[16px]">chat</span>
+<span>WhatsApp Suporte</span>
+</a>
+</div>
+<!-- Informações de Versão & Copyright Institucional -->
+<div class="flex flex-col items-center gap-0.5 mt-space-xs text-on-surface-variant">
+<span class="font-label-sm text-label-sm">VendaForce Mobile SFA • v3.8.4 (Build 142)</span>
+<span class="font-body-sm text-[11px] text-outline">Ambiente Seguro de Alta Disponibilidade para Força de Vendas</span>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    const passwordInput = document.getElementById('user-password');
+    const toggleBtn = document.getElementById('toggle-password-btn');
+    const toggleIcon = document.getElementById('toggle-password-icon');
+    const loginBtn = document.getElementById('btn-login');
+    const bioBtn = document.getElementById('btn-biometrics');
+
+    if (toggleBtn && passwordInput && toggleIcon) {
+      toggleBtn.addEventListener('click', function() {
+        const isPassword = passwordInput.getAttribute('type') === 'password';
+        passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+        toggleIcon.textContent = isPassword ? 'visibility' : 'visibility_off';
+      });
+    }
+
+    if (bioBtn) {
+      bioBtn.addEventListener('click', function() {
+        const originalContent = bioBtn.innerHTML;
+        bioBtn.innerHTML = `
+          <span class="material-symbols-outlined animate-spin text-[20px] text-primary-container">progress_activity</span>
+          <span>Validando biometria...</span>
+        `;
+        setTimeout(() => {
+          bioBtn.innerHTML = originalContent;
+        }, 1200);
+      });
+    }
+
+    if (loginBtn) {
+      loginBtn.addEventListener('click', function() {
+        const originalText = loginBtn.innerHTML;
+        loginBtn.innerHTML = `
+          <span class="material-symbols-outlined animate-spin text-[20px] text-white">progress_activity</span>
+          <span>Autenticando vendedor...</span>
+        `;
+        setTimeout(() => {
+          loginBtn.innerHTML = originalText;
+        }, 1500);
+      });
+    }
+  })();
+</script></main></body></html>

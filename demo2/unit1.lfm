@@ -1,0 +1,38 @@
+object Form1: TForm1
+  Left = 352
+  Height = 420
+  Top = 32
+  Width = 449
+  Caption = 'Form1'
+  ClientHeight = 420
+  ClientWidth = 449
+  DesignTimePPI = 120
+  LCLVersion = '4.8.0.0'
+  object PageControl1: TPageControl
+    Left = 0
+    Height = 420
+    Top = 0
+    Width = 449
+    ActivePage = TabSheet1
+    Align = alClient
+    TabIndex = 0
+    TabOrder = 0
+    object TabSheet1: TTabSheet
+      Caption = 'TabSheet1'
+      ClientHeight = 387
+      ClientWidth = 441
+      object Button1: TButton
+        Left = 59
+        Height = 31
+        Top = 60
+        Width = 94
+        Caption = 'Button1'
+        TabOrder = 0
+        OnClick = Button1Click
+      end
+    end
+    object TabSheet2: TTabSheet
+      Caption = 'TabSheet2'
+    end
+  end
+end

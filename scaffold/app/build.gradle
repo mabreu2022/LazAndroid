@@ -7,7 +7,7 @@ android {
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.lazarus.android.demo"
+        applicationId project.hasProperty("appId") ? project.property("appId") : "com.lazarus.android.demo"
         minSdk 21
         targetSdk 34
         versionCode 1

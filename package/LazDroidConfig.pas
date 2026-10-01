@@ -15,7 +15,7 @@ uses
 const
   LAZDROID_CONFIG_FILENAME = 'lazdroiddeploy.xml';
   DEFAULT_PACKAGE_NAME    = 'com.lazarus.android.demo';
-  DEFAULT_ACTIVITY_NAME   = 'android.app.NativeActivity';
+  DEFAULT_ACTIVITY_NAME   = 'com.pascal.lclproject.LCLActivity';
   DEFAULT_SO_NAME         = 'liblazapp.so';
 
 type
@@ -187,24 +187,39 @@ begin
   if (FAdbPath = '') and (FileExists('adb.exe')) then
     FAdbPath := 'adb.exe';
 
-  // 2. Java Home
-  if GetEnvironmentVariable('JAVA_HOME') <> '' then
+  // 2. Java Home (validar existência real de bin\java.exe)
+  if (GetEnvironmentVariable('JAVA_HOME') <> '') and
+     FileExists(IncludeTrailingPathDelimiter(GetEnvironmentVariable('JAVA_HOME')) + 'bin' + PathDelim + 'java.exe') then
     FJavaHome := GetEnvironmentVariable('JAVA_HOME')
-  else if (ProgramFiles <> '') and DirectoryExists(ProgramFiles + PathDelim + 'Android' + PathDelim + 'Android Studio' + PathDelim + 'jbr') then
-    FJavaHome := ProgramFiles + PathDelim + 'Android' + PathDelim + 'Android Studio' + PathDelim + 'jbr'
   else if (ProgramFiles <> '') and DirectoryExists(ProgramFiles + PathDelim + 'Eclipse Adoptium') then
   begin
     if FindFirst(ProgramFiles + PathDelim + 'Eclipse Adoptium' + PathDelim + 'jdk*', faDirectory, NdkSearchRec) = 0 then
     begin
-      FJavaHome := ProgramFiles + PathDelim + 'Eclipse Adoptium' + PathDelim + NdkSearchRec.Name;
+      repeat
+        if FileExists(ProgramFiles + PathDelim + 'Eclipse Adoptium' + PathDelim + NdkSearchRec.Name + PathDelim + 'bin' + PathDelim + 'java.exe') then
+        begin
+          FJavaHome := ProgramFiles + PathDelim + 'Eclipse Adoptium' + PathDelim + NdkSearchRec.Name;
+          Break;
+        end;
+      until FindNext(NdkSearchRec) <> 0;
       FindClose(NdkSearchRec);
     end;
   end
+  else if DirectoryExists('D:\DesthStrokeIDE\Android\jdk') and FileExists('D:\DesthStrokeIDE\Android\jdk\bin\java.exe') then
+    FJavaHome := 'D:\DesthStrokeIDE\Android\jdk'
+  else if (ProgramFiles <> '') and FileExists(ProgramFiles + PathDelim + 'Android' + PathDelim + 'Android Studio' + PathDelim + 'jbr' + PathDelim + 'bin' + PathDelim + 'java.exe') then
+    FJavaHome := ProgramFiles + PathDelim + 'Android' + PathDelim + 'Android Studio' + PathDelim + 'jbr'
   else if (ProgramFiles <> '') and DirectoryExists(ProgramFiles + PathDelim + 'Java') then
   begin
     if FindFirst(ProgramFiles + PathDelim + 'Java' + PathDelim + 'jdk*', faDirectory, NdkSearchRec) = 0 then
     begin
-      FJavaHome := ProgramFiles + PathDelim + 'Java' + PathDelim + NdkSearchRec.Name;
+      repeat
+        if FileExists(ProgramFiles + PathDelim + 'Java' + PathDelim + NdkSearchRec.Name + PathDelim + 'bin' + PathDelim + 'java.exe') then
+        begin
+          FJavaHome := ProgramFiles + PathDelim + 'Java' + PathDelim + NdkSearchRec.Name;
+          Break;
+        end;
+      until FindNext(NdkSearchRec) <> 0;
       FindClose(NdkSearchRec);
     end;
   end;

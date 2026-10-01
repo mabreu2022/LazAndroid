@@ -200,6 +200,10 @@ begin
     if FWorkingDirectory <> '' then
       FProcess.CurrentDirectory := FWorkingDirectory;
 
+    // Herdar ambiente do sistema atual (SystemRoot, PATH, TEMP, etc.) para evitar erro de sockets do Java (10106)
+    for I := 1 to GetEnvironmentVariableCount do
+      FProcess.Environment.Add(GetEnvironmentString(I));
+
     if FEnvironment.Count > 0 then
     begin
       for I := 0 to FEnvironment.Count - 1 do
