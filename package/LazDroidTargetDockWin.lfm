@@ -1,0 +1,164 @@
+object LazDroidTargetDockForm: TLazDroidTargetDockForm
+  Left = 700
+  Height = 480
+  Top = 150
+  Width = 360
+  Caption = 'Dispositivos Alvo Android (Target)'
+  ClientHeight = 480
+  ClientWidth = 360
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnShow = FormShow
+  LCLVersion = '2.2.0.4'
+  object pnlToolbar: TPanel
+    Left = 0
+    Height = 34
+    Top = 0
+    Width = 360
+    Align = alTop
+    BevelOuter = bvNone
+    ClientHeight = 34
+    ClientWidth = 360
+    TabOrder = 0
+    object btnRefresh: TSpeedButton
+      Left = 4
+      Height = 26
+      Top = 4
+      Width = 72
+      Caption = '🔄 Atualizar'
+      Flat = True
+      OnClick = btnRefreshClick
+    end
+    object btnDeploy: TSpeedButton
+      Left = 80
+      Height = 26
+      Top = 4
+      Width = 82
+      Caption = '▶️ Deploy (F9)'
+      Flat = True
+      OnClick = btnDeployClick
+    end
+    object btnDebug: TSpeedButton
+      Left = 166
+      Height = 26
+      Top = 4
+      Width = 64
+      Caption = '🐞 Debug'
+      Flat = True
+      OnClick = btnDebugClick
+    end
+    object btnLogcat: TSpeedButton
+      Left = 234
+      Height = 26
+      Top = 4
+      Width = 62
+      Caption = '📋 Logcat'
+      Flat = True
+      OnClick = btnLogcatClick
+    end
+    object btnSettings: TSpeedButton
+      Left = 300
+      Height = 26
+      Top = 4
+      Width = 56
+      Caption = '⚙️ Opções'
+      Flat = True
+      OnClick = btnSettingsClick
+    end
+  end
+  object tvTargets: TTreeView
+    Left = 0
+    Height = 422
+    Top = 34
+    Width = 360
+    Align = alClient
+    DefaultItemHeight = 22
+    PopupMenu = pmDevice
+    ReadOnly = True
+    RowSelect = True
+    ShowLines = True
+    ShowRoot = True
+    TabOrder = 1
+    OnAdvancedCustomDrawItem = tvTargetsAdvancedCustomDrawItem
+    OnDblClick = tvTargetsDblClick
+    OnMouseDown = tvTargetsMouseDown
+    OnSelectionChanged = tvTargetsSelectionChanged
+  end
+  object pnlStatus: TPanel
+    Left = 0
+    Height = 24
+    Top = 456
+    Width = 360
+    Align = alBottom
+    BevelOuter = bvLowered
+    ClientHeight = 24
+    ClientWidth = 360
+    TabOrder = 2
+    object lblStatusLeft: TLabel
+      Left = 6
+      Height = 22
+      Top = 1
+      Width = 240
+      Align = alClient
+      Caption = ' Aguardando conexão USB...'
+      Layout = tlCenter
+      ParentColor = False
+    end
+    object lblStatusRight: TLabel
+      Left = 246
+      Height = 22
+      Top = 1
+      Width = 108
+      Align = alRight
+      Alignment = taRightJustify
+      Caption = 'Auto-detect: 2.5s '
+      Layout = tlCenter
+      ParentColor = False
+    end
+  end
+  object TimerDetect: TTimer
+    Interval = 2500
+    OnTimer = TimerDetectTimer
+    Left = 40
+    Top = 80
+  end
+  object pmDevice: TPopupMenu
+    Left = 120
+    Top = 80
+    object miSetDefault: TMenuItem
+      Caption = '★ Definir como Dispositivo Alvo Padrão'
+      Default = True
+      OnClick = miSetDefaultClick
+    end
+    object miDeployRun: TMenuItem
+      Caption = '▶️ Deploy & Executar (Ctrl+Shift+F9)'
+      OnClick = miDeployRunClick
+    end
+    object miDeployDebug: TMenuItem
+      Caption = '🐞 Deploy & Depurar (Ctrl+F9)'
+      OnClick = miDeployDebugClick
+    end
+    object miSep1: TMenuItem
+      Caption = '-'
+    end
+    object miDeviceProps: TMenuItem
+      Caption = '📱 Propriedades do Aparelho...'
+      OnClick = miDevicePropsClick
+    end
+    object miOpenLogcat: TMenuItem
+      Caption = '📋 Abrir Terminal Logcat (adb logcat)'
+      OnClick = miOpenLogcatClick
+    end
+    object miSep2: TMenuItem
+      Caption = '-'
+    end
+    object miRestartAdb: TMenuItem
+      Caption = '🔄 Reiniciar Servidor ADB (kill/start)'
+      OnClick = miRestartAdbClick
+    end
+    object miRefreshNow: TMenuItem
+      Caption = '🔄 Atualizar Lista Agora'
+      OnClick = miRefreshNowClick
+    end
+  end
+end

@@ -39,6 +39,7 @@ type
     FLogcatFilter: string;
     FExtraFpcFlags: string;
     FLogLevelDebug: Boolean;
+    FTargetDeviceSerial: string;
   public
     constructor Create;
     destructor Destroy; override;
@@ -70,6 +71,7 @@ type
     property LogcatFilter: string read FLogcatFilter write FLogcatFilter;
     property ExtraFpcFlags: string read FExtraFpcFlags write FExtraFpcFlags;
     property LogLevelDebug: Boolean read FLogLevelDebug write FLogLevelDebug;
+    property TargetDeviceSerial: string read FTargetDeviceSerial write FTargetDeviceSerial;
   end;
 
 function DroidConfig: TLazDroidSettings;
@@ -271,6 +273,7 @@ begin
       FLogcatFilter       := Storage.GetValue('LogcatFilter', FLogcatFilter);
       FExtraFpcFlags      := Storage.GetValue('ExtraFpcFlags', FExtraFpcFlags);
       FLogLevelDebug      := Storage.GetValue('LogLevelDebug', FLogLevelDebug);
+      FTargetDeviceSerial := Storage.GetValue('TargetDeviceSerial', FTargetDeviceSerial);
 
       AbiStr              := Storage.GetValue('DefaultAbi', 'arm64-v8a');
       FDefaultAbi         := StringToAbi(AbiStr);
@@ -303,6 +306,7 @@ begin
       Storage.SetValue('LogcatFilter', FLogcatFilter);
       Storage.SetValue('ExtraFpcFlags', FExtraFpcFlags);
       Storage.SetValue('LogLevelDebug', FLogLevelDebug);
+      Storage.SetValue('TargetDeviceSerial', FTargetDeviceSerial);
       Storage.SetValue('DefaultAbi', AbiToString(FDefaultAbi));
     finally
       Storage.Free;

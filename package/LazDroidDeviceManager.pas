@@ -10,7 +10,7 @@ unit LazDroidDeviceManager;
 interface
 
 uses
-  Classes, SysUtils, Process, LazDroidConfig;
+  Classes, SysUtils, Process;
 
 type
   { TAndroidDevice }
@@ -23,6 +23,10 @@ type
     TransportId: string;
     PrimaryAbi: string;
     AndroidVersion: string;
+    Manufacturer: string;
+    SdkLevel: string;
+    ScreenSize: string;
+    BatteryLevel: string;
     IsReady: Boolean;
   end;
 
@@ -39,10 +43,17 @@ type
     function EnumerateDevices: TAndroidDeviceArray;
     function QueryDeviceAbi(const ASerial: string): string;
     function QueryAndroidVersion(const ASerial: string): string;
+    function QueryDeviceManufacturer(const ASerial: string): string;
+    function QueryDeviceSdkLevel(const ASerial: string): string;
+    function QueryDeviceScreenSize(const ASerial: string): string;
+    function QueryDeviceBattery(const ASerial: string): string;
+    procedure PopulateFullDeviceInfo(var ADev: TAndroidDevice);
     function IsDeviceConnected(const ASerial: string): Boolean;
     function GetFirstReadyDevice(out ADev: TAndroidDevice): Boolean;
     function FormatDeviceDescription(const ADev: TAndroidDevice): string;
     function IsPackageInstalled(const ASerial, APackageName: string): Boolean;
+    function RestartAdbServer: Boolean;
+    function OpenLogcatConsole(const ASerial: string; const AFilter: string = ''): Boolean;
   end;
 
 implementation
@@ -119,6 +130,10 @@ begin
   ADev.TransportId := '';
   ADev.PrimaryAbi := '';
   ADev.AndroidVersion := '';
+  ADev.Manufacturer := '';
+  ADev.SdkLevel := '';
+  ADev.ScreenSize := '';
+  ADev.BatteryLevel := '';
   ADev.IsReady := False;
 
   Tokens := TStringList.Create;
@@ -142,7 +157,13 @@ begin
           Key := Copy(Token, 1, SepPos - 1);
           Val := Copy(Token, SepPos + 1, Length(Token));
 
-          if Key = 'model' then ADev.Model := StringReplace(Val, '_', ' ', [rfReplaceAll])
+          if Key = 'model' then
+          begin
+            if Pos('SM_', Val) = 1 then
+              ADev.Model := StringReplace(Val, '_', '-', [])
+            else
+              ADev.Model := StringReplace(Val, '_', ' ', [rfReplaceAll]);
+          end
           else if Key = 'product' then ADev.Product := Val
           else if Key = 'device' then ADev.DeviceCode := Val
           else if Key = 'transport_id' then ADev.TransportId := Val;
@@ -189,6 +210,14 @@ begin
       ParseDeviceLine(Line, Dev);
       if Dev.Serial <> '' then
       begin
+        if Dev.IsReady then
+        begin
+          Dev.PrimaryAbi := QueryDeviceAbi(Dev.Serial);
+          Dev.AndroidVersion := QueryAndroidVersion(Dev.Serial);
+          Dev.Manufacturer := QueryDeviceManufacturer(Dev.Serial);
+          if (Dev.Manufacturer <> '') and (Pos(LowerCase(Dev.Manufacturer), LowerCase(Dev.Model)) = 0) then
+            Dev.Model := UpperCase(Copy(Dev.Manufacturer, 1, 1)) + Copy(Dev.Manufacturer, 2, Length(Dev.Manufacturer)) + ' ' + Dev.Model;
+        end;
         Inc(Count);
         SetLength(Result, Count);
         Result[Count - 1] := Dev;
@@ -223,6 +252,120 @@ begin
     if Output <> '' then
       Result := 'Android ' + Output;
   end;
+end;
+
+function TLazDroidDeviceManager.QueryDeviceManufacturer(const ASerial: string): string;
+var
+  Output: string;
+begin
+  Result := '';
+  if RunCommandSync(FAdbPath, ['-s', ASerial, 'shell', 'getprop', 'ro.product.manufacturer'], Output) = 0 then
+    Result := Trim(Output);
+end;
+
+function TLazDroidDeviceManager.QueryDeviceSdkLevel(const ASerial: string): string;
+var
+  Output: string;
+begin
+  Result := '';
+  if RunCommandSync(FAdbPath, ['-s', ASerial, 'shell', 'getprop', 'ro.build.version.sdk'], Output) = 0 then
+    Result := Trim(Output);
+end;
+
+function TLazDroidDeviceManager.QueryDeviceScreenSize(const ASerial: string): string;
+var
+  Output: string;
+begin
+  Result := '';
+  if RunCommandSync(FAdbPath, ['-s', ASerial, 'shell', 'wm', 'size'], Output) = 0 then
+  begin
+    Output := Trim(Output);
+    Output := StringReplace(Output, 'Physical size: ', '', [rfIgnoreCase]);
+    Result := Trim(Output);
+  end;
+end;
+
+function TLazDroidDeviceManager.QueryDeviceBattery(const ASerial: string): string;
+var
+  Output: string;
+  Lines: TStringList;
+  I: Integer;
+  Line: string;
+begin
+  Result := '';
+  if RunCommandSync(FAdbPath, ['-s', ASerial, 'shell', 'dumpsys', 'battery'], Output) = 0 then
+  begin
+    Lines := TStringList.Create;
+    try
+      Lines.Text := Output;
+      for I := 0 to Lines.Count - 1 do
+      begin
+        Line := Trim(Lines[I]);
+        if Pos('level:', Line) = 1 then
+        begin
+          Result := Trim(Copy(Line, 7, Length(Line))) + '%';
+          Break;
+        end;
+      end;
+    finally
+      Lines.Free;
+    end;
+  end;
+end;
+
+procedure TLazDroidDeviceManager.PopulateFullDeviceInfo(var ADev: TAndroidDevice);
+begin
+  if not ADev.IsReady then Exit;
+  if ADev.PrimaryAbi = '' then
+    ADev.PrimaryAbi := QueryDeviceAbi(ADev.Serial);
+  if ADev.AndroidVersion = '' then
+    ADev.AndroidVersion := QueryAndroidVersion(ADev.Serial);
+  if ADev.Manufacturer = '' then
+    ADev.Manufacturer := QueryDeviceManufacturer(ADev.Serial);
+  ADev.SdkLevel := QueryDeviceSdkLevel(ADev.Serial);
+  ADev.ScreenSize := QueryDeviceScreenSize(ADev.Serial);
+  ADev.BatteryLevel := QueryDeviceBattery(ADev.Serial);
+end;
+
+function TLazDroidDeviceManager.RestartAdbServer: Boolean;
+var
+  OutStr: string;
+begin
+  RunCommandSync(FAdbPath, ['kill-server'], OutStr);
+  Result := (RunCommandSync(FAdbPath, ['start-server'], OutStr) = 0);
+end;
+
+function TLazDroidDeviceManager.OpenLogcatConsole(const ASerial: string; const AFilter: string): Boolean;
+var
+  Proc: TProcess;
+  FilterStr: string;
+begin
+  Result := False;
+  FilterStr := Trim(AFilter);
+  if FilterStr = '' then
+    FilterStr := 'LazApp:* AndroidRuntime:E DEBUG:* *:S';
+
+  Proc := TProcess.Create(nil);
+  try
+    Proc.Executable := 'cmd.exe';
+    Proc.Parameters.Add('/c');
+    Proc.Parameters.Add('start');
+    Proc.Parameters.Add('LazDroid Logcat [' + ASerial + ']');
+    Proc.Parameters.Add(FAdbPath);
+    Proc.Parameters.Add('-s');
+    Proc.Parameters.Add(ASerial);
+    Proc.Parameters.Add('logcat');
+    Proc.Parameters.Add('-v');
+    Proc.Parameters.Add('time');
+    if FilterStr <> '' then
+      Proc.Parameters.Add(FilterStr);
+    Proc.Options := [];
+    Proc.Execute;
+    Result := True;
+  except
+    Result := False;
+  end;
+  Proc.Free;
 end;
 
 function TLazDroidDeviceManager.IsDeviceConnected(const ASerial: string): Boolean;

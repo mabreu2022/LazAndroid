@@ -244,16 +244,16 @@ Write-Step "6/7" "Registrando pacotes LazDroidControls.lpk e LazDroidDeploy.lpk 
 
 if (Test-Path $ControlsPkg) {
     Write-Info "Registrando paleta de componentes LazDroidControls.lpk..."
-    & "$LazarusDir\lazbuild.exe" "--add-package-link=$ControlsPkg" | Out-Null
-    & "$LazarusDir\lazbuild.exe" "--add-package=$ControlsPkg" | Out-Null
+    & "$LazarusDir\lazbuild.exe" --add-package-link "$ControlsPkg" | Out-Null
+    & "$LazarusDir\lazbuild.exe" --add-package "$ControlsPkg" | Out-Null
     Write-Success "Paleta de componentes LazDroidControls.lpk registrada na IDE!"
 }
 
 $PkgPath = "$RepoRoot\package\LazDroidDeploy.lpk"
 if (Test-Path $PkgPath) {
     Write-Info "Registrando plugin LazDroidDeploy.lpk..."
-    & "$LazarusDir\lazbuild.exe" "--add-package-link=$PkgPath" | Out-Null
-    & "$LazarusDir\lazbuild.exe" "--add-package=$PkgPath" | Out-Null
+    & "$LazarusDir\lazbuild.exe" --add-package-link "$PkgPath" | Out-Null
+    & "$LazarusDir\lazbuild.exe" --add-package "$PkgPath" | Out-Null
     Write-Success "Pacote LazDroidDeploy.lpk registrado com sucesso no Lazarus!"
 } else {
     Write-Err "Pacote nao encontrado: $PkgPath"

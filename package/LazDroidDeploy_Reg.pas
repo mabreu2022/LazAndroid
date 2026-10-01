@@ -12,11 +12,11 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Dialogs, LCLType,
   // Lazarus Open Tools API units
-  MenuIntf, IDECommands, LazIDEIntf, IDEOptionsIntf, IDEOptEditorIntf,
+  MenuIntf, IDECommands, LazIDEIntf, IDEOptionsIntf, IDEOptEditorIntf, IDEWindowIntf,
   // LazDroid units
   LazDroidConfig, LazDroidConfigFrame, LazDroidDeviceManager,
   LazDroidDeviceSelectDlg, LazDroidPipeline, LazDroidProcessRunner,
-  LazDroidProjectDescriptor;
+  LazDroidProjectDescriptor, LazDroidTargetDockWin;
 
 var
   DroidOptionsIndex: Integer = 1050;
@@ -30,6 +30,7 @@ var
   CmdDeployAndDebug: TIDECommand = nil;
   CmdCancelDeploy: TIDECommand = nil;
   CmdConfigureProject: TIDECommand = nil;
+  CmdViewTarget: TIDECommand = nil;
   GlobalPipeline: TLazDroidPipeline = nil;
 
 procedure EnsurePipeline;
@@ -53,6 +54,7 @@ end;
 procedure DoDeployAndRun(Sender: TObject);
 var
   TargetDevice: TAndroidDevice;
+  HasTarget: Boolean;
 begin
   EnsurePipeline;
 
@@ -72,9 +74,36 @@ begin
     Exit;
   end;
 
-  // Seleciona dispositivo conectado via ADB
-  if not ShowSelectDeviceDialog(TargetDevice) then
-    Exit; // Usuário cancelou ou nenhum aparelho pronto
+  // 1. Tenta obter o dispositivo ativo selecionado na janela Target (estilo Delphi)
+  HasTarget := GetActiveTargetDevice(TargetDevice);
+
+  // 2. Se não achou na janela aberta, tenta consultar o serial salvo no DroidConfig
+  if not HasTarget and (DroidConfig.TargetDeviceSerial <> '') then
+  begin
+    TargetDevice.Serial := DroidConfig.TargetDeviceSerial;
+    if DroidConfig.AdbPath <> '' then
+    begin
+      with TLazDroidDeviceManager.Create(DroidConfig.AdbPath) do
+      try
+        if IsDeviceConnected(TargetDevice.Serial) then
+        begin
+          TargetDevice.PrimaryAbi := QueryDeviceAbi(TargetDevice.Serial);
+          TargetDevice.AndroidVersion := QueryAndroidVersion(TargetDevice.Serial);
+          TargetDevice.IsReady := True;
+          HasTarget := True;
+        end;
+      finally
+        Free;
+      end;
+    end;
+  end;
+
+  // 3. Se ainda não há dispositivo alvo selecionado, exibe diálogo
+  if not HasTarget then
+  begin
+    if not ShowSelectDeviceDialog(TargetDevice) then
+      Exit; // Usuário cancelou ou nenhum aparelho pronto
+  end;
 
   // Dispara esteira de compilação, empacotamento e deploy
   GlobalPipeline.Start(TargetDevice.Serial, False);
@@ -83,6 +112,7 @@ end;
 procedure DoDeployAndDebug(Sender: TObject);
 var
   TargetDevice: TAndroidDevice;
+  HasTarget: Boolean;
 begin
   EnsurePipeline;
 
@@ -102,9 +132,32 @@ begin
     Exit;
   end;
 
-  // Seleciona dispositivo conectado via ADB
-  if not ShowSelectDeviceDialog(TargetDevice) then
-    Exit;
+  HasTarget := GetActiveTargetDevice(TargetDevice);
+  if not HasTarget and (DroidConfig.TargetDeviceSerial <> '') then
+  begin
+    TargetDevice.Serial := DroidConfig.TargetDeviceSerial;
+    if DroidConfig.AdbPath <> '' then
+    begin
+      with TLazDroidDeviceManager.Create(DroidConfig.AdbPath) do
+      try
+        if IsDeviceConnected(TargetDevice.Serial) then
+        begin
+          TargetDevice.PrimaryAbi := QueryDeviceAbi(TargetDevice.Serial);
+          TargetDevice.AndroidVersion := QueryAndroidVersion(TargetDevice.Serial);
+          TargetDevice.IsReady := True;
+          HasTarget := True;
+        end;
+      finally
+        Free;
+      end;
+    end;
+  end;
+
+  if not HasTarget then
+  begin
+    if not ShowSelectDeviceDialog(TargetDevice) then
+      Exit;
+  end;
 
   // Dispara esteira em modo depuração GDB Remote
   GlobalPipeline.Start(TargetDevice.Serial, True);
@@ -176,6 +229,32 @@ begin
     @DoConfigureProject
   );
 
+  CmdViewTarget := RegisterIDECommand(
+    CmdCategory,
+    'ecLazDroidViewTarget',
+    'Dispositivos Alvo Android (Target)',
+    CleanIDEShortCut,
+    nil,
+    @ShowLazDroidTargetWindow
+  );
+
+  // 4. Registrar Janela Acoplável (Dockable Window estilo Delphi Target)
+  LazDroidTargetDockCreator := IDEWindowCreators.Add(
+    'TLazDroidTargetDockForm',
+    @CreateLazDroidTargetWindow, nil,
+    '700', '150', '1060', '650'
+  );
+
+  // Registrar item no menu Exibir (View)
+  RegisterIDEMenuCommand(
+    itmViewMainWindows,
+    'itmLazDroidViewTarget',
+    'Dispositivos Alvo Android (Target)',
+    nil,
+    @ShowLazDroidTargetWindow,
+    CmdViewTarget
+  );
+
   // 4. Registrar Itens no Menu 'Run' (Executar) da IDE
   RunSection := itmRunBuilding;
   if RunSection = nil then
@@ -215,6 +294,15 @@ begin
     nil,
     @DoCancelDeploy,
     CmdCancelDeploy
+  );
+
+  RegisterIDEMenuCommand(
+    RunSection,
+    'itmLazDroidTargetManager',
+    'Dispositivos Alvo Android (Target)...',
+    nil,
+    @ShowLazDroidTargetWindow,
+    CmdViewTarget
   );
 
   // 5. Registrar Página nas Opções da IDE (Tools -> Options -> Environment)

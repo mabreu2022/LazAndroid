@@ -12,6 +12,7 @@
 ## 🎯 Funcionalidades Principais
 
 - ⚡ **Deploy em 1-Clique na IDE**: Dispare compilação, empacotamento, instalação e execução com um único atalho (`Ctrl+Shift+F9`) ou botão no menu `Run`.
+- 🎯 **Gerenciador de Alvos Estilo Delphi (Target Manager)**: Janela acoplável com **reconhecimento automático de celular via USB (Plug & Play)**, exibição dinâmica do modelo do aparelho sob o nó `Target`, propriedades completas (bateria, tela, ABI, Android) e deploy direto no alvo ativo!
 - 🎨 **Componentes LCL Nativos na Tela**: Crie telas usando o **Form Designer do Lazarus** com `TForm`, `TButton`, `TLabel`, `TPanel`, `TPageControl`, `TEdit`, `TCheckBox`, etc., renderizados via LCL CustomDrawn (`customdrawn_android`).
 - 📁 **Novo Projeto em 1-Clique**: Registrado no menu `Arquivo -> Novo... -> Aplicação Android (LazDroid)`, já pré-configurando biblioteca JNI, LCLWidgetType, flags de compilador e form inicial.
 - 📱 **Detecção e ABI Inteligente**: Detecta celulares conectados via USB (`adb devices -l`), seleciona automaticamente a arquitetura nativa correta (`arm64-v8a` ou `armeabi-v7a`).
@@ -100,8 +101,11 @@ Para acelerar o desenvolvimento de aplicações comerciais e corporativas no And
 2. **Crie ou Abra um Projeto:**
    - No Lazarus, crie um novo aplicativo em `Arquivo -> Novo... -> Aplicação Android (LazDroid)`.
    - Ou abra qualquer uma das demos (`demo4/demo4.lpi`, `demo3/demo3.lpi`, `demo/LazAndroidDemo.lpi` ou `demo2/project1.lpi`).
-3. **Execute no Dispositivo Físico:**
-   - Conecte o aparelho via cabo USB com a *Depuração USB* ativa e pressione **`Ctrl + Shift + F9`**!
+3. **Plug & Play — Conecte o Aparelho no USB:**
+   - Abra a janela `Exibir -> Dispositivos Alvo Android (Target)` (ou ancore-a ao lado do Project Inspector).
+   - Plugue o cabo USB com *Depuração USB* ativada: o LazDroid reconhece o aparelho imediatamente e exibe seu modelo (ex: `🟢 Samsung SM-G780G [RQ8R70BFZEJ] (arm64-v8a | Android 13) ★ [ATIVO]`).
+4. **Execute no Dispositivo:**
+   - Pressione **`Ctrl + Shift + F9`** (ou dê duplo clique no alvo): a compilação, empacotamento e deploy ocorrem direto no celular sem caixas de diálogo!
 
 ---
 

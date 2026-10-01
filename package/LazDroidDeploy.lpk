@@ -26,7 +26,7 @@
     <Description Value="Open Tool para Lazarus IDE que automatiza a compilação cruzada, montagem do scaffold Android, empacotamento com Gradle e deploy via ADB sobre USB com um clique."/>
     <License Value="MIT"/>
     <Version Major="1" Minor="0" Release="0" Build="1"/>
-    <Files Count="8">
+    <Files Count="9">
       <Item1>
         <Filename Value="LazDroidDeploy_Reg.pas"/>
         <HasRegisterProc Value="True"/>
@@ -60,6 +60,10 @@
         <Filename Value="LazDroidProjectDescriptor.pas"/>
         <UnitName Value="LazDroidProjectDescriptor"/>
       </Item8>
+      <Item9>
+        <Filename Value="LazDroidTargetDockWin.pas"/>
+        <UnitName Value="LazDroidTargetDockWin"/>
+      </Item9>
     </Files>
     <RequiredPkgs Count="5">
       <Item1>
