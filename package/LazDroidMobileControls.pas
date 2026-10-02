@@ -12,7 +12,7 @@ unit LazDroidMobileControls;
 interface
 
 uses
-  Classes, SysUtils, Types, Graphics, Controls, Forms, StdCtrls, ExtCtrls, LCLType, LCLIntf;
+  Classes, SysUtils, Types, Math, Graphics, Controls, Forms, StdCtrls, ExtCtrls, LCLType, LCLIntf;
 
 type
   { Enumerações visuais }
@@ -25,6 +25,13 @@ type
   TLazDroidTabChangeEvent = procedure(Sender: TObject; AIndex: Integer) of object;
   TLazDroidItemClickEvent = procedure(Sender: TObject; AIndex: Integer) of object;
 
+{ Funções utilitárias de densidade e escala mobile (DPI/DP) }
+function GetMobileScale(AControl: TControl = nil): Double;
+function MobileDP(const AValue: Integer; AControl: TControl = nil): Integer;
+function MobileSP(const AValue: Integer; AControl: TControl = nil): Integer;
+procedure AdaptMobileFormLayout(AForm: TCustomForm);
+
+type
   { ---------------------------------------------------------------------------
     TLazDroidAppBar — Barra superior mobile com título, subtítulo e botões
     --------------------------------------------------------------------------- }
@@ -298,24 +305,202 @@ type
     property Font;
   end;
 
+  { ---------------------------------------------------------------------------
+    TLazDroidSwitch — Chave de alternância (Toggle Switch) estilo Material/iOS
+    --------------------------------------------------------------------------- }
+  TLazDroidSwitch = class(TGraphicControl)
+  private
+    FChecked: Boolean;
+    FOnColor: TColor;
+    FOffColor: TColor;
+    FThumbColor: TColor;
+    FOnChange: TNotifyEvent;
+    procedure SetChecked(const AValue: Boolean);
+  protected
+    procedure Paint; override;
+    procedure Click; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property Checked: Boolean read FChecked write SetChecked default False;
+    property OnColor: TColor read FOnColor write FOnColor default $00D97706;
+    property OffColor: TColor read FOffColor write FOffColor default $00E5E7EB;
+    property ThumbColor: TColor read FThumbColor write FThumbColor default clWhite;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property Enabled;
+    property Visible;
+    property Align;
+    property Anchors;
+  end;
+
+  { ---------------------------------------------------------------------------
+    TLazDroidActivityIndicator — Indicador circular animado de carregamento
+    --------------------------------------------------------------------------- }
+  TLazDroidActivityIndicator = class(TGraphicControl)
+  private
+    FActive: Boolean;
+    FColor: TColor;
+    FSpeed: Integer;
+    FStep: Integer;
+    FTimer: TTimer;
+    procedure SetActive(const AValue: Boolean);
+    procedure TimerTick(Sender: TObject);
+  protected
+    procedure Paint; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+  published
+    property Active: Boolean read FActive write SetActive default True;
+    property Color: TColor read FColor write FColor default $00D97706;
+    property Speed: Integer read FSpeed write FSpeed default 100;
+    property Enabled;
+    property Visible;
+    property Align;
+    property Anchors;
+  end;
+
+  { ---------------------------------------------------------------------------
+    TLazDroidFAB — Botão de Ação Flutuante (Floating Action Button) circular
+    --------------------------------------------------------------------------- }
+  TLazDroidFAB = class(TCustomControl)
+  private
+    FIcon: TLazDroidActionIcon;
+    FButtonColor: TColor;
+    FIconColor: TColor;
+    FIsPressed: Boolean;
+  protected
+    procedure Paint; override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property Icon: TLazDroidActionIcon read FIcon write FIcon default aiPlus;
+    property ButtonColor: TColor read FButtonColor write FButtonColor default $00D97706;
+    property IconColor: TColor read FIconColor write FIconColor default clWhite;
+    property Enabled;
+    property Visible;
+    property Align;
+    property Anchors;
+    property OnClick;
+  end;
+
+  { ---------------------------------------------------------------------------
+    TLazDroidLayout — Contêiner de auto-organização flexível (Stack Layout)
+    --------------------------------------------------------------------------- }
+  TLazDroidLayoutDirection = (ldVertical, ldHorizontal);
+
+  TLazDroidLayout = class(TCustomControl)
+  private
+    FDirection: TLazDroidLayoutDirection;
+    FSpacing: Integer;
+    FAutoArrange: Boolean;
+    procedure SetDirection(const AValue: TLazDroidLayoutDirection);
+    procedure SetSpacing(const AValue: Integer);
+    procedure SetAutoArrange(const AValue: Boolean);
+    procedure ArrangeControls;
+  protected
+    procedure Resize; override;
+    procedure Loaded; override;
+    procedure Paint; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property Direction: TLazDroidLayoutDirection read FDirection write SetDirection default ldVertical;
+    property Spacing: Integer read FSpacing write SetSpacing default 12;
+    property AutoArrange: Boolean read FAutoArrange write SetAutoArrange default True;
+    property Align;
+    property Anchors;
+    property Color default clNone;
+    property Enabled;
+    property Visible;
+  end;
+
 procedure Register;
 
 implementation
 
-{ Rotina auxiliar de desenho de ícones geométricos limpos }
-procedure DrawMobileIcon(Canvas: TCanvas; Icon: TLazDroidActionIcon; const R: TRect; Color: TColor);
+{ Funções utilitárias de densidade e escala mobile (DPI/DP) }
+function GetMobileScale(AControl: TControl = nil): Double;
 var
-  cx, cy, s: Integer;
+  W: Integer;
+begin
+  Result := 1.0;
+  W := Screen.Width;
+  if Assigned(AControl) then
+  begin
+    if Assigned(AControl.Parent) then
+    begin
+      if AControl.Parent is TCustomForm then
+        W := TCustomForm(AControl.Parent).ClientWidth
+      else
+        W := AControl.Parent.ClientWidth;
+    end
+    else if AControl is TCustomForm then
+      W := TCustomForm(AControl).ClientWidth;
+  end;
+
+  // No Android, a largura base de design é 360dp.
+  // 1080 / 360 = 3.0x; 720 / 360 = 2.0x; 1440 / 360 = 4.0x
+  if W >= 600 then
+    Result := W / 360.0
+  else if Screen.PixelsPerInch > 120 then
+    Result := Screen.PixelsPerInch / 120.0
+  else
+    Result := 1.0;
+
+  if Result < 1.0 then Result := 1.0;
+end;
+
+function MobileDP(const AValue: Integer; AControl: TControl = nil): Integer;
+begin
+  Result := Round(AValue * GetMobileScale(AControl));
+end;
+
+function MobileSP(const AValue: Integer; AControl: TControl = nil): Integer;
+begin
+  Result := Round(AValue * GetMobileScale(AControl));
+end;
+
+procedure AdaptMobileFormLayout(AForm: TCustomForm);
+begin
+  if not Assigned(AForm) then Exit;
+  if AForm.Tag = 9999 then Exit;
+  AForm.Tag := 9999;
+
+  // No Android CustomDrawn, o LCL já invoca AutoAdjustLayout em ShowHide e OnConfigurationChanged.
+  // Se a largura já foi expandida para a resolução física (>= 600px), não precisa re-escalar.
+  if AForm.ClientWidth >= 600 then Exit;
+
+  // Caso esteja em modo legado com tela ainda em 320/360dp, executa AutoAdjustLayout nativo do LCL
+  if (Screen.Width > AForm.ClientWidth) and (Screen.PixelsPerInch > 0) then
+  begin
+    AForm.AutoAdjustLayout(lapAutoAdjustWithoutHorizontalScrolling,
+      AForm.DesignTimePPI, Screen.PixelsPerInch, AForm.ClientWidth, Screen.Width);
+  end;
+end;
+
+{ Rotina auxiliar de desenho de ícones geométricos limpos }
+procedure DrawMobileIcon(Canvas: TCanvas; Icon: TLazDroidActionIcon; const R: TRect; Color: TColor; const AScale: Double = 1.0);
+var
+  cx, cy, s, penW: Integer;
 begin
   if Icon = aiNone then Exit;
-  Canvas.Pen.Color := Color;
-  Canvas.Pen.Width := 2;
-  Canvas.Pen.Style := psSolid;
-  Canvas.Brush.Style := bsClear;
-
   cx := (R.Left + R.Right) div 2;
   cy := (R.Top + R.Bottom) div 2;
-  s := 7;
+
+  // O tamanho do ícone adapta-se perfeitamente ao retângulo delimitador R
+  s := (R.Bottom - R.Top) div 4;
+  if s < 6 then s := 6;
+
+  penW := (R.Bottom - R.Top) div 14;
+  if penW < 2 then penW := 2;
+
+  Canvas.Pen.Color := Color;
+  Canvas.Pen.Width := penW;
+  Canvas.Pen.Style := psSolid;
+  Canvas.Brush.Style := bsClear;
 
   case Icon of
     aiBack:
@@ -330,9 +515,9 @@ begin
     end;
     aiMenu:
     begin
-      Canvas.Line(cx - s, cy - 5, cx + s, cy - 5);
+      Canvas.Line(cx - s, cy - (s * 3 div 4), cx + s, cy - (s * 3 div 4));
       Canvas.Line(cx - s, cy, cx + s, cy);
-      Canvas.Line(cx - s, cy + 5, cx + s, cy + 5);
+      Canvas.Line(cx - s, cy + (s * 3 div 4), cx + s, cy + (s * 3 div 4));
     end;
     aiClose:
     begin
@@ -346,8 +531,8 @@ begin
     end;
     aiSearch:
     begin
-      Canvas.Ellipse(cx - s, cy - s, cx + 2, cy + 2);
-      Canvas.Line(cx + 1, cy + 1, cx + s, cy + s);
+      Canvas.Ellipse(cx - s, cy - s, cx + s div 3, cy + s div 3);
+      Canvas.Line(cx + s div 4, cy + s div 4, cx + s, cy + s);
     end;
     aiFilter:
     begin
@@ -381,13 +566,21 @@ begin
 end;
 
 function TLazDroidAppBar.GetBackRect: TRect;
+var
+  BtnSz, Pad: Integer;
 begin
-  Result := Rect(8, (Height - 40) div 2, 48, (Height + 40) div 2);
+  BtnSz := Round(Height * 0.72);
+  Pad := (Height - BtnSz) div 2;
+  Result := Rect(Pad, Pad, Pad + BtnSz, Pad + BtnSz);
 end;
 
 function TLazDroidAppBar.GetActionRect: TRect;
+var
+  BtnSz, Pad: Integer;
 begin
-  Result := Rect(Width - 48, (Height - 40) div 2, Width - 8, (Height + 40) div 2);
+  BtnSz := Round(Height * 0.72);
+  Pad := (Height - BtnSz) div 2;
+  Result := Rect(Width - Pad - BtnSz, Pad, Width - Pad, Pad + BtnSz);
 end;
 
 procedure TLazDroidAppBar.Paint;
@@ -404,7 +597,7 @@ begin
     if FBackHover then
     begin
       Canvas.Brush.Color := TColor($003A2A20);
-      Canvas.RoundRect(R.Left, R.Top, R.Right, R.Bottom, 8, 8);
+      Canvas.RoundRect(R.Left, R.Top, R.Right, R.Bottom, Height div 8, Height div 8);
     end;
     DrawMobileIcon(Canvas, aiBack, R, FTitleColor);
   end;
@@ -415,13 +608,13 @@ begin
     if FActionHover then
     begin
       Canvas.Brush.Color := TColor($003A2A20);
-      Canvas.RoundRect(R.Left, R.Top, R.Right, R.Bottom, 8, 8);
+      Canvas.RoundRect(R.Left, R.Top, R.Right, R.Bottom, Height div 8, Height div 8);
     end;
     DrawMobileIcon(Canvas, FActionIcon, R, FTitleColor);
   end;
 
-  TextLeft := 16;
-  if FShowBack then TextLeft := 52;
+  TextLeft := Round(Height * 0.3);
+  if FShowBack then TextLeft := Height + (Height div 8);
 
   Canvas.Brush.Style := bsClear;
   Canvas.Font := Self.Font;
@@ -429,11 +622,11 @@ begin
 
   if FSubtitle <> '' then
   begin
-    Canvas.TextOut(TextLeft, 8, FTitle);
-    Canvas.Font.Size := 9;
+    Canvas.TextOut(TextLeft, Round(Height * 0.16), FTitle);
+    Canvas.Font.Size := Max(8, Round(Self.Font.Size * 0.72));
     Canvas.Font.Style := [];
     Canvas.Font.Color := FSubtitleColor;
-    Canvas.TextOut(TextLeft, 30, FSubtitle);
+    Canvas.TextOut(TextLeft, Round(Height * 0.54), FSubtitle);
   end
   else
   begin
@@ -544,6 +737,8 @@ var
   BgCol: TColor;
   tx, ty: Integer;
   R: TRect;
+  Radius: Integer;
+  IconSz, IconPad: Integer;
 begin
   BgCol := GetBaseColor;
   if FIsPressed then
@@ -554,7 +749,7 @@ begin
   if (FVariant = bvOutline) then
   begin
     Canvas.Pen.Color := GetTextColor;
-    Canvas.Pen.Width := 2;
+    Canvas.Pen.Width := Max(2, Height div 20);
   end
   else
   begin
@@ -562,11 +757,14 @@ begin
     Canvas.Pen.Width := 1;
   end;
 
-  Canvas.RoundRect(R.Left, R.Top, R.Right, R.Bottom, FCornerRadius, FCornerRadius);
+  Radius := Max(6, Round(FCornerRadius * (Height / 48.0)));
+  Canvas.RoundRect(R.Left, R.Top, R.Right, R.Bottom, Radius, Radius);
 
   if FIcon <> aiNone then
   begin
-    DrawMobileIcon(Canvas, FIcon, Rect(R.Left + 12, R.Top + 12, R.Left + 36, R.Bottom - 12), GetTextColor);
+    IconSz := Round(Height * 0.55);
+    IconPad := (Height - IconSz) div 2;
+    DrawMobileIcon(Canvas, FIcon, Rect(R.Left + IconPad, IconPad, R.Left + IconPad + IconSz, IconPad + IconSz), GetTextColor);
   end;
 
   Canvas.Brush.Style := bsClear;
@@ -575,7 +773,7 @@ begin
   if not Enabled then Canvas.Font.Color := clGray;
 
   tx := (Width - Canvas.TextWidth(FCaption)) div 2;
-  if FIcon <> aiNone then tx := tx + 10;
+  if FIcon <> aiNone then tx := tx + (Height div 4);
   ty := (Height - Canvas.TextHeight(FCaption)) div 2;
   Canvas.TextOut(tx, ty, FCaption);
 end;
@@ -1134,6 +1332,279 @@ begin
     SetSelectedIndex(ClickedIndex);
 end;
 
+{ =============================================================================
+  TLazDroidSwitch
+  ============================================================================= }
+
+constructor TLazDroidSwitch.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  Width := 52;
+  Height := 30;
+  FChecked := False;
+  FOnColor := $00D97706;  // Amber / Primary
+  FOffColor := $00E5E7EB; // Cool Gray 200
+  FThumbColor := clWhite;
+end;
+
+procedure TLazDroidSwitch.SetChecked(const AValue: Boolean);
+begin
+  if FChecked <> AValue then
+  begin
+    FChecked := AValue;
+    Invalidate;
+    if Assigned(FOnChange) then FOnChange(Self);
+  end;
+end;
+
+procedure TLazDroidSwitch.Click;
+begin
+  SetChecked(not FChecked);
+  inherited Click;
+end;
+
+procedure TLazDroidSwitch.Paint;
+var
+  vDiameter, vLeft, Pad: Integer;
+begin
+  if FChecked then
+    Canvas.Brush.Color := FOnColor
+  else
+    Canvas.Brush.Color := FOffColor;
+
+  Canvas.Pen.Color := Canvas.Brush.Color;
+  Canvas.RoundRect(0, 0, Width, Height, Height, Height);
+
+  Pad := Max(2, Height div 10);
+  vDiameter := Height - (Pad * 2);
+  if FChecked then
+    vLeft := Width - vDiameter - Pad
+  else
+    vLeft := Pad;
+
+  Canvas.Brush.Color := FThumbColor;
+  Canvas.Pen.Color := FThumbColor;
+  Canvas.Ellipse(vLeft, Pad, vLeft + vDiameter, Pad + vDiameter);
+end;
+
+{ =============================================================================
+  TLazDroidActivityIndicator
+  ============================================================================= }
+
+constructor TLazDroidActivityIndicator.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  Width := 36;
+  Height := 36;
+  FActive := True;
+  FColor := $00D97706;
+  FSpeed := 100;
+  FStep := 0;
+  FTimer := TTimer.Create(Self);
+  FTimer.Interval := FSpeed;
+  FTimer.OnTimer := @TimerTick;
+  FTimer.Enabled := FActive and not (csDesigning in ComponentState);
+end;
+
+destructor TLazDroidActivityIndicator.Destroy;
+begin
+  FTimer.Free;
+  inherited Destroy;
+end;
+
+procedure TLazDroidActivityIndicator.SetActive(const AValue: Boolean);
+begin
+  if FActive <> AValue then
+  begin
+    FActive := AValue;
+    if Assigned(FTimer) then
+      FTimer.Enabled := FActive and not (csDesigning in ComponentState);
+    Invalidate;
+  end;
+end;
+
+procedure TLazDroidActivityIndicator.TimerTick(Sender: TObject);
+begin
+  FStep := (FStep + 1) mod 8;
+  Invalidate;
+end;
+
+procedure TLazDroidActivityIndicator.Paint;
+var
+  I, vRadius, vIndex: Integer;
+  vCenter: TPoint;
+  PenW: Integer;
+begin
+  vCenter := Point(Width div 2, Height div 2);
+  vRadius := Min(Width, Height) div 2;
+  vRadius := vRadius - Max(2, vRadius div 6);
+  if vRadius < 2 then Exit;
+
+  PenW := Max(2, vRadius div 5);
+  Canvas.Pen.Width := PenW;
+  Canvas.Brush.Style := bsClear;
+
+  for I := 0 to 7 do
+  begin
+    vIndex := (I + FStep) mod 8;
+    if vIndex < 3 then
+      Canvas.Pen.Color := FColor
+    else
+      Canvas.Pen.Color := $00E5E7EB;
+
+    Canvas.Line(
+      vCenter.X + Round(vRadius * Cos(I * Pi / 4) * 0.55),
+      vCenter.Y + Round(vRadius * Sin(I * Pi / 4) * 0.55),
+      vCenter.X + Round(vRadius * Cos(I * Pi / 4)),
+      vCenter.Y + Round(vRadius * Sin(I * Pi / 4))
+    );
+  end;
+end;
+
+{ =============================================================================
+  TLazDroidFAB
+  ============================================================================= }
+
+constructor TLazDroidFAB.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  ControlStyle := ControlStyle + [csOpaque];
+  Width := 56;
+  Height := 56;
+  FIcon := aiPlus;
+  FButtonColor := $00D97706; // Amber
+  FIconColor := clWhite;
+  FIsPressed := False;
+end;
+
+procedure TLazDroidFAB.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  inherited MouseDown(Button, Shift, X, Y);
+  FIsPressed := True;
+  Invalidate;
+end;
+
+procedure TLazDroidFAB.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  inherited MouseUp(Button, Shift, X, Y);
+  FIsPressed := False;
+  Invalidate;
+end;
+
+procedure TLazDroidFAB.Paint;
+var
+  BgCol: TColor;
+  R: TRect;
+begin
+  BgCol := FButtonColor;
+  if FIsPressed then
+    BgCol := TColor(Integer(BgCol) - $00151515);
+
+  Canvas.Brush.Color := BgCol;
+  Canvas.Pen.Color := BgCol;
+  Canvas.Ellipse(0, 0, Width, Height);
+
+  R := Rect(Round(Width * 0.22), Round(Height * 0.22), Round(Width * 0.78), Round(Height * 0.78));
+  DrawMobileIcon(Canvas, FIcon, R, FIconColor);
+end;
+
+{ =============================================================================
+  TLazDroidLayout
+  ============================================================================= }
+
+constructor TLazDroidLayout.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  ControlStyle := ControlStyle + [csAcceptsControls];
+  FDirection := ldVertical;
+  FSpacing := 12;
+  FAutoArrange := True;
+  Color := clNone;
+  Width := 200;
+  Height := 200;
+end;
+
+procedure TLazDroidLayout.SetDirection(const AValue: TLazDroidLayoutDirection);
+begin
+  if FDirection <> AValue then
+  begin
+    FDirection := AValue;
+    ArrangeControls;
+  end;
+end;
+
+procedure TLazDroidLayout.SetSpacing(const AValue: Integer);
+begin
+  if FSpacing <> AValue then
+  begin
+    FSpacing := Max(0, AValue);
+    ArrangeControls;
+  end;
+end;
+
+procedure TLazDroidLayout.SetAutoArrange(const AValue: Boolean);
+begin
+  if FAutoArrange <> AValue then
+  begin
+    FAutoArrange := AValue;
+    ArrangeControls;
+  end;
+end;
+
+procedure TLazDroidLayout.ArrangeControls;
+var
+  I, LPos: Integer;
+  C: TControl;
+begin
+  if not FAutoArrange then Exit;
+  if csLoading in ComponentState then Exit;
+
+  LPos := FSpacing;
+  for I := 0 to ControlCount - 1 do
+  begin
+    C := Controls[I];
+    if not C.Visible then Continue;
+
+    if FDirection = ldVertical then
+    begin
+      C.Left := FSpacing;
+      C.Top := LPos;
+      C.Width := ClientWidth - (FSpacing * 2);
+      LPos := C.Top + C.Height + FSpacing;
+    end
+    else
+    begin
+      C.Left := LPos;
+      C.Top := FSpacing;
+      LPos := C.Left + C.Width + FSpacing;
+    end;
+  end;
+end;
+
+procedure TLazDroidLayout.Resize;
+begin
+  inherited Resize;
+  ArrangeControls;
+end;
+
+procedure TLazDroidLayout.Loaded;
+begin
+  inherited Loaded;
+  ArrangeControls;
+end;
+
+procedure TLazDroidLayout.Paint;
+begin
+  inherited Paint;
+  if (csDesigning in ComponentState) and (Color = clNone) then
+  begin
+    Canvas.Pen.Color := $00D0D0D0;
+    Canvas.Pen.Style := psDash;
+    Canvas.Brush.Style := bsClear;
+    Canvas.Rectangle(ClientRect);
+  end;
+end;
+
 procedure Register;
 begin
   RegisterComponents('LazDroid', [
@@ -1142,6 +1613,10 @@ begin
     TLazDroidEdit,
     TLazDroidCard,
     TLazDroidBadge,
+    TLazDroidSwitch,
+    TLazDroidActivityIndicator,
+    TLazDroidFAB,
+    TLazDroidLayout,
     TLazDroidBottomNav,
     TLazDroidListView
   ]);

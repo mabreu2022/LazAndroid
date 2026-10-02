@@ -16,12 +16,14 @@ uses
   // LazDroid units
   LazDroidConfig, LazDroidConfigFrame, LazDroidDeviceManager,
   LazDroidDeviceSelectDlg, LazDroidPipeline, LazDroidProcessRunner,
-  LazDroidProjectDescriptor, LazDroidTargetDockWin;
+  LazDroidProjectDescriptor, LazDroidTargetDockWin, LazDroidEditorBar;
 
 var
   DroidOptionsIndex: Integer = 1050;
 
 procedure Register;
+procedure DoDeployAndRun(Sender: TObject);
+procedure DoOpenLogcat(Sender: TObject);
 
 implementation
 
@@ -311,11 +313,42 @@ begin
     TLazDroidOptionsFrame,
     DroidOptionsIndex
   )^.Index;
+
+  // 6. Instalar Barra Rápida no Editor de Código
+  InstallLazDroidEditorBar;
+  if Assigned(LazDroidEditorBarInstance) then
+  begin
+    LazDroidEditorBarInstance.OnDeploy := @DoDeployAndRun;
+    LazDroidEditorBarInstance.OnLogcat := @DoOpenLogcat;
+  end;
+end;
+
+procedure DoOpenLogcat(Sender: TObject);
+var
+  Serial: string;
+  Dev: TAndroidDevice;
+begin
+  Serial := DroidConfig.TargetDeviceSerial;
+  if (Serial = '') and GetActiveTargetDevice(Dev) then
+    Serial := Dev.Serial;
+
+  if Serial <> '' then
+  begin
+    with TLazDroidDeviceManager.Create(DroidConfig.AdbPath) do
+    try
+      OpenLogcatConsole(Serial, DroidConfig.LogcatFilter);
+    finally
+      Free;
+    end;
+  end
+  else
+    ShowMessage('Nenhum dispositivo Android selecionado para abrir o Logcat.');
 end;
 
 initialization
 
 finalization
+  UninstallLazDroidEditorBar;
   if Assigned(GlobalPipeline) then
     FreeAndNil(GlobalPipeline);
 

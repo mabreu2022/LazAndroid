@@ -1,881 +1,516 @@
 package com.pascal.lclproject;
 
-import android.app.*;
-import android.content.*;
-import android.os.*;
-import android.widget.*;
-import android.util.*;
-import android.graphics.*;
-import android.text.*;
-import android.view.*;
-import android.view.inputmethod.*;
-import android.view.MenuItem.*;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
-import android.content.Intent;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.telephony.SmsManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import java.util.*;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
+import android.text.InputType;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.BaseInputConnection;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputConnection;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.FrameLayout;
+import java.util.ArrayList;
 
-public class LCLActivity extends Activity implements SensorEventListener, LocationListener
-{
-  // -------------------------------------------
-  // Input connection to get character events
-  // -------------------------------------------
-  private class LCLInputConnection extends BaseInputConnection
-  {
-    private SpannableStringBuilder _editable;
-    View _lclView;
+/**
+ * LazDroid LCLActivity
+ * Camada de comunicação Java/Android para aplicações Lazarus LCL CustomDrawn.
+ * Incorpora renderização de alta densidade (DPI), controle de Safe Area (insets),
+ * captura avançada de teclado virtual (IME) e tratamento robusto de ciclo de vida.
+ */
+public class LCLActivity extends Activity {
+    private static final String TAG = "LazDroid";
+    private static boolean crashLoggerInstalled = false;
 
-    public LCLInputConnection(View targetView, boolean fullEditor)
-    {
-      super(targetView, fullEditor);
-      _lclView = (View) targetView;
+    // Campos exportados para o runtime Pascal da LCL
+    public String lcltext = "";
+    public String lcltitle = "";
+    public String lclbutton1str = "";
+    public String lclbutton2str = "";
+    public String lclbutton3str = "";
+    public int lclwidth = 0;
+    public int lclheight = 0;
+    public int lclbutton1 = 0;
+    public int lclbutton2 = 0;
+    public int lclbutton3 = 0;
+    public Bitmap lclbitmap = null;
+    public int lcltextsize = 16;
+    public int lcltextascent = 0;
+    public int lcltextbottom = 0;
+    public int lcltextdescent = 0;
+    public int lcltextleading = 0;
+    public int lcltexttop = 0;
+    public int lclmaxwidth = 0;
+    public int lclmaxcount = 0;
+    public float[] lclpartialwidths = null;
+    public int lcltimerinterval = 0;
+    public Runnable lcltimerid = null;
+    public int lclxdpi = 160;
+    public int lclydpi = 160;
+    public int lclformwidth = 0;
+    public int lclformheight = 0;
+    public int lclscreenwidth = 0;
+    public int lclscreenheight = 0;
+    public String lcldestination = "";
+    public int lclkind = 0;
+    public String[] lclmenu_captions = null;
+
+    // Configurações de renderização
+    // Modo Nativo: LCL desenha no DPI físico do aparelho
+    // Modo Compositor: LCL desenha em resolução base e o Android escala via hardware
+    private static final boolean LAZDROID_NATIVE_RENDER = true;
+    private static final int LAZDROID_DESIGN_WIDTH = 360;
+    private static final int LAZDROID_DESIGN_HEIGHT = 640;
+
+    private Handler handler = new Handler();
+    private Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private LCLView lclView;
+    private int mDesignWidth = 0;
+    private int mDesignHeight = 0;
+    private final ArrayList<Runnable> timers = new ArrayList<Runnable>();
+
+    static {
+        // Carrega bibliotecas C/Pascal
+        try {
+            try {
+                System.loadLibrary("sqlite");
+                Log.i(TAG, "libsqlite.so carregada.");
+            } catch (Throwable t) {
+                // opcional
+            }
+            try {
+                System.loadLibrary("lazapp");
+                Log.i(TAG, "liblazapp.so carregada com sucesso.");
+            } catch (Throwable t1) {
+                try {
+                    System.loadLibrary("project1");
+                    Log.i(TAG, "libproject1.so carregada com sucesso.");
+                } catch (Throwable t2) {
+                    Log.w(TAG, "Nao foi possivel carregar liblazapp/libproject1: " + t2.getMessage());
+                }
+            }
+            Log.i(TAG, "Bibliotecas nativas inicializadas.");
+        } catch (UnsatisfiedLinkError e) {
+            Log.e(TAG, "Falha fatal ao carregar bibliotecas nativas: " + e.getMessage(), e);
+        }
     }
 
-/*    public Editable getEditable()
-    {
-      if (_editable == null)
-      {
-        _editable = (SpannableStringBuilder) Editable.Factory.getInstance()
-        .newEditable("Placeholder");
-      }
-      return _editable;
-    } This crashes in HTC!!! */
-
-    // This method sends a text to be added at the current cursor position
-    @Override public boolean commitText(CharSequence text, int newCursorPosition)
-    {
-      //if (_editable != null) _editable.append(text);
-      Log.v("lclproject", "LCLInputConnection.commitText =" + text + " newCursorPosition=" + Integer.toString(newCursorPosition));
-
-      // Send each character of the string
-      int eventResult, i;
-      for (i = 0; i<text.length(); i++)
-      {
-        eventResult = LCLOnKey(-1, 0, null, (int) text.charAt(i));
-        ProcessEventResult(eventResult);
-      }
-      return true;
-    }
-
-    @Override public boolean deleteSurroundingText(int leftLength, int rightLength)
-    {
-      Log.v("lclproject", "LCLInputConnection.deleteSurroundingText left=" + Integer.toString(leftLength) + " right=" + Integer.toString(rightLength));
-
-      // For each left surrounding text deletion, send a backspace key
-      int eventResult, i;
-      for (i = 0; i<leftLength; i++)
-      {
-        eventResult = LCLOnKey(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL, null, (char) 0);
-        ProcessEventResult(eventResult);
-        eventResult = LCLOnKey(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL, null, (char) 0);
-        ProcessEventResult(eventResult);
-      }
-
-      // For each right surrounding text deletion, send a del key
-      // KEYCODE_FORWARD_DEL Since: API Level 11
-      /*for (i = 0; i<leftLength; i++)
-      {
-        eventResult = LCLOnKey(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_FORWARD_DEL, null, (char) 0);
-        if ((eventResult & 1) != 0) lclsurface.postInvalidate();
-        eventResult = LCLOnKey(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_FORWARD_DEL, null, (char) 0);
-        if ((eventResult & 1) != 0) lclsurface.postInvalidate();
-      }*/
-
-      return super.deleteSurroundingText(leftLength, rightLength);
-    }
-
-    @Override public boolean performEditorAction(int actionCode)
-    {
-      Log.i("lclapp", "LCLInputConnection.performEditorAction: " + actionCode);
-      int eventResult = LCLOnKey(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER, null, 13);
-      ProcessEventResult(eventResult);
-      eventResult = LCLOnKey(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER, null, 13);
-      ProcessEventResult(eventResult);
-      return true;
-    }
-
-    @Override public boolean sendKeyEvent(KeyEvent event)
-    {
-      Log.v("lclapp", "LCLInputConnection.sendKeyEvent: keyCode=" + event.getKeyCode() + " action=" + event.getAction());
-      int eventResult = LCLOnKey(event.getAction(), event.getKeyCode(), event, event.getUnicodeChar());
-      ProcessEventResult(eventResult);
-      return true;
-    }
-  }
-
-  // -------------------------------------------
-  // Our drawing surface
-  // -------------------------------------------
-  private class LCLSurface extends View
-  {
-    private Bitmap canvasbitmap; // This is the buffered canvas bitmap, which is reused until the canvas size changes
-
-    public LCLSurface(Context context)
-    {
-      super(context);
-      // Allows View.postInvalidate() to work
-      setWillNotDraw(false);
-      // We already double buffer, so no need for a second one
-      setWillNotCacheDrawing(true);
-      // Set focus on us to get keyboard events
-      requestFocus();
-      setFocusableInTouchMode(true);
-    }
-
-    @Override protected void onDraw(Canvas canvas)
-    {
-      int lWidth = getWidth();
-      int lHeight = getHeight();
-      if (lWidth <= 0 || lHeight <= 0) return;
-      Log.i("lclapp", "onDraw w=" + lWidth + " h=" + lHeight);
-      int oldlclformwidth = lclformwidth;
-
-      lclformwidth = lWidth;
-      lclformheight = lHeight;
-      lclscreenwidth = lclformwidth;
-      lclscreenheight = lclformheight;
-
-      // Check if we rotated in the draw event.
-      // LCLOnConfigurationChanged is called from here because the Android event
-      // OnConfigurationChanged can't return the new form width =(
-      // see http://stackoverflow.com/questions/2524683/how-to-get-new-width-height-of-root-layout-in-onconfigurationchanged
-      if (lWidth != oldlclformwidth) LCLOnConfigurationChanged(lclxdpi, lWidth); // we send xdpi because thats what the LCL uses for Screen.PixelsPerInch
-
-      //Log.v("lclproject", "LCLSurface.onDraw width=" + Integer.toString(lWidth)
-      //  + " height=" + Integer.toString(lHeight));
-
-      if ((canvasbitmap == null) || (canvasbitmap.getWidth() != lWidth) || (canvasbitmap.getHeight() != lHeight))
-	canvasbitmap = Bitmap.createBitmap(lWidth, lHeight, Bitmap.Config.ARGB_8888);
-      LCLDrawToBitmap(lWidth, lHeight, canvasbitmap);
-      canvas.drawBitmap(canvasbitmap, 0, 0, null);
-
-      try {
-        java.io.File dumpFile = new java.io.File(getFilesDir(), "lcl_render_dump.png");
-        java.io.FileOutputStream fos = new java.io.FileOutputStream(dumpFile);
-        canvasbitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-        fos.close();
-        Log.i("lclapp", "Bitmap dump salvo: " + dumpFile.getAbsolutePath() + " (" + dumpFile.length() + " bytes)");
-      } catch (Throwable t) {
-        Log.e("lclapp", "Bitmap dump erro: " + t.getMessage(), t);
-      }
-    }
-
-    @Override public boolean onKeyDown (int keyCode, KeyEvent event)
-    {
-      super.onKeyDown(keyCode, event);
-      int eventResult = LCLOnKey(KeyEvent.ACTION_DOWN, keyCode, event, (char) 0);
-      ProcessEventResult(eventResult);
-      return true;
-    }
-
-    @Override public boolean onKeyUp (int keyCode, KeyEvent event)
-    {
-      int eventResult = LCLOnKey(KeyEvent.ACTION_UP, keyCode, event, event.getUnicodeChar());
-      ProcessEventResult(eventResult);
-
-      super.onKeyUp(keyCode, event);
-      if ((eventResult & 2) != 0)
-      {
-        finish();
-        return false;
-      }
-
-      if (keyCode == KeyEvent.KEYCODE_MENU)
-      {
-        flagIsMenuOpen = false;
-        if (flagIsMenuOpen) closeOptionsMenu();
-        else openOptionsMenu();
-        flagIsMenuOpen = !flagIsMenuOpen;
-      }
-
-      return true;
-    }
-
-    @Override public boolean onTouchEvent (MotionEvent event)
-    {
-      Log.i("lclapp", "onTouchEvent: x=" + event.getX() + " y=" + event.getY() + " action=" + event.getAction());
-      int eventResult = LCLOnTouch(event.getX(), event.getY(), event.getAction());
-      if ((eventResult | 1) != 0) postInvalidate();
-      return true;
-    }
-
-    @Override public InputConnection onCreateInputConnection(EditorInfo outAttrs)
-    {
-      outAttrs.actionLabel = null;
-      outAttrs.label = "LCL Text";
-      outAttrs.inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
-      outAttrs.imeOptions = EditorInfo.IME_ACTION_DONE | EditorInfo.IME_FLAG_NO_EXTRACT_UI;
-      return new LCLInputConnection(this, true);
-    }
-
-    @Override public boolean onCheckIsTextEditor()
-    {
-      return true;
-    }
-  }
-
-  // Global objects
-  LCLSurface lclsurface;
-  SensorManager localSensorManager;
-
-  // Utility routines
-  public static double[] convertFloatsToDoubles(float[] input)
-  {
-    if (input == null) return null;
-    double[] output = new double[input.length];
-    for (int i = 0; i < input.length; i++)
-    {  output[i] = input[i]; }
-    return output;
-  }
-
-  public void ProcessEventResult(int eventResult)
-  {
-    if (((eventResult & 1) != 0) && (lclsurface != null)) lclsurface.postInvalidate();
-    //if ((eventResult & 2) != 0) reserved for BACK key handling and handled in onKeyUp, don't handle here!
-  }
-
-  // -------------------------------------------
-  // Activity Events
-  // -------------------------------------------
-
-  /** Called when the activity is first created. */
-  @Override public void onCreate(Bundle savedInstanceState)
-  {
-    super.onCreate(savedInstanceState);
-          
-    lclsurface = new LCLSurface(this);
-    setContentView(lclsurface);
-    lclsurface.postInvalidate();
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-      setShowWhenLocked(true);
-      setTurnScreenOn(true);
-    } else {
-      getWindow().addFlags(
-        WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-        WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
-        WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-      );
-    }
-    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-    DisplayMetrics metrics = new DisplayMetrics();
-    getWindowManager().getDefaultDisplay().getMetrics(metrics);
-    lclxdpi = (int) metrics.xdpi;
-    lclydpi = (int) metrics.ydpi;
-    lclformwidth = metrics.widthPixels;
-    lclformheight = metrics.heightPixels;
-    lclscreenwidth = lclformwidth;
-    lclscreenheight = lclformheight;
-    LCLOnCreate(this);
-  }
-
-  @Override protected void onResume()
-  {
-    super.onResume();
-    Log.i("lclapp", "LCLActivity.onResume called");
-    if (lclsurface != null) {
-      lclsurface.postInvalidate();
-    }
-  }
-
-  @Override public void onConfigurationChanged (Configuration newConfig)
-  {
-    super.onConfigurationChanged(newConfig);
-
-    lclformwidth = lclsurface.getWidth();
-    lclformheight = lclsurface.getHeight();
-    lclscreenwidth = lclformwidth;
-    lclscreenheight = lclformheight;
-    DisplayMetrics metrics = new DisplayMetrics();
-    getWindowManager().getDefaultDisplay().getMetrics(metrics);
-    lclxdpi = (int) metrics.xdpi;
-    lclydpi = (int) metrics.ydpi;
-    // Don't call LCLOnConfigurationChanged, wait for a onDraw instead
-    //lclsurface.postInvalidate();
-    //Log.i("lclapp", "onConfigurationChanged finished");
-  }
-
-  @Override public boolean onCreateOptionsMenu(Menu menu)
-  {
-    Log.i("lclapp", "onCreateOptionsMenu");
-    return super.onCreateOptionsMenu(menu);
-  }
-
-  @Override public boolean onPrepareOptionsMenu (Menu menu)
-  {
-    Log.i("lclapp", "onPrepareOptionsMenu");
-
-    super.onPrepareOptionsMenu(menu);
-
-    int i;
-
-    // First clear the captions list
-    for (i = 0; i < lclmenu_captions.length; i++)
-      lclmenu_captions[i] = "";
-
-    // Now ask the LCL to fill it
-    LCLOnMenuAction(0, 0);
-
-    // And fill the menus with it
-    menu.clear();
-    for (i = 0; i< lclmenu_captions.length; i++)
-    {
-      if (lclmenu_captions[i] != "")
-      {
-        Log.i("lclapp", "onPrepareOptionsMenu item=" + lclmenu_captions[i]);
-        MenuItem lMenuItem = menu.add(0, i, 0, lclmenu_captions[i]);
-        lMenuItem.setOnMenuItemClickListener(new OnMenuItemClickListener()
-        {
-          public boolean onMenuItemClick(MenuItem item)
-          {
-            flagIsMenuOpen = false;
-            LCLOnMenuAction(1, item.getItemId());
-            return true;
-          }
+    private static synchronized void installCrashLogger() {
+        if (crashLoggerInstalled) return;
+        crashLoggerInstalled = true;
+        final Thread.UncaughtExceptionHandler previous = Thread.getDefaultUncaughtExceptionHandler();
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable error) {
+                Log.e(TAG, "Excecao Java nao tratada na thread " + thread.getName(), error);
+                if (previous != null) {
+                    previous.uncaughtException(thread, error);
+                }
+            }
         });
-      };
-    };
+    }
 
-    return true;
-  }
+    // Métodos nativos implementados em Pascal (customdrawnobject_android.inc)
+    public native int LCLDrawToBitmap(int width, int height, Bitmap bitmap);
+    public native int LCLOnTouch(float x, float y, int action);
+    public native int LCLOnCreate(Activity activity);
+    public native int LCLOnMessageBoxFinished(int result, int dialogType);
+    public native int LCLOnKey(int action, int keyCode, KeyEvent event, int unicodeChar);
+    public native int LCLOnTimer(Runnable timer, int id);
+    public native int LCLOnConfigurationChanged(int newDpi, int newWidth);
+    public native int LCLOnSensorChanged(int sensor, double[] values);
+    public native int LCLOnMenuAction(int item, int checked);
 
-  // -------------------------------------------
-  // JNI table of Pascal functions
-  // -------------------------------------------
-  public native int LCLDrawToBitmap(int width, int height, Bitmap bitmap);
-  public native int LCLOnTouch(float x, float y, int action);
-  public native int LCLOnCreate(Activity lclactivity);
-  public native int LCLOnMessageBoxFinished(int Result, int DialogType);
-  public native int LCLOnKey(int kind, int keyCode, KeyEvent event, int AChar);
-  public native int LCLOnTimer(Runnable timerid, int timeridindex);
-  public native int LCLOnConfigurationChanged(int ANewDPI, int ANewWidth);
-  public native int LCLOnSensorChanged(int ASensorKind, double[] AValues);
-  public native int LCLOnMenuAction(int kind, int itemIndex);
+    @Override
+    public void onCreate(Bundle state) {
+        super.onCreate(state);
+        installCrashLogger();
+        Log.i(TAG, "onCreate: package=" + getPackageName() + ", pid=" + android.os.Process.myPid());
 
-  // -------------------------------------------
-  // Functions exported to the Pascal side
-  // -------------------------------------------
+        // Flags para manter a tela ativa em depuração
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true);
+            setTurnScreenOn(true);
+        } else {
+            getWindow().addFlags(
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+            );
+        }
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-  // input: String lcltext, int lcltextsize
-  // output: int lclwidth, int lclheight, int lclascent, etc
-  public void LCLDoGetTextBounds()
-  {
-    Paint localpaint = new Paint();
-    Rect localbounds = new Rect();
-    String lcltext_hack = "M" + lcltext + "M";
-    localpaint.setTextSize(lcltextsize);
-    // Paint.getTextBounds has multiple problems:
-    // 1->It consistently gives us a too small size
-    // 2->It ignores spaces in the end and has issues with some characters, see http://code.google.com/p/android/issues/detail?id=7527
-    // so we use measureText instead, but it also has problem 2, so we need to add a character to the start and end of text and then subtract it =(
-    lclwidth = (int) (localpaint.measureText(lcltext_hack) - localpaint.measureText("MM"));
-    // Painter.getTextBounds consistently gives us a too small size so work around that
-//    lclwidth = lclwidth + (3 * lcltextsize) / 16;
-    // Don't use just localbounds.height() from the source text
-    // because it will calculate the minimum necessary height,
-    // but we can't easily use that to draw text because it draws relative to the baseline
-    localpaint.getTextBounds("Íqg", 0, 3, localbounds);
-    lclheight = localbounds.height();
-    // Also get some measures
-    lcltextascent = (int) localpaint.getFontMetrics().ascent;
-    lcltextbottom = (int) localpaint.getFontMetrics().bottom;
-    lcltextdescent = (int) localpaint.getFontMetrics().descent;
-    lcltextleading = (int) localpaint.getFontMetrics().leading;
-    lcltexttop = (int) localpaint.getFontMetrics().top;
-  }
+        lclView = new LCLView(this);
 
-  // input: String lcltext, int lclmaxwidth, int lcltextsize
-  // output: int lclmaxcount
-  public void LCLDoGetTextPartialWidths()
-  {
-    Paint localpaint = new Paint();
-    Rect localbounds = new Rect();
-    localpaint.setTextSize(lcltextsize);
+        // FrameLayout raiz com setFitsSystemWindows: respeita status bar, notch e navegação
+        FrameLayout root = new FrameLayout(this);
+        root.setBackgroundColor(Color.BLACK);
+        root.setFitsSystemWindows(true);
+        root.addView(lclView, new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        setContentView(root);
 
-    float localmaxwidth = (float) lclmaxwidth;
-    //Log.i("lclapp", "[LCLDoGetTextPartialWidths] lcltext="+lcltext+" localmaxwidth="+Float.toString(localmaxwidth));
-    lclmaxcount = localpaint.breakText(lcltext, true, localmaxwidth, lclpartialwidths);
-  }
+        // Executa LCLOnCreate após o primeiro layout da View, garantindo medidas reais
+        lclView.post(new Runnable() {
+            @Override
+            public void run() {
+                updateDesignSize(lclView.getWidth(), lclView.getHeight());
+                Log.i(TAG, "LCLOnCreate: view " + lclView.getWidth() + "x" + lclView.getHeight() +
+                        ", surface " + lclscreenwidth + "x" + lclscreenheight + ", dpi " + lclxdpi);
+                int result = LCLOnCreate(LCLActivity.this);
+                Log.i(TAG, "LCLOnCreate retornou " + result);
+                lclView.invalidate();
+            }
+        });
+    }
 
-  // input: String lcltext, int lclwidth, int lclheight
-  // output: lclbitmap
-  public void LCLDoDrawText(int ATextColor)
-  {
-    lclbitmap = Bitmap.createBitmap(lclwidth, lclheight, Bitmap.Config.ARGB_8888);
-    Canvas localcanvas = new Canvas(lclbitmap);
-    Paint localpaint = new Paint();
-    localpaint.setColor(ATextColor);
-    localpaint.setTextSize(lcltextsize);
-    localpaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-    localcanvas.drawColor(Color.TRANSPARENT); // TRANSPARENT
-    // The Y coordinate is the lower baseline of letters like "abc"
-    // see http://code.google.com/p/android/issues/detail?id=393
-    localcanvas.drawText(lcltext, 0, lclheight - lcltextbottom, localpaint);
-  }
+    private void updateDesignSize(int viewWidth, int viewHeight) {
+        viewWidth = Math.max(1, viewWidth);
+        viewHeight = Math.max(1, viewHeight);
 
-  // LCLType definitions
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        int dpi = metrics.densityDpi > 0 ? metrics.densityDpi : (int) metrics.xdpi;
+        if (dpi <= 0) dpi = 160;
 
-  private final int idButtonBase = 0x00000000;
-  private final int idButtonOk = 0x00000001;
-  private final int idButtonCancel = 0x00000002;
-  private final int idButtonHelp = 0x00000003;
-  private final int idButtonYes = 0x00000004;
-  private final int idButtonNo = 0x00000005;
-  private final int idButtonClose = 0x00000006;
-  private final int idButtonAbort = 0x00000007;
-  private final int idButtonRetry = 0x00000008;
-  private final int idButtonIgnore = 0x00000009;
-  private final int idButtonAll = 0x0000000A;
-  private final int idButtonYesToAll = 0x0000000B;
-  private final int idButtonNoToAll = 0x0000000C;
-  private final int idButtonOpen = 0x0000000D;
-  private final int idButtonSave = 0x0000000E;
-  private final int idButtonShield = 0x0000000F;
+        int designWidth = viewWidth;
+        int designHeight = viewHeight;
 
-  // input: String lcltext, String lcltitle, int lclconfig (buttons)
-  // output: nothing, but calles LCLOnMessageBoxFinished
-  public void LCLDoShowMessageBox()
-  {
-    Log.i("lclapp", "LCLDoShowMessageBox: title='" + lcltitle + "' text='" + lcltext + "'");
-    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
-    {
-      @Override
-      public void onClick(DialogInterface dialog, int which)
-      {
-        switch (which)
-        {
-        case DialogInterface.BUTTON_POSITIVE:
-          LCLOnMessageBoxFinished(lclbutton1, 0);
-          break;
-        case DialogInterface.BUTTON_NEUTRAL:
-          LCLOnMessageBoxFinished(lclbutton2, 0);
-          break;
-        case DialogInterface.BUTTON_NEGATIVE:
-          LCLOnMessageBoxFinished(lclbutton3, 0);
-          break;
+        if (!LAZDROID_NATIVE_RENDER) {
+            int designShort = Math.min(LAZDROID_DESIGN_WIDTH, LAZDROID_DESIGN_HEIGHT);
+            if (viewWidth <= viewHeight) {
+                designWidth = designShort;
+                designHeight = Math.round((float) designShort * viewHeight / viewWidth);
+            } else {
+                designHeight = designShort;
+                designWidth = Math.round((float) designShort * viewWidth / viewHeight);
+            }
+        }
+
+        mDesignWidth = designWidth;
+        mDesignHeight = designHeight;
+        lclformwidth = designWidth;
+        lclformheight = designHeight;
+        lclscreenwidth = designWidth;
+        lclscreenheight = designHeight;
+        lclxdpi = dpi;
+        lclydpi = dpi;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (lclView != null) lclView.invalidate();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.i(TAG, "onDestroy");
+        super.onDestroy();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration config) {
+        super.onConfigurationChanged(config);
+        Log.i(TAG, "onConfigurationChanged: orientation=" + config.orientation);
+        if (lclView != null) {
+            lclView.post(new Runnable() {
+                @Override
+                public void run() {
+                    updateDesignSize(lclView.getWidth(), lclView.getHeight());
+                    LCLOnConfigurationChanged(lclxdpi, lclformwidth);
+                    lclView.invalidate();
+                }
+            });
+        }
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int result = LCLOnKey(event.getAction(), event.getKeyCode(), event, event.getUnicodeChar());
+        if ((result & 1) != 0 && lclView != null) {
+            lclView.invalidate();
+        }
+        // Bit 2: LCL tratou o botão BACK no form principal e solicita mover o app para background
+        if (((result & 2) != 0) && (event.getAction() == KeyEvent.ACTION_UP)) {
+            moveTaskToBack(true);
+            return true;
+        }
+        if (result != 0) {
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    public void LCLDoGetTextBounds() {
+        textPaint.setTextSize(lcltextsize);
+        Rect bounds = new Rect();
+        textPaint.getTextBounds(lcltext, 0, lcltext.length(), bounds);
+        Paint.FontMetricsInt fm = textPaint.getFontMetricsInt();
+        lclwidth = Math.max(1, (int) Math.ceil(textPaint.measureText(lcltext)));
+        lclheight = Math.max(1, fm.bottom - fm.top);
+        lcltextascent = fm.ascent;
+        lcltextbottom = fm.bottom;
+        lcltextdescent = fm.descent;
+        lcltextleading = fm.leading;
+        lcltexttop = fm.top;
+    }
+
+    public void LCLDoGetTextPartialWidths() {
+        textPaint.setTextSize(lcltextsize);
+        lclpartialwidths = new float[lcltext.length()];
+        textPaint.getTextWidths(lcltext, lclpartialwidths);
+    }
+
+    public void LCLDoDrawText(int color) {
+        LCLDoGetTextBounds();
+        lclbitmap = Bitmap.createBitmap(lclwidth, lclheight, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(lclbitmap);
+        textPaint.setColor(color);
+        textPaint.setTextSize(lcltextsize);
+        canvas.drawText(lcltext, 0, -lcltexttop, textPaint);
+    }
+
+    public void LCLDoShowMessageBox() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(lcltitle);
+        builder.setMessage(lcltext);
+        if (lclbutton1str != null && !lclbutton1str.isEmpty()) {
+            builder.setPositiveButton(lclbutton1str, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    LCLOnMessageBoxFinished(lclbutton1, 0);
+                }
+            });
+        }
+        if (lclbutton2str != null && !lclbutton2str.isEmpty()) {
+            builder.setNegativeButton(lclbutton2str, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    LCLOnMessageBoxFinished(lclbutton2, 0);
+                }
+            });
+        }
+        builder.show();
+    }
+
+    public void LCLDoCreateTimer() {
+        final Runnable timer = new Runnable() {
+            public void run() {
+                LCLOnTimer(this, 0);
+                if (lclView != null) lclView.invalidate();
+                handler.postDelayed(this, Math.max(1, lcltimerinterval));
+            }
         };
-      }
-    };
-
-    DialogInterface.OnCancelListener dialogCancelListener = new DialogInterface.OnCancelListener()
-    {
-      @Override
-      public void onCancel(DialogInterface dialog)
-      {
-        // The Cancel button number matches for LCLIntf.MessageBox and LCLIntf.PromptDialog
-        LCLOnMessageBoxFinished(idButtonCancel, 0);
-      }
-    };
-
-    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    builder.setMessage(lcltext);
-    builder.setTitle(lcltitle);
-    if (lclbutton1 >= 0) builder.setPositiveButton(lclbutton1str, dialogClickListener);
-    if (lclbutton2 >= 0) builder.setNeutralButton(lclbutton2str, dialogClickListener);
-    if (lclbutton3 >= 0) builder.setNegativeButton(lclbutton3str, dialogClickListener);
-    builder.show().setOnCancelListener(dialogCancelListener);
-  };
-
-  private Handler LocalHandler = new Handler();
-
-  private class LCLRunnable implements Runnable
-  {
-    public boolean Destroyed = false;
-
-    public void run()
-    {
-      int lcltimeridindex = lcltimerids.indexOf(this);
-      int eventResult = LCLOnTimer(this, lcltimeridindex);
-      ProcessEventResult(eventResult);
-      if (this.Destroyed == false) LocalHandler.postDelayed(this, lcltimerinterval);
+        lcltimerid = timer;
+        timers.add(timer);
+        handler.postDelayed(timer, Math.max(1, lcltimerinterval));
     }
-  };
 
-  // input:  int lcltimerinterval in milliseconds
-  // output:  Runnable lcltimerid
-  public void LCLDoCreateTimer()
-  {
-    lcltimerid = new LCLRunnable();
-
-    LocalHandler.removeCallbacks(lcltimerid);
-    LocalHandler.postDelayed(lcltimerid, lcltimerinterval);
-
-    lcltimerids.add(lcltimerid);
-  };
-
-  // input: Runnable lcltimerid
-  public void LCLDoDestroyTimer()
-  {
-    LocalHandler.removeCallbacks(lcltimerid);
-    ((LCLRunnable) lcltimerid).Destroyed = true;
-    lcltimerids.remove(lcltimerids.indexOf(lcltimerid));
-  };
-
-  public void LCLDoHideVirtualKeyboard()
-  {
-    runOnUiThread(new Runnable()
-    {
-      @Override public void run()
-      {
-        if (lclsurface != null)
-        {
-          InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-          if (imm != null)
-          {
-            imm.hideSoftInputFromWindow(lclsurface.getWindowToken(), 0);
-          }
+    public void LCLDoDestroyTimer() {
+        if (lcltimerid != null) {
+            handler.removeCallbacks(lcltimerid);
+            timers.remove(lcltimerid);
         }
-      }
-    });
-  };
+    }
 
-  public void LCLDoShowVirtualKeyboard()
-  {
-    runOnUiThread(new Runnable()
-    {
-      @Override public void run()
-      {
-        if (lclsurface != null)
-        {
-          lclsurface.setFocusableInTouchMode(true);
-          lclsurface.requestFocus();
-          InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-          if (imm != null)
-          {
-            imm.showSoftInput(lclsurface, InputMethodManager.SHOW_FORCED);
-          }
+    public void LCLDoHideVirtualKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null && lclView != null) {
+            imm.hideSoftInputFromWindow(lclView.getWindowToken(), 0);
         }
-      }
-    });
-  };
+    }
 
-  // SensorEventListener overrides
+    public void LCLDoShowVirtualKeyboard() {
+        if (lclView == null) return;
+        lclView.requestFocus();
+        int margin = Math.max(48, lclView.getHeight() / 6);
+        Rect focusRect = new Rect(Math.max(0, lclView.lastTouchX - margin),
+                                  Math.max(0, lclView.lastTouchY - margin),
+                                  Math.min(lclView.getWidth(), lclView.lastTouchX + margin),
+                                  Math.min(lclView.getHeight(), lclView.lastTouchY + margin));
+        lclView.requestRectangleOnScreen(focusRect, false);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.showSoftInput(lclView, InputMethodManager.SHOW_IMPLICIT);
+        }
+    }
 
-  @Override public void onSensorChanged(SensorEvent event)
-  {
-    double[] eventValues = convertFloatsToDoubles(event.values);
-    int eventKind = event.sensor.getType();
-    int eventResult = LCLOnSensorChanged(eventKind, eventValues);
-    if (((eventResult | 1) != 0) && (lclsurface != null)) lclsurface.postInvalidate();
-  }
+    public void LCLDoStartReadingAccelerometer() {}
+    public void LCLDoStopReadingAccelerometer() {}
+    public void LCLDoSendMessage() { if (lclView != null) lclView.invalidate(); }
+    public void LCLDoRequestPositionInfo() {}
+    public void LCLDoShowListViewDialog() {}
 
-  @Override public void onAccuracyChanged(Sensor sensor, int accuracy)
-  {
-  }
+    /**
+     * LCLView — Superfície de renderização gráfica acelerada por hardware
+     */
+    private class LCLView extends View {
+        private Bitmap bitmap;
+        private final Paint scaledBitmapPaint = new Paint(Paint.FILTER_BITMAP_FLAG);
+        private String composingText = "";
+        public int lastTouchX = 0;
+        public int lastTouchY = 0;
 
-  public void LCLDoStartReadingAccelerometer()
-  {
-    localSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-    localSensorManager.registerListener(this,
-      localSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-      SensorManager.SENSOR_DELAY_NORMAL);
-  };
+        public LCLView(Context context) {
+            super(context);
+            setFocusable(true);
+            setFocusableInTouchMode(true);
+            requestFocus();
+        }
 
-  public void LCLDoStopReadingAccelerometer()
-  {
-    localSensorManager.unregisterListener(this);
-  };
+        @Override
+        public boolean onCheckIsTextEditor() {
+            return true;
+        }
 
-  // input: String lcldestination, String lcltext (Body)
-  // input: String lcldestination, String lcltext (Body)
-  public void LCLDoSendMessage()
-  {
-    try
-    {
-      if (lclkind == 1)
-      {
-        int piFlags = (Build.VERSION.SDK_INT >= 23) ? PendingIntent.FLAG_IMMUTABLE : 0;
-        PendingIntent sentPI = PendingIntent.getBroadcast(this, 0,
-          new Intent("SMS_SENT"), piFlags);
-
-        PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0,
-          new Intent("SMS_DELIVERED"), piFlags);
-
-        int rxFlags = (Build.VERSION.SDK_INT >= 33) ? Context.RECEIVER_NOT_EXPORTED : 0;
-        if (Build.VERSION.SDK_INT >= 33)
-        {
-          registerReceiver(new BroadcastReceiver()
-          {
-            @Override public void onReceive(Context arg0, Intent arg1)
-            {
-              double[] statusArray = new double[1];
-              statusArray[0] = (getResultCode() == Activity.RESULT_OK) ? 1.0 : 2.0;
-              int eventResult = LCLOnSensorChanged(-11, statusArray);
-              ProcessEventResult(eventResult);
+        private void dispatchCommittedText(CharSequence text) {
+            if (text == null || text.length() == 0) return;
+            for (int offset = 0; offset < text.length();) {
+                int codePoint = Character.codePointAt(text, offset);
+                KeyEvent event = new KeyEvent(KeyEvent.ACTION_MULTIPLE, KeyEvent.KEYCODE_UNKNOWN);
+                LCLOnKey(-1, KeyEvent.KEYCODE_UNKNOWN, event, codePoint);
+                offset += Character.charCount(codePoint);
             }
-          }, new IntentFilter("SMS_SENT"), rxFlags);
-
-          registerReceiver(new BroadcastReceiver()
-          {
-            @Override public void onReceive(Context arg0, Intent arg1)
-            {
-              double[] statusArray = new double[1];
-              statusArray[0] = (getResultCode() == Activity.RESULT_OK) ? 10.0 : 11.0;
-              int eventResult = LCLOnSensorChanged(-11, statusArray);
-              ProcessEventResult(eventResult);
-            }
-          }, new IntentFilter("SMS_DELIVERED"), rxFlags);
+            invalidate();
         }
 
-        SmsManager sms = SmsManager.getDefault();
-        sms.sendTextMessage(lcldestination, null, lcltext, sentPI, deliveredPI);
-      }
+        private void dispatchDeleteKey() {
+            long now = SystemClock.uptimeMillis();
+            KeyEvent event = new KeyEvent(now, now, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL, 0);
+            LCLOnKey(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL, event, 0);
+            invalidate();
+        }
+
+        @Override
+        public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
+            outAttrs.inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE |
+                    InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
+            outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_ACTION_NONE;
+            return new BaseInputConnection(this, false) {
+                @Override
+                public boolean commitText(CharSequence text, int newCursorPosition) {
+                    String value = text == null ? "" : text.toString();
+                    if (!value.equals(composingText)) {
+                        dispatchCommittedText(value);
+                    }
+                    composingText = "";
+                    return true;
+                }
+
+                @Override
+                public boolean setComposingText(CharSequence text, int newCursorPosition) {
+                    String value = text == null ? "" : text.toString();
+                    int common = 0;
+                    int limit = Math.min(composingText.length(), value.length());
+                    while (common < limit && composingText.charAt(common) == value.charAt(common)) {
+                        common++;
+                    }
+                    for (int index = composingText.length(); index > common; index--) {
+                        dispatchDeleteKey();
+                    }
+                    if (common < value.length()) {
+                        dispatchCommittedText(value.substring(common));
+                    }
+                    composingText = value;
+                    return true;
+                }
+
+                @Override
+                public boolean finishComposingText() {
+                    composingText = "";
+                    return true;
+                }
+
+                @Override
+                public boolean deleteSurroundingText(int beforeLength, int afterLength) {
+                    if (beforeLength > 0) {
+                        dispatchDeleteKey();
+                    }
+                    if (beforeLength > 0 && composingText.length() > 0) {
+                        int newLength = Math.max(0, composingText.length() - 1);
+                        composingText = composingText.substring(0, newLength);
+                    }
+                    return true;
+                }
+
+                @Override
+                public boolean sendKeyEvent(KeyEvent event) {
+                    if (event == null) return false;
+                    if (event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+                        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                            dispatchDeleteKey();
+                        }
+                        return true;
+                    }
+                    LCLOnKey(event.getAction(), event.getKeyCode(), event, event.getUnicodeChar());
+                    invalidate();
+                    return true;
+                }
+            };
+        }
+
+        @Override
+        protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
+            super.onSizeChanged(width, height, oldWidth, oldHeight);
+            if (width <= 0 || height <= 0) return;
+            updateDesignSize(width, height);
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+            int width = Math.max(1, getWidth());
+            int height = Math.max(1, getHeight());
+            int designWidth = Math.max(1, mDesignWidth);
+            int designHeight = Math.max(1, mDesignHeight);
+
+            if (bitmap == null || bitmap.getWidth() != designWidth || bitmap.getHeight() != designHeight) {
+                bitmap = Bitmap.createBitmap(designWidth, designHeight, Bitmap.Config.ARGB_8888);
+            }
+
+            LCLDrawToBitmap(designWidth, designHeight, bitmap);
+
+            if (designWidth == width && designHeight == height) {
+                canvas.drawBitmap(bitmap, 0, 0, null);
+            } else {
+                Rect source = new Rect(0, 0, designWidth, designHeight);
+                Rect destination = new Rect(0, 0, width, height);
+                canvas.drawBitmap(bitmap, source, destination, scaledBitmapPaint);
+            }
+        }
+
+        @Override
+        public boolean onTouchEvent(MotionEvent event) {
+            lastTouchX = Math.round(event.getX());
+            lastTouchY = Math.round(event.getY());
+            float width = Math.max(1, getWidth());
+            float height = Math.max(1, getHeight());
+            float designWidth = Math.max(1, mDesignWidth);
+            float designHeight = Math.max(1, mDesignHeight);
+            float x = event.getX() * designWidth / width;
+            float y = event.getY() * designHeight / height;
+            LCLOnTouch(x, y, event.getAction());
+            invalidate();
+            return true;
+        }
     }
-    catch (Exception e)
-    {
-      Log.w("lclapp", "LCLDoSendMessage exception: " + e.getMessage());
-    }
-  };
-
-  // LocationListener overrides
-
-  @Override public void onLocationChanged(Location loc)
-  {
-    if (loc != null)
-    {
-      double[] positionArray = new double[6];
-      positionArray[0] = loc.getLatitude();
-      positionArray[1] = loc.getLongitude();
-      positionArray[2] = loc.getAltitude();
-      positionArray[3] = (double)loc.getAccuracy();
-      positionArray[4] = (double)loc.getSpeed();
-      positionArray[5] = (double)loc.getTime();
-      int eventResult = LCLOnSensorChanged(-10, positionArray);
-      if (((eventResult | 1) != 0) && (lclsurface != null)) lclsurface.postInvalidate();
-    }
-  }
-
-  @Override public void onProviderDisabled(String provider)
-  {
-  }
-
-  @Override public void onProviderEnabled(String provider)
-  {
-  }
-
-  @Override public void onStatusChanged(String provider, int status, Bundle extras)
-  {
-  }
-
-  // input:  int lclkind
-  public void LCLDoRequestPositionInfo()
-  {
-    LocationManager mlocManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-    switch (lclkind)
-    {
-      case 1:
-        mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-        break;
-      case 2:
-        mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
-        break;
-      default:
-        Log.i("lclapp", "[LCLDoRequestPositionInfo] Wrong lclkind parameter");
-        break;
-    }
-  }
-
-  // Prepare dialog callbacks
-  // for TCDComboBox
-  public void LCLDoPrepareSelectItemDialog(CharSequence[] items, int selected, AlertDialog.Builder dialog)
-  {
-    //Log.i("lclapp", "LCLDoPrepareSelectItemDialog");
-    dialog.setSingleChoiceItems(items, selected, new DialogInterface.OnClickListener()
-    {
-      @Override public void onClick(DialogInterface dialog, int which)
-      {
-        //Log.i("lclapp", "LCLDoPrepareSelectItemDialog.onClick");
-        LCLOnMessageBoxFinished(which, 1);
-        dialog.dismiss();
-      }
-    });
-  }
-
-  // This method allows us to use the native Android ListView in a dialog
-  // It is nice for choosing a line in a table with multiple columns of information
-  // The extra columns appear as sub-info in the Android ListView
-  //
-  // output: Calls LCLOnMessageBoxFinished which will call LCLIntf.OnListViewDialogResult
-  //
-  public void LCLDoShowListViewDialog(String ATitle, String[] AItems,
-    String[] ASubItems, int AColorOddRow, int AColorEvenRow)
-  {
-    final Dialog dialog = new Dialog(this);
-
-    ListView lListView = new ListView(this);
-    List<LCL_ListViewItem> listItems = new ArrayList<LCL_ListViewItem>();
-    for (int i = 0; i < AItems.length; i++)
-    {
-      listItems.add(new LCL_ListViewItem(AItems[i], ASubItems[i]));
-    };
-    LCL_ListViewAdapter listAdapter = new LCL_ListViewAdapter(
-      this,
-      listItems,
-      android.R.layout.simple_list_item_2,
-      new String[] { "title", "description" },
-      new int[] { android.R.id.text1, android.R.id.text2 });
-    listAdapter.colors[0] = AColorOddRow;
-    listAdapter.colors[1] = AColorEvenRow;
-    lListView.setAdapter(listAdapter);
-    lListView.setClickable(true);
-    AdapterView.OnItemClickListener listviewClickListener = new AdapterView.OnItemClickListener()
-    {
-      @Override public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3)
-      {
-        //Log.i("lclapp", "LCLDoPrepareSelectItemDialog.onClick");
-        LCLOnMessageBoxFinished(position, 2);
-        dialog.dismiss();
-      }
-    };
-    lListView.setOnItemClickListener(listviewClickListener);
-
-    DialogInterface.OnCancelListener dialogCancelListener = new DialogInterface.OnCancelListener()
-    {
-      @Override public void onCancel(DialogInterface dialog)
-      {
-        LCLOnMessageBoxFinished(-1, 2);
-      }
-    };
-    dialog.setOnCancelListener(dialogCancelListener);
-    dialog.setTitle(ATitle);
-    dialog.setContentView(lListView);
-    dialog.show();
-  }
-
-  //
-  // Classes for the ListView
-  //
-
-  //
-  // ListView item
-  //
-  public class LCL_ListViewItem extends HashMap<String, String>
-  {
-    public String Title;
-    public String Description;
-
-    public LCL_ListViewItem(String ATitle, String ADescription)
-    {
-      this.Title = ATitle;
-      this.Description = ADescription;
-    }
-
-    @Override public String get(Object k)
-    {
-      String key = (String) k;
-      if (key.equals("title")) return Title;
-      else if (key.equals("description")) return Description;
-      return null;
-    }
-  }
-
-  //
-  // Adapter class for the ListView
-  //
-  public class LCL_ListViewAdapter extends SimpleAdapter
-  {
-    private List<LCL_ListViewItem> Items;
-    // Colors to alternate
-    public int[] colors = new int[] { 0xff292C29, 0xff424542 };
-
-    @SuppressWarnings("unchecked") public LCL_ListViewAdapter(
-      Context context,
-      List<? extends Map<String, String>> AItems,
-      int resource,
-      String[] from,
-      int[] to)
-    {
-      super(context, AItems, resource, from, to);
-      this.Items = (List<LCL_ListViewItem>) Items;
-    }
-
-    @Override public View getView(int position, View convertView, ViewGroup parent)
-    {
-      View view = super.getView(position, convertView, parent);
-
-      int colorPos = position % colors.length;
-      view.setBackgroundColor(colors[colorPos]);
-      return view;
-    }
-  }
-
-  // -------------------------------------------
-  // End of the helper classes of LCLDoShowListViewDialog
-  // -------------------------------------------
-
-  // -------------------------------------------
-  // Fields exported to the Pascal side for easier data communication
-  // -------------------------------------------
-  public String lcltext;
-  public String lcltitle;
-  public String lclbutton1str;
-  public String lclbutton2str;
-  public String lclbutton3str;
-  //
-  public int lclwidth;
-  public int lclheight;
-  public int lclbutton1;
-  public int lclbutton2;
-  public int lclbutton3;
-  public Bitmap lclbitmap;
-  //
-  public int lcltextsize;
-  public int lcltextascent;
-  public int lcltextbottom;
-  public int lcltextdescent;
-  public int lcltextleading;
-  public int lcltexttop;
-  public int lclmaxwidth;
-  public int lclmaxcount;
-  public float[] lclpartialwidths;
-  //
-  public int lcltimerinterval;
-  public Runnable lcltimerid;
-  public List lcltimerids = new ArrayList(); // To keep the references alive, avoids a wrong GC
-  //
-  public int lclxdpi;
-  public int lclydpi;
-  public int lclformwidth;
-  public int lclformheight;
-  public int lclscreenwidth;
-  public int lclscreenheight;
-  // for LazDeviceAPIs
-  public String lcldestination;
-  public int lclkind;
-  // for the menus
-  public String[] lclmenu_captions = new String[6];
-  public boolean flagIsMenuOpen = false;
-
-  static
-  {
-    try 
-    {
-      Log.i("lclapp", "Tentando carregar libsqlite.so...");
-      System.loadLibrary("sqlite");
-      Log.i("lclapp", "libsqlite.so carregada com sucesso.");
-    } 
-    catch(Throwable ule) 
-    {
-      Log.w("lclapp", "libsqlite.so nao carregada via Java: " + ule.getMessage());
-    }
-
-    try 
-    {
-      Log.i("lclapp", "Tentando carregar liblazapp.so...");
-      System.loadLibrary("lazapp");
-      Log.i("lclapp", "liblazapp.so carregada com sucesso.");
-    } 
-    catch(Throwable ule) 
-    {
-      Log.e("lclapp", "ERRO FATAL: Nao foi possivel carregar liblazapp.so", ule);
-    }
-  }
 }

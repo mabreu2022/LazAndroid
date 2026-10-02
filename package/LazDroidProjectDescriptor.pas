@@ -117,7 +117,9 @@ begin
     '$(LazarusDir)\lcl\units\$(TargetCPU)-$(TargetOS);' +
     '$(LazarusDir)\components\lazutils\lib\$(TargetCPU)-$(TargetOS);' +
     '$(LazarusDir)\components\freetype\lib\$(TargetCPU)-$(TargetOS);' +
-    '$(LazarusDir)\packager\units\$(TargetCPU)-$(TargetOS)';
+    '$(LazarusDir)\packager\units\$(TargetCPU)-$(TargetOS);' +
+    '..\package;..\package\lib\$(TargetCPU)-$(TargetOS)';
+  AProject.LazCompilerOptions.IncludePath := '$(ProjOutDir);..\package';
 
   // Destino do binário .so
   if (DroidConfig.ScaffoldDirectory <> '') and DirectoryExists(DroidConfig.ScaffoldDirectory) then

@@ -21,7 +21,7 @@
     <BuildModes>
       <Item Name="Default" Default="True"/>
       <SharedMatrixOptions Count="1">
-        <Item1 ID="433126361025" Modes="Default" Type="IDEMacro" MacroName="LCLWidgetType" Value="customdrawn"/>
+        <Item1 ID="071362007958" Modes="Default" Type="IDEMacro" MacroName="LCLWidgetType" Value="customdrawn"/>
       </SharedMatrixOptions>
     </BuildModes>
     <PublishOptions>
@@ -32,6 +32,9 @@
       <FormatVersion Value="2"/>
     </RunParams>
     <RequiredPackages>
+      <Item>
+        <PackageName Value="LazDroidControls"/>
+      </Item>
       <Item>
         <PackageName Value="LCL"/>
       </Item>
@@ -54,11 +57,11 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="..\scaffold\app\src\main\jniLibs\arm64-v8a\project1"/>
+      <Filename Value="D:\Projetos AntiGravity\LazarusAndroid\scaffold\app\src\main\jniLibs\arm64-v8a\project1"/>
     </Target>
     <SearchPaths>
-      <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="$(LazarusDir)\lcl\units\$(TargetCPU)-$(TargetOS)\customdrawn;$(LazarusDir)\lcl\units\$(TargetCPU)-$(TargetOS);$(LazarusDir)\components\lazutils\lib\$(TargetCPU)-$(TargetOS);$(LazarusDir)\components\freetype\lib\$(TargetCPU)-$(TargetOS);$(LazarusDir)\packager\units\$(TargetCPU)-$(TargetOS)"/>
+      <IncludeFiles Value="$(ProjOutDir);..\package"/>
+      <OtherUnitFiles Value="$(LazarusDir)\lcl\units\$(TargetCPU)-$(TargetOS)\customdrawn;$(LazarusDir)\lcl\units\$(TargetCPU)-$(TargetOS);$(LazarusDir)\components\lazutils\lib\$(TargetCPU)-$(TargetOS);$(LazarusDir)\components\freetype\lib\$(TargetCPU)-$(TargetOS);$(LazarusDir)\packager\units\$(TargetCPU)-$(TargetOS);..\package;..\package\lib\$(TargetCPU)-$(TargetOS)"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <CodeGeneration>

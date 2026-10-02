@@ -10,7 +10,7 @@ unit LazDroidPipeline;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Dialogs, FileUtil, LazDroidConfig, LazDroidDeviceManager,
+  Classes, SysUtils, Forms, Controls, Dialogs, FileUtil, LazFileUtils, LazDroidConfig, LazDroidDeviceManager,
   LazDroidProcessRunner, LazIDEIntf, ProjectIntf;
 
 type
@@ -448,6 +448,11 @@ var
   NdkLib: string;
   LazDir: string;
   LclCdDir: string;
+  PkgDir: string;
+  OtherUnits: string;
+  UnitPath: string;
+  OtherList: TStringList;
+  i: Integer;
   Params: TStringList;
   Env: TStringList;
 begin
@@ -532,6 +537,9 @@ begin
 
     // Suporte automático a LCL CustomDrawn para Android caso esteja presente no Lazarus
     LazDir := 'C:\lazarus';
+    if not DirectoryExists(LazDir) and DirectoryExists('D:\lazarus') then
+      LazDir := 'D:\lazarus';
+
     if DirectoryExists(LazDir) then
     begin
       LclCdDir := LazDir + PathDelim + 'lcl' + PathDelim + 'units' + PathDelim + TargetCpu + '-android' + PathDelim + 'customdrawn';
@@ -544,6 +552,54 @@ begin
         Params.Add('-Fu' + LazDir + PathDelim + 'packager' + PathDelim + 'units' + PathDelim + TargetCpu + '-android');
         Params.Add('-dLCL');
         Params.Add('-dLCLcustomdrawn');
+      end;
+    end;
+
+    // Suporte automático aos componentes do pacote LazDroid (LazDroidControls, etc.)
+    PkgDir := '';
+    if (FScaffoldPath <> '') then
+      PkgDir := IncludeTrailingPathDelimiter(ExtractFilePath(ExcludeTrailingPathDelimiter(FScaffoldPath))) + 'package';
+    if (PkgDir = '') or not DirectoryExists(PkgDir) then
+      PkgDir := ExtractFilePath(PrjFile) + '..' + PathDelim + 'package';
+
+    if DirectoryExists(PkgDir) then
+    begin
+      Params.Add('-Fu' + PkgDir);
+      Params.Add('-Fi' + PkgDir);
+      if DirectoryExists(PkgDir + PathDelim + 'lib' + PathDelim + TargetCpu + '-android') then
+        Params.Add('-Fu' + PkgDir + PathDelim + 'lib' + PathDelim + TargetCpu + '-android');
+    end;
+
+    // Incorpora dinamicamente quaisquer OtherUnitFiles definidos no projeto ativo
+    if Assigned(LazarusIDE) and Assigned(LazarusIDE.ActiveProject) then
+    begin
+      OtherUnits := LazarusIDE.ActiveProject.LazCompilerOptions.OtherUnitFiles;
+      if OtherUnits <> '' then
+      begin
+        OtherUnits := StringReplace(OtherUnits, '$(TargetCPU)', TargetCpu, [rfReplaceAll, rfIgnoreCase]);
+        OtherUnits := StringReplace(OtherUnits, '$(TargetOS)', 'android', [rfReplaceAll, rfIgnoreCase]);
+        OtherUnits := StringReplace(OtherUnits, '$(LazarusDir)', LazDir, [rfReplaceAll, rfIgnoreCase]);
+        OtherUnits := StringReplace(OtherUnits, '$(ProjOutDir)', UnitOutDir, [rfReplaceAll, rfIgnoreCase]);
+
+        OtherList := TStringList.Create;
+        try
+          OtherList.Delimiter := ';';
+          OtherList.StrictDelimiter := True;
+          OtherList.DelimitedText := OtherUnits;
+          for i := 0 to OtherList.Count - 1 do
+          begin
+            UnitPath := Trim(OtherList[i]);
+            if UnitPath <> '' then
+            begin
+              if not FilenameIsAbsolute(UnitPath) then
+                UnitPath := ExpandFileName(IncludeTrailingPathDelimiter(ExtractFilePath(PrjFile)) + UnitPath);
+              if DirectoryExists(UnitPath) then
+                Params.Add('-Fu' + UnitPath);
+            end;
+          end;
+        finally
+          OtherList.Free;
+        end;
       end;
     end;
 
@@ -769,26 +825,83 @@ begin
   end;
 end;
 
+function FindDebugServerBinary(const ANDKRoot: string; AAbi: TAndroidAbi): string;
+var
+  Candidate: string;
+  ArchDir: string;
+begin
+  Result := '';
+  if AAbi in [abiArm64_v8a] then
+    ArchDir := 'aarch64'
+  else
+    ArchDir := 'arm';
+
+  // 1. Procura lldb-server no NDK Clang
+  Candidate := IncludeTrailingPathDelimiter(ANDKRoot) +
+    'toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\11.0.5\lib\linux\' + ArchDir + '\lldb-server';
+  if FileExists(Candidate) then Exit(Candidate);
+
+  // 2. Procura gdbserver clássico no NDK
+  if AAbi in [abiArm64_v8a] then
+    Candidate := IncludeTrailingPathDelimiter(ANDKRoot) + 'prebuilt\android-arm64\gdbserver\gdbserver'
+  else
+    Candidate := IncludeTrailingPathDelimiter(ANDKRoot) + 'prebuilt\android-arm\gdbserver\gdbserver';
+  if FileExists(Candidate) then Exit(Candidate);
+
+  // 3. Fallback no NDK alternativo (DeathStroke ou SDK padrão)
+  Candidate := 'D:\DesthStrokeIDE\Android\sdk\ndk-bundle\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\11.0.5\lib\linux\' + ArchDir + '\lldb-server';
+  if FileExists(Candidate) then Exit(Candidate);
+
+  if AAbi in [abiArm64_v8a] then
+    Candidate := 'D:\DesthStrokeIDE\Android\sdk\ndk-bundle\prebuilt\android-arm64\gdbserver\gdbserver'
+  else
+    Candidate := 'D:\DesthStrokeIDE\Android\sdk\ndk-bundle\prebuilt\android-arm\gdbserver\gdbserver';
+  if FileExists(Candidate) then Exit(Candidate);
+end;
+
 procedure TLazDroidPipeline.SetupGdbServer;
 var
   AppPid: string;
   OutputStr: string;
   Params: TStringList;
   Pkg: string;
-  GdbExe: string;
+  ServerBin: string;
+  IsLLDB: Boolean;
 begin
   Pkg := Trim(FCurrentPackageName);
   if Pkg = '' then Pkg := DEFAULT_PACKAGE_NAME;
 
   LogMsg('=========================================================', luSuccess);
-  LogMsg('  CONFIGURANDO SESSÃO DE DEPURAÇÃO GDB (DELPHI STYLE)    ', luSuccess);
+  LogMsg('  CONFIGURANDO SESSÃO DE DEPURAÇÃO REMOTA (LLDB / GDB)   ', luSuccess);
   LogMsg('=========================================================', luSuccess);
 
-  // 1. Redireciona a porta TCP 5039 do Android para o Windows Host
+  // 1. Localiza o binário do servidor de depuração no NDK (lldb-server ou gdbserver)
+  ServerBin := FindDebugServerBinary(FSettings.AndroidNdkRoot, FTargetAbi);
+  IsLLDB := (ServerBin <> '') and (Pos('lldb-server', LowerCase(ServerBin)) > 0);
+
+  if ServerBin <> '' then
+  begin
+    LogMsg('>>> [DEBUG] Servidor nativo localizado: ' + ServerBin, luInfo);
+    // Envia o servidor para o /data/local/tmp
+    FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'push', ServerBin, '/data/local/tmp/lazdroid-server'], OutputStr);
+    FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell', 'chmod', '755', '/data/local/tmp/lazdroid-server'], OutputStr);
+
+    // Prepara o diretório files/ na sandbox da aplicação via run-as
+    FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell', 'run-as', Pkg, 'mkdir', '-p', 'files'], OutputStr);
+    FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell', 'run-as', Pkg, 'cp', '/data/local/tmp/lazdroid-server', 'files/lazdroid-server'], OutputStr);
+    FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell', 'run-as', Pkg, 'chmod', '700', 'files/lazdroid-server'], OutputStr);
+  end
+  else
+    LogMsg('AVISO: Servidor nativo (lldb-server/gdbserver) não localizado no NDK; tentando usar binário já existente no aparelho.', luWarning);
+
+  // 2. Marca a aplicação como debug-app para evitar congelamento por ANR do Android
+  FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell', 'am', 'set-debug-app', Pkg], OutputStr);
+
+  // 3. Redireciona a porta TCP 5039 do Android para o Windows Host
   FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'forward', 'tcp:5039', 'tcp:5039'], OutputStr);
   LogMsg('>>> [DEBUG] Porta TCP 5039 redirecionada via ADB (localhost:5039 <-> celular:5039).', luInfo);
 
-  // 2. Aguarda a inicialização do processo da Activity e detecta o PID
+  // 4. Aguarda a inicialização do processo da Activity e detecta o PID
   Sleep(1200);
   if FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell', 'pidof', Pkg], OutputStr) = 0 then
     AppPid := Trim(OutputStr)
@@ -797,19 +910,13 @@ begin
 
   if AppPid = '' then
   begin
-    LogMsg('AVISO: Não foi possível obter o PID de ' + Pkg + ' para attach automático do GDB.', luWarning);
+    LogMsg('AVISO: Não foi possível obter o PID de ' + Pkg + ' para attach automático do depurador.', luWarning);
     Exit;
   end;
 
   LogMsg(Format('>>> [DEBUG] Aplicação Android detectada com PID: %s', [AppPid]), luSuccess);
 
-  // 3. Prepara o binário do gdbserver se necessário no diretório da app
-  FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell',
-    'run-as', Pkg, 'cp', '/data/local/tmp/gdbserver', '/data/data/' + Pkg + '/gdbserver'], OutputStr);
-  FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell',
-    'run-as', Pkg, 'chmod', '755', '/data/data/' + Pkg + '/gdbserver'], OutputStr);
-
-  // 4. Inicia o gdbserver em background no dispositivo anexado ao PID
+  // 5. Inicia o servidor de depuração em background anexado ao PID
   if Assigned(FGdbServerRunner) then
   begin
     FGdbServerRunner.RequestCancel;
@@ -823,10 +930,20 @@ begin
     Params.Add('shell');
     Params.Add('run-as');
     Params.Add(Pkg);
-    Params.Add('/data/data/' + Pkg + '/gdbserver');
-    Params.Add(':5039');
-    Params.Add('--attach');
-    Params.Add(AppPid);
+
+    if IsLLDB then
+    begin
+      Params.Add('sh');
+      Params.Add('-c');
+      Params.Add('files/lazdroid-server gdbserver 127.0.0.1:5039 --attach ' + AppPid);
+    end
+    else
+    begin
+      Params.Add('files/lazdroid-server');
+      Params.Add(':5039');
+      Params.Add('--attach');
+      Params.Add(AppPid);
+    end;
 
     FGdbServerRunner := TLazDroidProcessThread.Create(
       FSettings.AdbPath,
@@ -838,11 +955,12 @@ begin
     Params.Free;
   end;
 
-  GdbExe := IncludeTrailingPathDelimiter(FSettings.AndroidNdkRoot) + 'prebuilt\windows-x86_64\bin\gdb.exe';
+  if IsLLDB then
+    LogMsg('>>> [DEBUG] LLDB-Server ATIVO no celular aguardando conexão em localhost:5039!', luSuccess)
+  else
+    LogMsg('>>> [DEBUG] GDB-Server ATIVO no celular aguardando conexão em localhost:5039!', luSuccess);
 
-  LogMsg('>>> [DEBUG] GDB Server ATIVO no celular aguardando conexão em localhost:5039!', luSuccess);
-  LogMsg('>>> [DEBUG] GDB Client NDK: ' + GdbExe, luInfo);
-  LogMsg('>>> [DEBUG] O depurador do Lazarus (ou GDB Client) pode agora conectar em localhost:5039.', luInfo);
+  LogMsg('>>> [DEBUG] O depurador do Lazarus (FpLldb / GDB) pode agora conectar em localhost:5039.', luInfo);
   LogMsg('=========================================================', luSuccess);
 end;
 

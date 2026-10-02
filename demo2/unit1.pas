@@ -5,18 +5,18 @@ unit Unit1;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, StdCtrls;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, LazDroidMobileControls;
 
 type
 
   { TForm1 }
 
   TForm1 = class(TForm)
-    Button1: TButton;
-    PageControl1: TPageControl;
-    TabSheet1: TTabSheet;
-    TabSheet2: TTabSheet;
-    procedure Button1Click(Sender: TObject);
+    LazDroidAppBar1: TLazDroidAppBar;
+    LazDroidButton1: TLazDroidButton;
+    LazDroidSwitch1: TLazDroidSwitch;
+    LazDroidActivityIndicator1: TLazDroidActivityIndicator;
+    LazDroidFAB1: TLazDroidFAB;
   private
 
   public
@@ -29,13 +29,6 @@ var
 implementation
 
 {$R *.lfm}
-
-{ TForm1 }
-
-procedure TForm1.Button1Click(Sender: TObject);
-begin
-  Showmessage('teste');
-end;
 
 end.
 
