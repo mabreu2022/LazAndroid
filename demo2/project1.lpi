@@ -48,6 +48,7 @@
         <Filename Value="unit1.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
       </Unit>
@@ -57,7 +58,7 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="D:\Projetos AntiGravity\LazarusAndroid\scaffold\app\src\main\jniLibs\arm64-v8a\project1"/>
+      <Filename Value="..\scaffold\app\src\main\jniLibs\arm64-v8a\liblazapp.so"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);..\package"/>

@@ -16,7 +16,13 @@ uses
   // LazDroid units
   LazDroidConfig, LazDroidConfigFrame, LazDroidDeviceManager,
   LazDroidDeviceSelectDlg, LazDroidPipeline, LazDroidProcessRunner,
-  LazDroidProjectDescriptor, LazDroidTargetDockWin, LazDroidEditorBar;
+  LazDroidProjectDescriptor, LazDroidTargetDockWin, LazDroidEditorBar,
+  // Debugger Open Tools
+  BaseDebugManager, GDBMIServerDebugger, GDBMIDebugger, IdeDebuggerOpts, ProjectDebugLink
+  {$IFDEF WINDOWS}
+  , Windows
+  {$ENDIF}
+  ;
 
 var
   DroidOptionsIndex: Integer = 1050;
@@ -35,10 +41,370 @@ var
   CmdViewTarget: TIDECommand = nil;
   GlobalPipeline: TLazDroidPipeline = nil;
 
+type
+  TElf64_Ehdr = packed record
+    e_ident: array[0..15] of Byte;
+    e_type: Word;
+    e_machine: Word;
+    e_version: Cardinal;
+    e_entry: QWord;
+    e_phoff: QWord;
+    e_shoff: QWord;
+    e_flags: Cardinal;
+    e_ehsize: Word;
+    e_phentsize: Word;
+    e_phnum: Word;
+    e_shentsize: Word;
+    e_shnum: Word;
+    e_shstrndx: Word;
+  end;
+
+  TElf64_Shdr = packed record
+    sh_name: Cardinal;
+    sh_type: Cardinal;
+    sh_flags: QWord;
+    sh_addr: QWord;
+    sh_offset: QWord;
+    sh_size: QWord;
+    sh_link: Cardinal;
+    sh_info: Cardinal;
+    sh_addralign: QWord;
+    sh_entsize: QWord;
+  end;
+
+  TElf32_Ehdr = packed record
+    e_ident: array[0..15] of Byte;
+    e_type: Word;
+    e_machine: Word;
+    e_version: Cardinal;
+    e_entry: Cardinal;
+    e_phoff: Cardinal;
+    e_shoff: Cardinal;
+    e_flags: Cardinal;
+    e_ehsize: Word;
+    e_phentsize: Word;
+    e_phnum: Word;
+    e_shentsize: Word;
+    e_shnum: Word;
+    e_shstrndx: Word;
+  end;
+
+  TElf32_Shdr = packed record
+    sh_name: Cardinal;
+    sh_type: Cardinal;
+    sh_flags: Cardinal;
+    sh_addr: Cardinal;
+    sh_offset: Cardinal;
+    sh_size: Cardinal;
+    sh_link: Cardinal;
+    sh_info: Cardinal;
+    sh_addralign: Cardinal;
+    sh_entsize: Cardinal;
+  end;
+
+function GetElfTextSectionOffset(const AFilename: string): QWord;
+var
+  FS: TFileStream;
+  Ident: array[0..15] of Byte;
+  Hdr64: TElf64_Ehdr;
+  Shdr64, StrShdr64: TElf64_Shdr;
+  Hdr32: TElf32_Ehdr;
+  Shdr32, StrShdr32: TElf32_Shdr;
+  StrTable: array of Byte;
+  i: Integer;
+  SecName: string;
+begin
+  Result := 0;
+  if not FileExists(AFilename) then Exit;
+  try
+    FS := TFileStream.Create(AFilename, fmOpenRead or fmShareDenyNone);
+    try
+      if FS.Read(Ident, 16) < 16 then Exit;
+      if (Ident[0] <> $7F) or (Ident[1] <> Byte('E')) or (Ident[2] <> Byte('L')) or (Ident[3] <> Byte('F')) then Exit;
+      FS.Position := 0;
+      if Ident[4] = 2 then // 64-bit ELF
+      begin
+        if FS.Read(Hdr64, SizeOf(Hdr64)) < SizeOf(Hdr64) then Exit;
+        if (Hdr64.e_shoff = 0) or (Hdr64.e_shnum = 0) or (Hdr64.e_shstrndx >= Hdr64.e_shnum) then Exit;
+        FS.Position := Int64(Hdr64.e_shoff) + Int64(Hdr64.e_shstrndx) * Int64(Hdr64.e_shentsize);
+        if FS.Read(StrShdr64, SizeOf(StrShdr64)) < SizeOf(StrShdr64) then Exit;
+        SetLength(StrTable, StrShdr64.sh_size);
+        FS.Position := Int64(StrShdr64.sh_offset);
+        FS.Read(StrTable[0], StrShdr64.sh_size);
+        for i := 0 to Hdr64.e_shnum - 1 do
+        begin
+          FS.Position := Int64(Hdr64.e_shoff) + Int64(i) * Int64(Hdr64.e_shentsize);
+          if FS.Read(Shdr64, SizeOf(Shdr64)) = SizeOf(Shdr64) then
+          begin
+            if (Shdr64.sh_name < StrShdr64.sh_size) then
+            begin
+              SecName := PChar(@StrTable[Shdr64.sh_name]);
+              if SecName = '.text' then
+              begin
+                Result := Shdr64.sh_addr;
+                if Result = 0 then Result := Shdr64.sh_offset;
+                Exit;
+              end;
+            end;
+          end;
+        end;
+      end
+      else if Ident[4] = 1 then // 32-bit ELF
+      begin
+        if FS.Read(Hdr32, SizeOf(Hdr32)) < SizeOf(Hdr32) then Exit;
+        if (Hdr32.e_shoff = 0) or (Hdr32.e_shnum = 0) or (Hdr32.e_shstrndx >= Hdr32.e_shnum) then Exit;
+        FS.Position := Int64(Hdr32.e_shoff) + Int64(Hdr32.e_shstrndx) * Int64(Hdr32.e_shentsize);
+        if FS.Read(StrShdr32, SizeOf(StrShdr32)) < SizeOf(StrShdr32) then Exit;
+        SetLength(StrTable, StrShdr32.sh_size);
+        FS.Position := Int64(StrShdr32.sh_offset);
+        FS.Read(StrTable[0], StrShdr32.sh_size);
+        for i := 0 to Hdr32.e_shnum - 1 do
+        begin
+          FS.Position := Int64(Hdr32.e_shoff) + Int64(i) * Int64(Hdr32.e_shentsize);
+          if FS.Read(Shdr32, SizeOf(Shdr32)) = SizeOf(Shdr32) then
+          begin
+            if (Shdr32.sh_name < StrShdr32.sh_size) then
+            begin
+              SecName := PChar(@StrTable[Shdr32.sh_name]);
+              if SecName = '.text' then
+              begin
+                Result := Shdr32.sh_addr;
+                if Result = 0 then Result := Shdr32.sh_offset;
+                Exit;
+              end;
+            end;
+          end;
+        end;
+      end;
+    finally
+      FS.Free;
+    end;
+  except
+    Result := 0;
+  end;
+end;
+
+function QueryLibLazAppTextAddress(const AAdbPath, ASerial, APackage, ALocalModule: string): string;
+var
+  DevMgr: TLazDroidDeviceManager;
+  TargetPid: string;
+  OutMaps: string;
+  Lines: TStringList;
+  i, Attempt: Integer;
+  Line: string;
+  DashPos: Integer;
+  BaseHexStr: string;
+  BaseAddr: QWord;
+  TextOffset: QWord;
+  ValCode: Integer;
+begin
+  Result := '';
+  DevMgr := TLazDroidDeviceManager.Create(AAdbPath);
+  Lines := TStringList.Create;
+  try
+    for Attempt := 1 to 10 do
+    begin
+      if DevMgr.RunCommandSync(AAdbPath, ['-s', ASerial, 'shell', 'pidof', APackage], TargetPid) = 0 then
+      begin
+        TargetPid := StringReplace(StringReplace(TargetPid, #13, '', [rfReplaceAll]), #10, '', [rfReplaceAll]);
+        TargetPid := Trim(TargetPid);
+        if Pos(' ', TargetPid) > 0 then
+          TargetPid := Copy(TargetPid, 1, Pos(' ', TargetPid) - 1);
+        if TargetPid <> '' then
+        begin
+          if DevMgr.RunCommandSync(AAdbPath, ['-s', ASerial, 'shell', 'run-as', APackage, 'grep', 'liblazapp', '/proc/' + TargetPid + '/maps'], OutMaps) = 0 then
+          begin
+            Lines.Text := OutMaps;
+            for i := 0 to Lines.Count - 1 do
+            begin
+              Line := Lines[i];
+              if (Pos('r-xp', Line) > 0) and (Pos('liblazapp.so', Line) > 0) then
+              begin
+                DashPos := Pos('-', Line);
+                if DashPos > 1 then
+                begin
+                  BaseHexStr := Trim(Copy(Line, 1, DashPos - 1));
+                  Val('$' + BaseHexStr, BaseAddr, ValCode);
+                  if (ValCode = 0) and (BaseAddr > 0) then
+                  begin
+                    TextOffset := GetElfTextSectionOffset(ALocalModule);
+                    Result := '0x' + LowerCase(IntToHex(BaseAddr + TextOffset, 8));
+                    Exit;
+                  end;
+                end;
+              end;
+            end;
+          end;
+        end;
+      end;
+      Sleep(200);
+    end;
+  finally
+    Lines.Free;
+    DevMgr.Free;
+  end;
+end;
+
+procedure ConfigureGdbServerDebugger(const ANDKRoot, ALocalModule: string; APort: Integer; const AArchitecture, ATextAddrHex: string);
+var
+  GdbExe: string;
+  PythonDir: string;
+  vList: TDebuggerPropertiesConfigList;
+  vConfig: TDebuggerPropertiesConfig;
+  vProps: TGDBMIServerDebuggerProperties;
+  ModuleFile: string;
+begin
+  // 1. Localiza o executável gdb-orig.exe ou gdb.exe do NDK
+  GdbExe := IncludeTrailingPathDelimiter(ANDKRoot) + 'prebuilt' + DirectorySeparator +
+            'windows-x86_64' + DirectorySeparator + 'bin' + DirectorySeparator + 'gdb-orig.exe';
+  if not FileExists(GdbExe) then
+    GdbExe := IncludeTrailingPathDelimiter(ANDKRoot) + 'prebuilt' + DirectorySeparator +
+              'windows-x86_64' + DirectorySeparator + 'bin' + DirectorySeparator + 'gdb.exe';
+
+  // 2. Define PYTHONHOME para o Python 2.7 do NDK (necessário para o gdb do NDK)
+  PythonDir := IncludeTrailingPathDelimiter(ANDKRoot) + 'prebuilt' + DirectorySeparator + 'windows-x86_64';
+  {$IFDEF WINDOWS}
+  Windows.SetEnvironmentVariable('PYTHONHOME', PChar(PythonDir));
+  {$ELSE}
+  SetEnvironmentVariable('PYTHONHOME', PythonDir);
+  {$ENDIF}
+
+  ModuleFile := StringReplace(ALocalModule, '\', '/', [rfReplaceAll]);
+
+  // 3. Configura no DbgProjectLink (opções do projeto atual)
+  vList := DbgProjectLink.DebuggerPropertiesConfigList;
+  if Assigned(vList) then
+  begin
+    vConfig := vList.EntryByName('LazDroid GDBServer', TGDBMIServerDebugger.ClassName);
+    if not Assigned(vConfig) then
+    begin
+      vConfig := TDebuggerPropertiesConfig.CreateForDebuggerClass(TGDBMIServerDebugger, True);
+      vConfig.ConfigName := 'LazDroid GDBServer';
+    end;
+    vConfig.Active := True;
+    vConfig.DebuggerFilename := GdbExe;
+
+    if Assigned(vConfig.DebuggerProperties) and (vConfig.DebuggerProperties is TGDBMIServerDebuggerProperties) then
+    begin
+      vProps := TGDBMIServerDebuggerProperties(vConfig.DebuggerProperties);
+      vProps.Debugger_Remote_Hostname := '127.0.0.1';
+      vProps.Debugger_Remote_Port := IntToStr(APort);
+      vProps.Architecture := AArchitecture;
+      vProps.RemoteTimeout := 15;
+      vProps.SkipSettingLocalExeName := True;
+      vProps.InternalStartBreak := gdbsNone;
+      vProps.InternalExceptionBreakPoints := [];
+      vProps.WarnOnSetBreakpointError := gdbwNone;
+      vProps.WarnOnInternalError := TGDBMIDebuggerShowWarning.False;
+
+      vProps.EventProperties.AfterInit.Clear;
+      vProps.EventProperties.AfterInit.Add('set confirm off');
+      vProps.EventProperties.AfterInit.Add('set sysroot');
+      vProps.EventProperties.AfterInit.Add('set auto-solib-add off');
+
+      vProps.EventProperties.AfterConnect.Clear;
+      vProps.EventProperties.AfterConnect.Add('file');
+      if (ATextAddrHex <> '') and (ATextAddrHex <> '0x0') then
+        vProps.EventProperties.AfterConnect.Add('add-symbol-file "' + ModuleFile + '" ' + ATextAddrHex);
+      vProps.EventProperties.AfterConnect.Add('handle SIGSEGV nostop noprint pass');
+      vProps.EventProperties.AfterConnect.Add('handle SIGBUS nostop noprint pass');
+      vProps.EventProperties.AfterConnect.Add('handle SIG35 nostop noprint pass');
+      vProps.EventProperties.AfterConnect.Add('handle SIG36 nostop noprint pass');
+    end;
+
+    vList.CurrentDebuggerPropertiesConfig := vConfig;
+  end;
+
+  DbgProjectLink.DebuggerBackend := '';
+  DbgProjectLink.MarkDebuggerClassConfAsModified;
+
+  // 4. Configura também no DebuggerOptions (global da IDE)
+  if Assigned(DebuggerOptions.DebuggerPropertiesConfigList) then
+  begin
+    vConfig := DebuggerOptions.DebuggerPropertiesConfigList.EntryByName('LazDroid GDBServer', TGDBMIServerDebugger.ClassName);
+    if not Assigned(vConfig) then
+    begin
+      vConfig := TDebuggerPropertiesConfig.CreateForDebuggerClass(TGDBMIServerDebugger, True);
+      vConfig.ConfigName := 'LazDroid GDBServer';
+    end;
+    vConfig.Active := True;
+    vConfig.DebuggerFilename := GdbExe;
+
+    if Assigned(vConfig.DebuggerProperties) and (vConfig.DebuggerProperties is TGDBMIServerDebuggerProperties) then
+    begin
+      vProps := TGDBMIServerDebuggerProperties(vConfig.DebuggerProperties);
+      vProps.Debugger_Remote_Hostname := '127.0.0.1';
+      vProps.Debugger_Remote_Port := IntToStr(APort);
+      vProps.Architecture := AArchitecture;
+      vProps.RemoteTimeout := 15;
+      vProps.SkipSettingLocalExeName := True;
+      vProps.InternalStartBreak := gdbsNone;
+      vProps.InternalExceptionBreakPoints := [];
+      vProps.WarnOnSetBreakpointError := gdbwNone;
+      vProps.WarnOnInternalError := TGDBMIDebuggerShowWarning.False;
+
+      vProps.EventProperties.AfterInit.Clear;
+      vProps.EventProperties.AfterInit.Add('set confirm off');
+      vProps.EventProperties.AfterInit.Add('set sysroot');
+      vProps.EventProperties.AfterInit.Add('set auto-solib-add off');
+
+      vProps.EventProperties.AfterConnect.Clear;
+      vProps.EventProperties.AfterConnect.Add('file');
+      if (ATextAddrHex <> '') and (ATextAddrHex <> '0x0') then
+        vProps.EventProperties.AfterConnect.Add('add-symbol-file "' + ModuleFile + '" ' + ATextAddrHex);
+      vProps.EventProperties.AfterConnect.Add('handle SIGSEGV nostop noprint pass');
+      vProps.EventProperties.AfterConnect.Add('handle SIGBUS nostop noprint pass');
+      vProps.EventProperties.AfterConnect.Add('handle SIG35 nostop noprint pass');
+      vProps.EventProperties.AfterConnect.Add('handle SIG36 nostop noprint pass');
+    end;
+
+    DebuggerOptions.CurrentDebuggerPropertiesConfig := vConfig;
+    DebuggerOptions.SaveDebuggerPropertiesList;
+  end;
+end;
+
+procedure HandleDebugReady(Sender: TObject; const ANDKRoot, ALocalModule, ASerial, APackage: string; APort: Integer);
+var
+  Arch: string;
+  TextAddrHex: string;
+begin
+  LogToLazarusMessages('>>> [LAZDROID-DEBUG] Calibrando depurador nativo GDBServer no Lazarus IDE...', luSuccess);
+
+  if Pos('arm64', LowerCase(ALocalModule)) > 0 then
+    Arch := 'aarch64'
+  else
+    Arch := 'arm';
+
+  // Obtém o endereço real de carregamento em memória da biblioteca .so no Android
+  TextAddrHex := QueryLibLazAppTextAddress(DroidConfig.AdbPath, ASerial, APackage, ALocalModule);
+  if TextAddrHex <> '' then
+    LogToLazarusMessages('>>> [LAZDROID-DEBUG] Símbolos de ' + ExtractFileName(ALocalModule) + ' realocados em memória no endereço: ' + TextAddrHex, luSuccess)
+  else
+    LogToLazarusMessages('AVISO: Endereço de memória de ' + ExtractFileName(ALocalModule) + ' não detectado. Depuração usando mapa padrão.', luWarning);
+
+  ConfigureGdbServerDebugger(ANDKRoot, ALocalModule, APort, Arch, TextAddrHex);
+
+  // Inicializa o depurador
+  if not DebugBoss.InitDebugger then
+  begin
+    LogToLazarusMessages('ERRO: Falha ao inicializar o depurador GDBServer do Lazarus.', luError);
+    Exit;
+  end;
+
+  LazarusIDE.ToolStatus := itDebugger;
+  DebugBoss.UpdateButtonsAndMenuItems;
+
+  LogToLazarusMessages('>>> [LAZDROID-DEBUG] Depurador GDB engatado! Conectando e enviando Continue...', luSuccess);
+  DebugBoss.RunDebugger;
+end;
+
 procedure EnsurePipeline;
 begin
   if not Assigned(GlobalPipeline) then
+  begin
     GlobalPipeline := TLazDroidPipeline.Create(DroidConfig);
+    GlobalPipeline.OnDebugReady := @HandleDebugReady;
+  end;
 end;
 
 procedure DoConfigureProject(Sender: TObject);
@@ -319,6 +685,7 @@ begin
   if Assigned(LazDroidEditorBarInstance) then
   begin
     LazDroidEditorBarInstance.OnDeploy := @DoDeployAndRun;
+    LazDroidEditorBarInstance.OnDebug  := @DoDeployAndDebug;
     LazDroidEditorBarInstance.OnLogcat := @DoOpenLogcat;
   end;
 end;

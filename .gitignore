@@ -26,8 +26,15 @@ local.properties
 **/local.properties
 
 # Native compiled shared libraries (generated during build)
-scaffold/app/src/main/jniLibs/**/*.so
+scaffold/app/src/main/jniLibs/**/liblazapp*.so
+scaffold/app/src/main/jniLibs/**/libproject*.so
+scaffold/app/src/main/jniLibs/**/liblazapp
+scaffold/app/src/main/jniLibs/**/link*.res
+link*.res
+*.res
 !scaffold/app/src/main/jniLibs/**/.gitkeep
+!scaffold/app/src/main/jniLibs/**/libsqlite*.so
+!scaffold/app/src/main/jniLibs/**/libgdbserver*.so
 
 # Heavy binaries & extracted toolchain archives
 tools/*.exe

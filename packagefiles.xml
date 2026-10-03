@@ -11,37 +11,37 @@
       <Name Value="dcpcrypt"/>
       <Version Major="2" Release="4" Build="2"/>
       <Filename Value="C:\Users\Denize Abreu\AppData\Local\lazarus\onlinepackagemanager\packages\DCPcrypt\dcpcrypt.lpk"/>
-      <LastUsed Value="2026/10/02 08:11:44"/>
+      <LastUsed Value="2026/10/03 11:56:19"/>
     </Item2>
     <Item3>
       <Name Value="dcpcrypt_laz"/>
       <Version Major="2" Release="4" Build="2"/>
       <Filename Value="C:\Users\Denize Abreu\AppData\Local\lazarus\onlinepackagemanager\packages\DCPcrypt\dcpcrypt_laz.lpk"/>
-      <LastUsed Value="2026/10/02 08:11:44"/>
+      <LastUsed Value="2026/10/03 11:56:19"/>
     </Item3>
     <Item4>
       <Name Value="deathstroke_design"/>
       <Version Minor="1"/>
-      <Filename Value="D:\DesthStrokeIDE\Packages\deathstroke_design.lpk"/>
-      <LastUsed Value="2026/10/02 08:11:44"/>
+      <Filename Value="D:\DesthStrokeIDE\svn\Packages\deathstroke_design.lpk"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item4>
     <Item5>
       <Name Value="deathstroke_runtime"/>
       <Version Minor="1"/>
-      <Filename Value="D:\DesthStrokeIDE\Packages\deathstroke_runtime.lpk"/>
-      <LastUsed Value="2026/10/02 08:11:44"/>
+      <Filename Value="D:\DesthStrokeIDE\svn\Packages\deathstroke_runtime.lpk"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item5>
     <Item6>
       <Name Value="LazDroidControls"/>
       <Version Major="1" Build="1"/>
       <Filename Value="d:\Projetos AntiGravity\LazarusAndroid\package\LazDroidControls.lpk"/>
-      <LastUsed Value="2026/10/02 08:11:44"/>
+      <LastUsed Value="2026/10/03 11:56:19"/>
     </Item6>
     <Item7>
       <Name Value="LazDroidDeploy"/>
       <Version Major="1" Build="1"/>
       <Filename Value="d:\Projetos AntiGravity\LazarusAndroid\package\LazDroidDeploy.lpk"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item7>
     <Item8>
       <Name Value="LazSpeedReport"/>
@@ -53,54 +53,54 @@
       <Name Value="zcomponent"/>
       <Version Major="8"/>
       <Filename Value="C:\Users\Denize Abreu\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\packages\lazarus\zcomponent.lpk"/>
-      <LastUsed Value="2026/10/02 08:11:44"/>
+      <LastUsed Value="2026/10/03 11:56:19"/>
     </Item9>
     <Item10>
       <Name Value="zcomponentdesign"/>
       <Version Major="8"/>
       <Filename Value="C:\Users\Denize Abreu\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\packages\lazarus\zcomponentdesign.lpk"/>
-      <LastUsed Value="2026/10/02 08:11:44"/>
+      <LastUsed Value="2026/10/03 11:56:19"/>
     </Item10>
     <Item11>
       <Name Value="zcore"/>
       <Version Major="8"/>
       <Filename Value="C:\Users\Denize Abreu\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\packages\lazarus\zcore.lpk"/>
-      <LastUsed Value="2026/10/02 08:11:44"/>
+      <LastUsed Value="2026/10/03 11:56:19"/>
     </Item11>
     <Item12>
       <Name Value="zdbc"/>
       <Version Major="8"/>
       <Filename Value="C:\Users\Denize Abreu\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\packages\lazarus\zdbc.lpk"/>
-      <LastUsed Value="2026/10/02 08:11:44"/>
+      <LastUsed Value="2026/10/03 11:56:19"/>
     </Item12>
     <Item13>
       <Name Value="zparsesql"/>
       <Version Major="8"/>
       <Filename Value="C:\Users\Denize Abreu\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\packages\lazarus\zparsesql.lpk"/>
-      <LastUsed Value="2026/10/02 08:11:44"/>
+      <LastUsed Value="2026/10/03 11:56:19"/>
     </Item13>
     <Item14>
       <Name Value="zplain"/>
       <Version Major="8"/>
       <Filename Value="C:\Users\Denize Abreu\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\packages\lazarus\zplain.lpk"/>
-      <LastUsed Value="2026/10/02 08:11:44"/>
+      <LastUsed Value="2026/10/03 11:56:19"/>
     </Item14>
   </UserPkgLinks>
   <GlobalPkgLinks Version="3" Count="64">
     <Item1>
       <Name Value="anchordocking"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/10/02 08:11:44"/>
+      <LastUsed Value="2026/10/03 11:56:19"/>
     </Item1>
     <Item2>
       <Name Value="anchordockingdsgn"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/10/02 08:11:44"/>
+      <LastUsed Value="2026/10/03 11:56:19"/>
     </Item2>
     <Item3>
       <Name Value="buildintf"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item3>
     <Item4>
       <Name Value="cairocanvas_pkg"/>
@@ -123,12 +123,12 @@
     </Item7>
     <Item8>
       <Name Value="cmdlinedebuggerbase"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item8>
     <Item9>
       <Name Value="codetools"/>
       <Version Major="1" Release="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item9>
     <Item10>
       <Name Value="datetimectrls"/>
@@ -148,11 +148,11 @@
     <Item13>
       <Name Value="debuggerintf"/>
       <Version Minor="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item13>
     <Item14>
       <Name Value="dockedformeditor"/>
-      <LastUsed Value="2026/10/02 08:11:44"/>
+      <LastUsed Value="2026/10/03 11:56:19"/>
     </Item14>
     <Item15>
       <Name Value="editormacroscript"/>
@@ -171,7 +171,7 @@
     <Item18>
       <Name Value="fcl"/>
       <Version Major="1" Release="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item18>
     <Item19>
       <Name Value="fpcunitide"/>
@@ -181,42 +181,42 @@
     <Item20>
       <Name Value="fpdebug"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item20>
     <Item21>
       <Name Value="freetypelaz"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item21>
     <Item22>
       <Name Value="ideconfig"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item22>
     <Item23>
       <Name Value="idedebugger"/>
       <Version Release="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item23>
     <Item24>
       <Name Value="ideintf"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item24>
     <Item25>
       <Name Value="idepackager"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item25>
     <Item26>
       <Name Value="ideproject"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item26>
     <Item27>
       <Name Value="ideutilspkg"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item27>
     <Item28>
       <Name Value="instantfpclaz"/>
@@ -236,44 +236,44 @@
     <Item31>
       <Name Value="laz.virtualtreeview_package"/>
       <Version Major="5" Minor="5" Release="3" Build="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item31>
     <Item32>
       <Name Value="lazcontroldsgn"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item32>
     <Item33>
       <Name Value="lazcontrols"/>
       <Version Major="1" Release="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item33>
     <Item34>
       <Name Value="lazdebuggerfp"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item34>
     <Item35>
       <Name Value="lazdebuggerfplldb"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item35>
     <Item36>
       <Name Value="lazdebuggergdbmi"/>
       <Version Minor="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item36>
     <Item37>
       <Name Value="lazdebuggerintf"/>
       <Version Release="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item37>
     <Item38>
       <Name Value="lazdebuggerlldb"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item38>
     <Item39>
       <Name Value="lazedit"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item39>
     <Item40>
       <Name Value="lazprojectgroups"/>
@@ -287,22 +287,22 @@
     <Item42>
       <Name Value="lazutils"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item42>
     <Item43>
       <Name Value="lcl"/>
       <Version Major="4" Minor="8"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item43>
     <Item44>
       <Name Value="lclbase"/>
       <Version Major="4" Minor="8"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item44>
     <Item45>
       <Name Value="lclextensions_package"/>
       <Version Minor="6" Release="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item45>
     <Item46>
       <Name Value="leakview"/>
@@ -371,12 +371,12 @@
     <Item59>
       <Name Value="synedit"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/10/02 08:21:08"/>
+      <LastUsed Value="2026/10/03 12:19:35"/>
     </Item59>
     <Item60>
       <Name Value="syneditdsgn"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/10/02 08:11:44"/>
+      <LastUsed Value="2026/10/03 11:56:19"/>
     </Item60>
     <Item61>
       <Name Value="tachartlazaruspkg"/>

@@ -58,6 +58,9 @@ type
 
 implementation
 
+uses
+  Forms;
+
 { TLazDroidDeviceManager }
 
 constructor TLazDroidDeviceManager.Create(const AAdbPath: string);
@@ -104,7 +107,10 @@ begin
       if BytesRead > 0 then
         StrStream.WriteBuffer(Buffer[0], BytesRead)
       else
+      begin
+        Forms.Application.ProcessMessages;
         Sleep(10);
+      end;
     end;
 
     Result := Proc.ExitCode;

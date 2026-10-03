@@ -8,11 +8,12 @@ object Form1: TForm1
   ClientWidth = 320
   DesignTimePPI = 120
   LCLVersion = '4.8.0.0'
+  OnCreate = FormCreate
   object LazDroidAppBar1: TLazDroidAppBar
     Left = 0
-    Height = 56
     Top = 0
     Width = 320
+    Align = alTop
     Title = 'LazDroid Mobile'
     Font.Height = -16
     Font.Name = 'Segoe UI'
@@ -23,10 +24,12 @@ object Form1: TForm1
     Height = 48
     Top = 80
     Width = 272
+    Anchors = [akTop, akLeft, akRight]
     Caption = 'Botão Touch'
     Font.Height = -14
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold]
+    OnClick = LazDroidButton1Click
   end
   object LazDroidSwitch1: TLazDroidSwitch
     Left = 24
@@ -40,13 +43,12 @@ object Form1: TForm1
     Height = 32
     Top = 150
     Width = 32
-    Active = True
   end
   object LazDroidFAB1: TLazDroidFAB
     Left = 240
     Height = 56
     Top = 480
     Width = 56
-    Icon = aiPlus
+    Anchors = [akRight, akBottom]
   end
 end

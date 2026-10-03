@@ -12,7 +12,7 @@ unit LazDroidMobileControls;
 interface
 
 uses
-  Classes, SysUtils, Types, Math, Graphics, Controls, Forms, StdCtrls, ExtCtrls, LCLType, LCLIntf;
+  Classes, SysUtils, Types, Math, Graphics, Controls, Forms, StdCtrls, ExtCtrls, LCLType, LCLIntf, LResources;
 
 type
   { Enumerações visuais }
@@ -70,6 +70,9 @@ type
     property OnBackClick: TNotifyEvent read FOnBackClick write FOnBackClick;
     property OnActionClick: TNotifyEvent read FOnActionClick write FOnActionClick;
     property Font;
+    property Anchors;
+    property Visible;
+    property Enabled;
   end;
 
   { ---------------------------------------------------------------------------
@@ -232,6 +235,9 @@ type
     property BarColor: TColor read FBarColor write FBarColor default $0018181B; // Zinc 900
     property OnTabSelected: TLazDroidTabChangeEvent read FOnTabSelected write FOnTabSelected;
     property Font;
+    property Anchors;
+    property Visible;
+    property Enabled;
   end;
 
   { ---------------------------------------------------------------------------
@@ -396,6 +402,7 @@ type
     FDirection: TLazDroidLayoutDirection;
     FSpacing: Integer;
     FAutoArrange: Boolean;
+    FArranging: Boolean;
     procedure SetDirection(const AValue: TLazDroidLayoutDirection);
     procedure SetSpacing(const AValue: Integer);
     procedure SetAutoArrange(const AValue: Boolean);
@@ -464,20 +471,26 @@ begin
 end;
 
 procedure AdaptMobileFormLayout(AForm: TCustomForm);
+var
+  TargetDPI: Integer;
+  ScaleFactor: Double;
 begin
   if not Assigned(AForm) then Exit;
   if AForm.Tag = 9999 then Exit;
   AForm.Tag := 9999;
 
-  // No Android CustomDrawn, o LCL já invoca AutoAdjustLayout em ShowHide e OnConfigurationChanged.
-  // Se a largura já foi expandida para a resolução física (>= 600px), não precisa re-escalar.
-  if AForm.ClientWidth >= 600 then Exit;
+  // Calcula a taxa de escala relativa à densidade base móvel (160 DPI ou 360dp)
+  ScaleFactor := 1.0;
+  if Screen.Width >= 480 then
+    ScaleFactor := Screen.Width / 360.0
+  else if Screen.PixelsPerInch > 120 then
+    ScaleFactor := Screen.PixelsPerInch / 120.0;
 
-  // Caso esteja em modo legado com tela ainda em 320/360dp, executa AutoAdjustLayout nativo do LCL
-  if (Screen.Width > AForm.ClientWidth) and (Screen.PixelsPerInch > 0) then
+  if ScaleFactor > 1.05 then
   begin
+    TargetDPI := Round(AForm.DesignTimePPI * ScaleFactor);
     AForm.AutoAdjustLayout(lapAutoAdjustWithoutHorizontalScrolling,
-      AForm.DesignTimePPI, Screen.PixelsPerInch, AForm.ClientWidth, Screen.Width);
+      AForm.DesignTimePPI, TargetDPI, AForm.ClientWidth, Screen.Width);
   end;
 end;
 
@@ -673,7 +686,6 @@ end;
 constructor TLazDroidButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  ControlStyle := ControlStyle + [csOpaque];
   Width := 140;
   Height := 48;
   FCaption := 'Botão Touch';
@@ -734,12 +746,17 @@ end;
 
 procedure TLazDroidButton.Paint;
 var
-  BgCol: TColor;
+  BgCol, ParentBg: TColor;
   tx, ty: Integer;
   R: TRect;
   Radius: Integer;
   IconSz, IconPad: Integer;
 begin
+  ParentBg := GetRGBColorResolvingParent;
+  Canvas.Brush.Color := ParentBg;
+  Canvas.Brush.Style := bsSolid;
+  Canvas.FillRect(ClientRect);
+
   BgCol := GetBaseColor;
   if FIsPressed then
     BgCol := TColor(Integer(BgCol) - $00151515);
@@ -804,6 +821,7 @@ end;
 constructor TLazDroidCard.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  ControlStyle := ControlStyle + [csAcceptsControls];
   Width := 280;
   Height := 160;
   FCornerRadius := 12;
@@ -1366,7 +1384,13 @@ end;
 procedure TLazDroidSwitch.Paint;
 var
   vDiameter, vLeft, Pad: Integer;
+  ParentBg: TColor;
 begin
+  ParentBg := GetRGBColorResolvingParent;
+  Canvas.Brush.Color := ParentBg;
+  Canvas.Brush.Style := bsSolid;
+  Canvas.FillRect(ClientRect);
+
   if FChecked then
     Canvas.Brush.Color := FOnColor
   else
@@ -1434,7 +1458,13 @@ var
   I, vRadius, vIndex: Integer;
   vCenter: TPoint;
   PenW: Integer;
+  ParentBg: TColor;
 begin
+  ParentBg := GetRGBColorResolvingParent;
+  Canvas.Brush.Color := ParentBg;
+  Canvas.Brush.Style := bsSolid;
+  Canvas.FillRect(ClientRect);
+
   vCenter := Point(Width div 2, Height div 2);
   vRadius := Min(Width, Height) div 2;
   vRadius := vRadius - Max(2, vRadius div 6);
@@ -1468,7 +1498,6 @@ end;
 constructor TLazDroidFAB.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  ControlStyle := ControlStyle + [csOpaque];
   Width := 56;
   Height := 56;
   FIcon := aiPlus;
@@ -1493,9 +1522,14 @@ end;
 
 procedure TLazDroidFAB.Paint;
 var
-  BgCol: TColor;
+  BgCol, ParentBg: TColor;
   R: TRect;
 begin
+  ParentBg := GetRGBColorResolvingParent;
+  Canvas.Brush.Color := ParentBg;
+  Canvas.Brush.Style := bsSolid;
+  Canvas.FillRect(ClientRect);
+
   BgCol := FButtonColor;
   if FIsPressed then
     BgCol := TColor(Integer(BgCol) - $00151515);
@@ -1519,6 +1553,7 @@ begin
   FDirection := ldVertical;
   FSpacing := 12;
   FAutoArrange := True;
+  FArranging := False;
   Color := clNone;
   Width := 200;
   Height := 200;
@@ -1555,29 +1590,63 @@ procedure TLazDroidLayout.ArrangeControls;
 var
   I, LPos: Integer;
   C: TControl;
+  TargetX, TargetY, TargetW, TargetH: Integer;
 begin
   if not FAutoArrange then Exit;
   if csLoading in ComponentState then Exit;
+  if FArranging then Exit;
 
-  LPos := FSpacing;
-  for I := 0 to ControlCount - 1 do
-  begin
-    C := Controls[I];
-    if not C.Visible then Continue;
+  FArranging := True;
+  try
+    DisableAlign;
+    try
+      LPos := FSpacing;
+      for I := 0 to ControlCount - 1 do
+      begin
+        C := Controls[I];
+        if not C.Visible then Continue;
+        // Controles com alinhamento explícito gerenciado pelo LCL (alTop, alBottom, alClient, etc.)
+        // não devem ter Left/Top/Width manipulados pelo layout para evitar loop de ChangeBounds.
+        if C.Align <> alNone then Continue;
 
-    if FDirection = ldVertical then
-    begin
-      C.Left := FSpacing;
-      C.Top := LPos;
-      C.Width := ClientWidth - (FSpacing * 2);
-      LPos := C.Top + C.Height + FSpacing;
-    end
-    else
-    begin
-      C.Left := LPos;
-      C.Top := FSpacing;
-      LPos := C.Left + C.Width + FSpacing;
+        if FDirection = ldVertical then
+        begin
+          TargetX := FSpacing;
+          TargetY := LPos;
+          // Controles com AutoSize ativo (ex: TLabel, TCheckBox) calculam sua própria largura
+          // baseada no texto. Forçar uma largura externa faz o LCL entrar em loop em ChangeBounds.
+          if C.AutoSize then
+            TargetW := C.Width
+          else
+            TargetW := Max(10, ClientWidth - (FSpacing * 2));
+          TargetH := C.Height;
+
+          if (C.Left <> TargetX) or (C.Top <> TargetY) or (C.Width <> TargetW) or (C.Height <> TargetH) then
+            C.SetBounds(TargetX, TargetY, TargetW, TargetH);
+
+          LPos := C.Top + C.Height + FSpacing;
+        end
+        else
+        begin
+          TargetX := LPos;
+          TargetY := FSpacing;
+          TargetW := C.Width;
+          if C.AutoSize then
+            TargetH := C.Height
+          else
+            TargetH := Max(10, ClientHeight - (FSpacing * 2));
+
+          if (C.Left <> TargetX) or (C.Top <> TargetY) or (C.Width <> TargetW) or (C.Height <> TargetH) then
+            C.SetBounds(TargetX, TargetY, TargetW, TargetH);
+
+          LPos := C.Left + C.Width + FSpacing;
+        end;
+      end;
+    finally
+      EnableAlign;
     end;
+  finally
+    FArranging := False;
   end;
 end;
 
@@ -1620,6 +1689,22 @@ begin
     TLazDroidBottomNav,
     TLazDroidListView
   ]);
+  RegisterClasses([
+    TLazDroidAppBar,
+    TLazDroidButton,
+    TLazDroidEdit,
+    TLazDroidCard,
+    TLazDroidBadge,
+    TLazDroidSwitch,
+    TLazDroidActivityIndicator,
+    TLazDroidFAB,
+    TLazDroidLayout,
+    TLazDroidBottomNav,
+    TLazDroidListView
+  ]);
 end;
+
+initialization
+  {$I LazDroidControls.lrs}
 
 end.

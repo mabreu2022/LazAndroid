@@ -20,6 +20,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
@@ -74,7 +76,7 @@ public class LCLActivity extends Activity {
     // Configurações de renderização
     // Modo Nativo: LCL desenha no DPI físico do aparelho
     // Modo Compositor: LCL desenha em resolução base e o Android escala via hardware
-    private static final boolean LAZDROID_NATIVE_RENDER = true;
+    private static final boolean LAZDROID_NATIVE_RENDER = false;
     private static final int LAZDROID_DESIGN_WIDTH = 360;
     private static final int LAZDROID_DESIGN_HEIGHT = 640;
 
@@ -84,6 +86,7 @@ public class LCLActivity extends Activity {
     private int mDesignWidth = 0;
     private int mDesignHeight = 0;
     private final ArrayList<Runnable> timers = new ArrayList<Runnable>();
+    private boolean mIsTextEditor = false;
 
     static {
         // Carrega bibliotecas C/Pascal
@@ -155,6 +158,10 @@ public class LCLActivity extends Activity {
             );
         }
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().setSoftInputMode(
+            WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN |
+            WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+        );
 
         lclView = new LCLView(this);
 
@@ -162,9 +169,21 @@ public class LCLActivity extends Activity {
         FrameLayout root = new FrameLayout(this);
         root.setBackgroundColor(Color.BLACK);
         root.setFitsSystemWindows(true);
+        root.setFocusable(true);
+        root.setFocusableInTouchMode(true);
         root.addView(lclView, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         setContentView(root);
+        root.requestFocus();
+
+        root.post(new Runnable() {
+            @Override
+            public void run() {
+                if (!mIsTextEditor) {
+                    LCLDoHideVirtualKeyboard();
+                }
+            }
+        });
 
         // Executa LCLOnCreate após o primeiro layout da View, garantindo medidas reais
         lclView.post(new Runnable() {
@@ -200,6 +219,7 @@ public class LCLActivity extends Activity {
                 designHeight = designShort;
                 designWidth = Math.round((float) designShort * viewWidth / viewHeight);
             }
+            dpi = 160; // 160 DPI é a densidade baseline (1dp = 1px) no Android
         }
 
         mDesignWidth = designWidth;
@@ -216,6 +236,21 @@ public class LCLActivity extends Activity {
     protected void onResume() {
         super.onResume();
         if (lclView != null) lclView.invalidate();
+        if (!mIsTextEditor) LCLDoHideVirtualKeyboard();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus && !mIsTextEditor) {
+            LCLDoHideVirtualKeyboard();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (!mIsTextEditor) LCLDoHideVirtualKeyboard();
+                }
+            }, 250);
+        }
     }
 
     @Override
@@ -333,23 +368,51 @@ public class LCLActivity extends Activity {
     }
 
     public void LCLDoHideVirtualKeyboard() {
+        mIsTextEditor = false;
+        if (lclView != null) {
+            lclView.setFocusableInTouchMode(false);
+            lclView.clearFocus();
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            WindowInsetsController controller = getWindow().getInsetsController();
+            if (controller != null) {
+                controller.hide(WindowInsets.Type.ime());
+            }
+        }
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm != null && lclView != null) {
-            imm.hideSoftInputFromWindow(lclView.getWindowToken(), 0);
+        if (imm != null) {
+            View tokenView = lclView != null ? lclView : getWindow().getDecorView();
+            if (tokenView != null) {
+                imm.hideSoftInputFromWindow(tokenView.getWindowToken(), 0);
+            }
+            if (lclView != null) {
+                imm.restartInput(lclView);
+            }
         }
     }
 
     public void LCLDoShowVirtualKeyboard() {
+        Log.i(TAG, ">>> LCLDoShowVirtualKeyboard CALLED! Stack: " + Log.getStackTraceString(new Throwable()));
         if (lclView == null) return;
+        mIsTextEditor = true;
+        lclView.setFocusable(true);
+        lclView.setFocusableInTouchMode(true);
         lclView.requestFocus();
-        int margin = Math.max(48, lclView.getHeight() / 6);
-        Rect focusRect = new Rect(Math.max(0, lclView.lastTouchX - margin),
-                                  Math.max(0, lclView.lastTouchY - margin),
-                                  Math.min(lclView.getWidth(), lclView.lastTouchX + margin),
-                                  Math.min(lclView.getHeight(), lclView.lastTouchY + margin));
-        lclView.requestRectangleOnScreen(focusRect, false);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            WindowInsetsController controller = getWindow().getInsetsController();
+            if (controller != null) {
+                controller.show(WindowInsets.Type.ime());
+            }
+        }
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
+            imm.restartInput(lclView);
+            int margin = Math.max(48, lclView.getHeight() / 6);
+            Rect focusRect = new Rect(Math.max(0, lclView.lastTouchX - margin),
+                                      Math.max(0, lclView.lastTouchY - margin),
+                                      Math.min(lclView.getWidth(), lclView.lastTouchX + margin),
+                                      Math.min(lclView.getHeight(), lclView.lastTouchY + margin));
+            lclView.requestRectangleOnScreen(focusRect, false);
             imm.showSoftInput(lclView, InputMethodManager.SHOW_IMPLICIT);
         }
     }
@@ -365,21 +428,20 @@ public class LCLActivity extends Activity {
      */
     private class LCLView extends View {
         private Bitmap bitmap;
-        private final Paint scaledBitmapPaint = new Paint(Paint.FILTER_BITMAP_FLAG);
+        private final Paint scaledBitmapPaint = new Paint(Paint.FILTER_BITMAP_FLAG | Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
         private String composingText = "";
         public int lastTouchX = 0;
         public int lastTouchY = 0;
 
         public LCLView(Context context) {
             super(context);
-            setFocusable(true);
-            setFocusableInTouchMode(true);
-            requestFocus();
+            setFocusable(false);
+            setFocusableInTouchMode(false);
         }
 
         @Override
         public boolean onCheckIsTextEditor() {
-            return true;
+            return mIsTextEditor;
         }
 
         private void dispatchCommittedText(CharSequence text) {
@@ -402,6 +464,10 @@ public class LCLActivity extends Activity {
 
         @Override
         public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
+            Log.i(TAG, ">>> onCreateInputConnection CALLED! mIsTextEditor=" + mIsTextEditor);
+            if (!mIsTextEditor) {
+                return null;
+            }
             outAttrs.inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE |
                     InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
             outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_ACTION_NONE;
@@ -487,11 +553,15 @@ public class LCLActivity extends Activity {
                 bitmap = Bitmap.createBitmap(designWidth, designHeight, Bitmap.Config.ARGB_8888);
             }
 
+            // Garante limpeza completa da superfície para prevenir sombras e rastros de frames passados
+            bitmap.eraseColor(Color.WHITE);
+
             LCLDrawToBitmap(designWidth, designHeight, bitmap);
 
             if (designWidth == width && designHeight == height) {
                 canvas.drawBitmap(bitmap, 0, 0, null);
             } else {
+                canvas.drawColor(Color.WHITE);
                 Rect source = new Rect(0, 0, designWidth, designHeight);
                 Rect destination = new Rect(0, 0, width, height);
                 canvas.drawBitmap(bitmap, source, destination, scaledBitmapPaint);
@@ -500,6 +570,9 @@ public class LCLActivity extends Activity {
 
         @Override
         public boolean onTouchEvent(MotionEvent event) {
+            if (!mIsTextEditor && event.getAction() == MotionEvent.ACTION_DOWN) {
+                LCLDoHideVirtualKeyboard();
+            }
             lastTouchX = Math.round(event.getX());
             lastTouchY = Math.round(event.getY());
             float width = Math.max(1, getWidth());

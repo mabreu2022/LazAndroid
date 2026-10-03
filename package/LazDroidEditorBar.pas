@@ -30,6 +30,7 @@ type
     FCbResolution: TComboBox;
     FCbBuildMode: TComboBox;
     FBtnDeploy: TSpeedButton;
+    FBtnDebug: TSpeedButton;
     FBtnLogcat: TSpeedButton;
     FTimerAttach: TTimer;
     FDeviceManager: TLazDroidDeviceManager;
@@ -37,6 +38,7 @@ type
     FUpdating: Boolean;
     FLastEditorForm: TCustomForm;
     FOnDeploy: TLazDroidActionProc;
+    FOnDebug: TLazDroidActionProc;
     FOnLogcat: TLazDroidActionProc;
 
     function FindCodeEditorForm: TCustomForm;
@@ -47,6 +49,7 @@ type
     procedure BuildModeChange(Sender: TObject);
     procedure RefreshClick(Sender: TObject);
     procedure DeployClick(Sender: TObject);
+    procedure DebugClick(Sender: TObject);
     procedure LogcatClick(Sender: TObject);
     procedure TimerAttachTimer(Sender: TObject);
     function ProjectOpened(Sender: TObject; AProject: TLazProject): TModalResult;
@@ -61,6 +64,7 @@ type
     procedure UpdateResolutionForSelectedDevice;
 
     property OnDeploy: TLazDroidActionProc read FOnDeploy write FOnDeploy;
+    property OnDebug: TLazDroidActionProc read FOnDebug write FOnDebug;
     property OnLogcat: TLazDroidActionProc read FOnLogcat write FOnLogcat;
   end;
 
@@ -318,19 +322,33 @@ begin
   FBtnDeploy.Parent := FBar;
   FBtnDeploy.Left := 837;
   FBtnDeploy.Top := 4;
-  FBtnDeploy.Width := 90;
+  FBtnDeploy.Width := 85;
   FBtnDeploy.Height := 24;
   FBtnDeploy.Caption := '▶ Deploy';
   FBtnDeploy.Font.Style := [fsBold];
   FBtnDeploy.Flat := False;
   FBtnDeploy.ShowHint := True;
-  FBtnDeploy.Hint := 'Compilar, empacotar e fazer Deploy no aparelho USB selecionado (F9)';
+  FBtnDeploy.Hint := 'Compilar, empacotar e fazer Deploy no aparelho USB selecionado (Ctrl+Shift+F9)';
   FBtnDeploy.OnClick := @DeployClick;
 
-  // 7. Botão Logcat Rápido
+  // 7. Botão Debug Rápido (1 clique)
+  FBtnDebug := TSpeedButton.Create(FBar);
+  FBtnDebug.Parent := FBar;
+  FBtnDebug.Left := 926;
+  FBtnDebug.Top := 4;
+  FBtnDebug.Width := 85;
+  FBtnDebug.Height := 24;
+  FBtnDebug.Caption := '🐞 Debug';
+  FBtnDebug.Font.Style := [fsBold];
+  FBtnDebug.Flat := False;
+  FBtnDebug.ShowHint := True;
+  FBtnDebug.Hint := 'Compilar com símbolos, fazer Deploy e engatar Depuração Remota (Ctrl+F9)';
+  FBtnDebug.OnClick := @DebugClick;
+
+  // 8. Botão Logcat Rápido
   FBtnLogcat := TSpeedButton.Create(FBar);
   FBtnLogcat.Parent := FBar;
-  FBtnLogcat.Left := 933;
+  FBtnLogcat.Left := 1015;
   FBtnLogcat.Top := 4;
   FBtnLogcat.Width := 65;
   FBtnLogcat.Height := 24;
@@ -551,6 +569,12 @@ procedure TLazDroidEditorBar.DeployClick(Sender: TObject);
 begin
   if Assigned(FOnDeploy) then
     FOnDeploy(Sender);
+end;
+
+procedure TLazDroidEditorBar.DebugClick(Sender: TObject);
+begin
+  if Assigned(FOnDebug) then
+    FOnDebug(Sender);
 end;
 
 procedure TLazDroidEditorBar.LogcatClick(Sender: TObject);

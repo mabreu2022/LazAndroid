@@ -29,6 +29,7 @@ type
 
   TOnStageChange = procedure(AOldStage, ANewStage: TPipelineStage; const ADescription: string) of object;
   TOnPipelineFinish = procedure(ASuccess: Boolean; const AFinalMsg: string) of object;
+  TOnDebugReady = procedure(Sender: TObject; const ANDKRoot, ALocalModule, ASerial, APackage: string; APort: Integer);
 
   { TLazDroidPipeline }
   TLazDroidPipeline = class
@@ -53,6 +54,7 @@ type
 
     FOnStageChange: TOnStageChange;
     FOnPipelineFinish: TOnPipelineFinish;
+    FOnDebugReady: TOnDebugReady;
 
     procedure SetStage(ANewStage: TPipelineStage; const ADescription: string);
     procedure LogMsg(const AText: string; AUrgency: TLazDroidLogUrgency = luInfo);
@@ -75,6 +77,7 @@ type
     procedure Start(const ATargetSerial: string = ''; ADebugMode: Boolean = False);
     procedure Cancel;
 
+    function GetCompiledSoPath: string;
     property CurrentStage: TPipelineStage read FCurrentStage;
     property ActiveDevice: TAndroidDevice read FActiveDevice;
     property CurrentAppTitle: string read FCurrentAppTitle;
@@ -83,6 +86,7 @@ type
     property IsDebugMode: Boolean read FIsDebugMode write FIsDebugMode;
     property OnStageChange: TOnStageChange read FOnStageChange write FOnStageChange;
     property OnPipelineFinish: TOnPipelineFinish read FOnPipelineFinish write FOnPipelineFinish;
+    property OnDebugReady: TOnDebugReady read FOnDebugReady write FOnDebugReady;
   end;
 
 function StageToString(AStage: TPipelineStage): string;
@@ -160,7 +164,11 @@ begin
     end;
 
     if not DirectoryExists(Result) then
-      Result := 'd:\Projetos AntiGravity\LazarusAndroid\scaffold';
+    begin
+      Result := ExtractFilePath(ParamStr(0)) + 'scaffold';
+      if not DirectoryExists(Result) then
+        Result := 'scaffold';
+    end;
   end;
 end;
 
@@ -436,6 +444,97 @@ begin
   RunPascalBuild;
 end;
 
+function EnsureLprAndroidBridge(const APrjFile: string): Boolean;
+var
+  Lines: TStringList;
+  Content: string;
+  PrjName: string;
+  BakFile: string;
+begin
+  Result := True;
+  if not FileExists(APrjFile) then Exit(False);
+
+  Lines := TStringList.Create;
+  try
+    Lines.LoadFromFile(APrjFile);
+    Content := Lines.Text;
+
+    // Se já contém a exportação JNI_OnLoad e o customdrawn_android, já está pronto
+    if (Pos('JNI_OnLoad', Content) > 0) and (Pos('customdrawn_android', Content) > 0) then
+      Exit(True);
+
+    // Cria backup de segurança do arquivo original
+    BakFile := APrjFile + '.bak';
+    if not FileExists(BakFile) then
+      Lines.SaveToFile(BakFile);
+
+    PrjName := ChangeFileExt(ExtractFileName(APrjFile), '');
+
+    // Converte para estrutura híbrida Desktop/Android com suporte nativo a JNI
+    Lines.Clear;
+    Lines.Add('{$IFDEF ANDROID}');
+    Lines.Add('library ' + PrjName + ';');
+    Lines.Add('{$ELSE}');
+    Lines.Add('program ' + PrjName + ';');
+    Lines.Add('{$ENDIF}');
+    Lines.Add('');
+    Lines.Add('{$mode objfpc}{$H+}');
+    Lines.Add('');
+    Lines.Add('uses');
+    Lines.Add('  {$IFDEF UNIX}');
+    Lines.Add('  cthreads,');
+    Lines.Add('  {$ENDIF}');
+    Lines.Add('  {$IFDEF ANDROID}');
+    Lines.Add('  customdrawnint,');
+    Lines.Add('  customdrawn_android,');
+    Lines.Add('  customdrawndrawers,');
+    Lines.Add('  {$ENDIF}');
+    Lines.Add('  Interfaces, // LCL Widgetset');
+    Lines.Add('  Forms, Unit1;');
+    Lines.Add('');
+    Lines.Add('{$IFDEF ANDROID}');
+    Lines.Add('exports');
+    Lines.Add('  JNI_OnLoad name ''JNI_OnLoad'',');
+    Lines.Add('  JNI_OnUnload name ''JNI_OnUnload'';');
+    Lines.Add('');
+    Lines.Add('procedure MyActivityOnCreate;');
+    Lines.Add('begin');
+    Lines.Add('  DefaultStyle := dsAndroid;');
+    Lines.Add('  Application.Initialize;');
+    Lines.Add('  Application.CreateForm(TForm1, Form1);');
+    Lines.Add('  if Assigned(Form1) then');
+    Lines.Add('  begin');
+    Lines.Add('    Form1.WindowState := wsMaximized;');
+    Lines.Add('    Form1.Show;');
+    Lines.Add('  end;');
+    Lines.Add('  Application.Run;');
+    Lines.Add('end;');
+    Lines.Add('{$ENDIF}');
+    Lines.Add('');
+    Lines.Add('{$R *.res}');
+    Lines.Add('');
+    Lines.Add('begin');
+    Lines.Add('  {$IFDEF ANDROID}');
+    Lines.Add('  CDWidgetset.ActivityClassName := ''com/pascal/lclproject/LCLActivity'';');
+    Lines.Add('  CDWidgetset.ActivityOnCreate := @MyActivityOnCreate;');
+    Lines.Add('  {$ELSE}');
+    Lines.Add('  RequireDerivedFormResource := True;');
+    Lines.Add('  Application.Scaled := True;');
+    Lines.Add('  {$PUSH}{$WARN 5044 OFF}');
+    Lines.Add('  Application.MainFormOnTaskbar := True;');
+    Lines.Add('  {$POP}');
+    Lines.Add('  Application.Initialize;');
+    Lines.Add('  Application.CreateForm(TForm1, Form1);');
+    Lines.Add('  Application.Run;');
+    Lines.Add('  {$ENDIF}');
+    Lines.Add('end.');
+
+    Lines.SaveToFile(APrjFile);
+  finally
+    Lines.Free;
+  end;
+end;
+
 procedure TLazDroidPipeline.RunPascalBuild;
 var
   PrjFile: string;
@@ -465,6 +564,9 @@ begin
     SetStage(stageFailed, 'Arquivo de projeto ausente.');
     Exit;
   end;
+
+  if EnsureLprAndroidBridge(PrjFile) then
+    LogMsg('Ponte JNI e suporte a LCLActivity verificados no projeto.', luInfo);
 
   TargetAbiStr := FSettings.AbiToString(FTargetAbi);
   CompilerExe  := FSettings.GetFpcCompilerForAbi(FTargetAbi);
@@ -502,17 +604,13 @@ begin
   Params := TStringList.Create;
   Env := TStringList.Create;
   try
+    Params.Add('-B');
     Params.Add('-Tandroid');
     Params.Add('-P' + TargetCpu);
     Params.Add('-fPIC');
     Params.Add('-FE' + JniOutDir);
     Params.Add('-FU' + UnitOutDir);
     Params.Add('-o' + JniOutDir + PathDelim + DEFAULT_SO_NAME);
-
-    // Símbolos de depuração e números de linha DWARF 2 (estilo Delphi)
-    Params.Add('-gw2');
-    Params.Add('-godwarfsets');
-    Params.Add('-gl');
 
     // Ferramentas binárias do Android NDK (as.exe, ld.exe)
     NdkBin := FSettings.GetNdkToolchainBinForAbi(FTargetAbi);
@@ -524,11 +622,25 @@ begin
     if NdkLib <> '' then
       Params.Add('-Fl' + NdkLib);
 
-    // Flags extras do usuário (O3, Xs, etc)
-    if FSettings.ExtraFpcFlags <> '' then
+    if FIsDebugMode then
     begin
-      Params.Delimiter := ' ';
-      Params.DelimitedText := Params.DelimitedText + ' ' + FSettings.ExtraFpcFlags;
+      // Modo Depuração: Desativa otimizações (-O-) para que F7 e F8 sigam rigorosamente cada linha
+      Params.Add('-O-');
+      Params.Add('-gw2');
+      Params.Add('-godwarfsets');
+      Params.Add('-gl');
+    end
+    else
+    begin
+      // Modo Release: Inclui símbolos básicos mas aplica flags de otimização e strip (-O3, -Xs, etc.)
+      Params.Add('-gw2');
+      Params.Add('-godwarfsets');
+      Params.Add('-gl');
+      if FSettings.ExtraFpcFlags <> '' then
+      begin
+        Params.Delimiter := ' ';
+        Params.DelimitedText := Params.DelimitedText + ' ' + FSettings.ExtraFpcFlags;
+      end;
     end;
 
     // Incluir diretório do projeto nas units e arquivos de inclusão
@@ -622,6 +734,16 @@ begin
   end;
 end;
 
+function TLazDroidPipeline.GetCompiledSoPath: string;
+var
+  TargetAbiStr: string;
+begin
+  TargetAbiStr := FSettings.AbiToString(FTargetAbi);
+  Result := IncludeTrailingPathDelimiter(FScaffoldPath) +
+            'app' + PathDelim + 'src' + PathDelim + 'main' + PathDelim +
+            'jniLibs' + PathDelim + TargetAbiStr + PathDelim + DEFAULT_SO_NAME;
+end;
+
 procedure TLazDroidPipeline.RunPackaging;
 var
   GradlewBin: string;
@@ -629,15 +751,11 @@ var
   PropLines: TStringList;
   Params: TStringList;
   Env: TStringList;
-  TargetAbiStr: string;
   ExpectedSo: string;
 begin
   SetStage(stagePackaging, 'Empacotando aplicação Android via Gradle Wrapper...');
 
-  TargetAbiStr := FSettings.AbiToString(FTargetAbi);
-  ExpectedSo := IncludeTrailingPathDelimiter(FScaffoldPath) +
-                'app' + PathDelim + 'src' + PathDelim + 'main' + PathDelim +
-                'jniLibs' + PathDelim + TargetAbiStr + PathDelim + DEFAULT_SO_NAME;
+  ExpectedSo := GetCompiledSoPath;
 
   if not FileExists(ExpectedSo) then
   begin
@@ -791,7 +909,7 @@ end;
 procedure TLazDroidPipeline.RunLaunch;
 var
   Params: TStringList;
-  ComponentTarget, TargetAct: string;
+  ComponentTarget, TargetAct, DummyOutput: string;
 begin
   SetStage(stageLaunch, 'Iniciando Activity principal no dispositivo...');
 
@@ -800,6 +918,12 @@ begin
     TargetAct := 'com.pascal.lclproject.LCLActivity';
 
   ComponentTarget := FCurrentPackageName + '/' + TargetAct;
+
+  // Se em modo depuração, define debug-app ANTES do start da Activity para evitar encerramento forçado do app
+  if FIsDebugMode then
+    FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell', 'am', 'set-debug-app', FCurrentPackageName], DummyOutput)
+  else
+    FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell', 'am', 'clear-debug-app'], DummyOutput);
 
   Params := TStringList.Create;
   try
@@ -836,26 +960,29 @@ begin
   else
     ArchDir := 'arm';
 
-  // 1. Procura lldb-server no NDK Clang
-  Candidate := IncludeTrailingPathDelimiter(ANDKRoot) +
-    'toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\11.0.5\lib\linux\' + ArchDir + '\lldb-server';
-  if FileExists(Candidate) then Exit(Candidate);
-
-  // 2. Procura gdbserver clássico no NDK
+  // 1. Procura gdbserver clássico no NDK (preferencial e 100% testado com GDBServer MI)
   if AAbi in [abiArm64_v8a] then
     Candidate := IncludeTrailingPathDelimiter(ANDKRoot) + 'prebuilt\android-arm64\gdbserver\gdbserver'
   else
     Candidate := IncludeTrailingPathDelimiter(ANDKRoot) + 'prebuilt\android-arm\gdbserver\gdbserver';
   if FileExists(Candidate) then Exit(Candidate);
 
-  // 3. Fallback no NDK alternativo (DeathStroke ou SDK padrão)
-  Candidate := 'D:\DesthStrokeIDE\Android\sdk\ndk-bundle\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\11.0.5\lib\linux\' + ArchDir + '\lldb-server';
+  // 2. Procura lldb-server no NDK Clang
+  Candidate := IncludeTrailingPathDelimiter(ANDKRoot) +
+    'toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\11.0.5\lib\linux\' + ArchDir + '\lldb-server';
   if FileExists(Candidate) then Exit(Candidate);
 
+  // 3. Fallback no NDK alternativo (ndk-bundle no SDK)
   if AAbi in [abiArm64_v8a] then
-    Candidate := 'D:\DesthStrokeIDE\Android\sdk\ndk-bundle\prebuilt\android-arm64\gdbserver\gdbserver'
+    Candidate := IncludeTrailingPathDelimiter(ExtractFilePath(ExcludeTrailingPathDelimiter(ANDKRoot))) +
+      'ndk-bundle\prebuilt\android-arm64\gdbserver\gdbserver'
   else
-    Candidate := 'D:\DesthStrokeIDE\Android\sdk\ndk-bundle\prebuilt\android-arm\gdbserver\gdbserver';
+    Candidate := IncludeTrailingPathDelimiter(ExtractFilePath(ExcludeTrailingPathDelimiter(ANDKRoot))) +
+      'ndk-bundle\prebuilt\android-arm\gdbserver\gdbserver';
+  if FileExists(Candidate) then Exit(Candidate);
+
+  Candidate := IncludeTrailingPathDelimiter(ExtractFilePath(ExcludeTrailingPathDelimiter(ANDKRoot))) +
+    'ndk-bundle\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\11.0.5\lib\linux\' + ArchDir + '\lldb-server';
   if FileExists(Candidate) then Exit(Candidate);
 end;
 
@@ -879,25 +1006,30 @@ begin
   ServerBin := FindDebugServerBinary(FSettings.AndroidNdkRoot, FTargetAbi);
   IsLLDB := (ServerBin <> '') and (Pos('lldb-server', LowerCase(ServerBin)) > 0);
 
+  // Limpeza preventiva de instâncias anteriores de depuração
+  FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell', 'run-as', Pkg, 'killall', '-9', 'lazdroid-server'], OutputStr);
+  FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'forward', '--remove', 'tcp:5039'], OutputStr);
+
+  // Envia o servidor e configura sandbox apenas se ainda não existir
   if ServerBin <> '' then
   begin
     LogMsg('>>> [DEBUG] Servidor nativo localizado: ' + ServerBin, luInfo);
-    // Envia o servidor para o /data/local/tmp
-    FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'push', ServerBin, '/data/local/tmp/lazdroid-server'], OutputStr);
-    FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell', 'chmod', '755', '/data/local/tmp/lazdroid-server'], OutputStr);
-
-    // Prepara o diretório files/ na sandbox da aplicação via run-as
-    FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell', 'run-as', Pkg, 'mkdir', '-p', 'files'], OutputStr);
-    FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell', 'run-as', Pkg, 'cp', '/data/local/tmp/lazdroid-server', 'files/lazdroid-server'], OutputStr);
-    FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell', 'run-as', Pkg, 'chmod', '700', 'files/lazdroid-server'], OutputStr);
+    // Verifica se já existe na sandbox do app
+    if (FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell', 'run-as', Pkg, 'ls', 'files/lazdroid-server'], OutputStr) <> 0) or
+       (Pos('No such file', OutputStr) > 0) then
+    begin
+      LogMsg('>>> [DEBUG] Instalando servidor na sandbox do dispositivo...', luInfo);
+      FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'push', ServerBin, '/data/local/tmp/lazdroid-server'], OutputStr);
+      FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell', 'chmod', '755', '/data/local/tmp/lazdroid-server'], OutputStr);
+      FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell', 'run-as', Pkg, 'mkdir', '-p', 'files'], OutputStr);
+      FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell', 'run-as', Pkg, 'cp', '/data/local/tmp/lazdroid-server', 'files/lazdroid-server'], OutputStr);
+      FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell', 'run-as', Pkg, 'chmod', '700', 'files/lazdroid-server'], OutputStr);
+    end;
   end
   else
     LogMsg('AVISO: Servidor nativo (lldb-server/gdbserver) não localizado no NDK; tentando usar binário já existente no aparelho.', luWarning);
 
-  // 2. Marca a aplicação como debug-app para evitar congelamento por ANR do Android
-  FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'shell', 'am', 'set-debug-app', Pkg], OutputStr);
-
-  // 3. Redireciona a porta TCP 5039 do Android para o Windows Host
+  // Redireciona a porta TCP 5039 do Android para o Windows Host
   FDevManager.RunCommandSync(FSettings.AdbPath, ['-s', FActiveDevice.Serial, 'forward', 'tcp:5039', 'tcp:5039'], OutputStr);
   LogMsg('>>> [DEBUG] Porta TCP 5039 redirecionada via ADB (localhost:5039 <-> celular:5039).', luInfo);
 
@@ -951,6 +1083,7 @@ begin
       FScaffoldPath
     );
     FGdbServerRunner.Start;
+    Sleep(1500);
   finally
     Params.Free;
   end;
@@ -960,8 +1093,16 @@ begin
   else
     LogMsg('>>> [DEBUG] GDB-Server ATIVO no celular aguardando conexão em localhost:5039!', luSuccess);
 
-  LogMsg('>>> [DEBUG] O depurador do Lazarus (FpLldb / GDB) pode agora conectar em localhost:5039.', luInfo);
+  LogMsg('>>> [DEBUG] Conectando depurador nativo do Lazarus ao celular...', luInfo);
   LogMsg('=========================================================', luSuccess);
+
+  FIsRunning := False;
+  SetStage(stageCompleted, 'Depurador remoto pronto em localhost:5039.');
+  if Assigned(FOnPipelineFinish) then
+    FOnPipelineFinish(True, 'Deploy concluído com servidor de depuração ativo.');
+
+  if Assigned(FOnDebugReady) then
+    FOnDebugReady(Self, FSettings.AndroidNdkRoot, GetCompiledSoPath, FActiveDevice.Serial, Pkg, 5039);
 end;
 
 procedure TLazDroidPipeline.StartLogcat;
@@ -990,16 +1131,13 @@ begin
     Params.Add('logcat');
     Params.Add('-v');
     Params.Add('time');
-    Params.Add('-s');
+    Params.Add('LazDroid:*');
     Params.Add('lclapp:*');
     Params.Add('LazApp:*');
-    Params.Add('AndroidRuntime:*');
-    Params.Add('DEBUG:*');
-    Params.Add('libc:*');
-    Params.Add('System.out:*');
-    Params.Add('*:E');
+    Params.Add('AndroidRuntime:E');
+    Params.Add('*:S');
 
-    LogMsg('Logcat ativo (Filtro: lclapp:* LazApp:* AndroidRuntime:* DEBUG:* libc:*)', luLogcat);
+    LogMsg('Logcat ativo (Filtro: LazDroid:* lclapp:* LazApp:* AndroidRuntime:E)', luLogcat);
 
     FLogcatRunner := TLazDroidProcessThread.Create(
       FSettings.AdbPath,
@@ -1042,8 +1180,9 @@ begin
     stageLaunch:
     begin
       if FIsDebugMode then
-        SetupGdbServer;
-      StartLogcat;
+        SetupGdbServer
+      else
+        StartLogcat;
     end;
   end;
 end;

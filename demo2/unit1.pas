@@ -17,6 +17,8 @@ type
     LazDroidSwitch1: TLazDroidSwitch;
     LazDroidActivityIndicator1: TLazDroidActivityIndicator;
     LazDroidFAB1: TLazDroidFAB;
+    procedure FormCreate(Sender: TObject);
+    procedure LazDroidButton1Click(Sender: TObject);
   private
 
   public
@@ -29,6 +31,18 @@ var
 implementation
 
 {$R *.lfm}
+
+{ TForm1 }
+
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+  AdaptMobileFormLayout(Self);
+end;
+
+procedure TForm1.LazDroidButton1Click(Sender: TObject);
+begin
+  Showmessage('olá mundo!');
+end;
 
 end.
 
