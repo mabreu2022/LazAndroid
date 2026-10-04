@@ -18,9 +18,9 @@
         </SyntaxOptions>
       </Parsing>
     </CompilerOptions>
-    <Description Value="Paleta de componentes mobile touch-first para LazDroid / Lazarus (AppBar, Button, Edit, Card, Badge, BottomNav, ListView)"/>
+    <Description Value="Suite completa de 29 componentes mobile touch-first para LazDroid / Lazarus (AppBar, Button, Edit, Card, Badge, Switch, ActivityIndicator, FAB, Layout, BottomNav, ListView, DatePicker, TimePicker, ProgressBar, Slider, SegmentedControl, CheckBox, RatingBar, SearchBar, ChipGroup, RadioGroup, OtpBox, SignaturePad, Keypad, MetricCard, BottomSheet, SpeedDial, SectionHeader, Avatar)"/>
     <License Value="MIT"/>
-    <Version Major="1" Minor="0" Release="0" Build="1"/>
+    <Version Major="1" Minor="2" Release="0" Build="1"/>
     <Files Count="1">
       <Item1>
         <Filename Value="LazDroidMobileControls.pas"/>

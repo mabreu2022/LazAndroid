@@ -1,0 +1,3 @@
+@echo off
+title Abrindo Manual de Componentes LazDroid em PDF...
+start "" "%~dp0docs\manual_componentes_lazdroid.pdf"
