@@ -12,7 +12,7 @@ unit LazDroidMobileControls;
 interface
 
 uses
-  Classes, SysUtils, Types, Math, DateUtils, Graphics, Controls, Forms, StdCtrls, ExtCtrls, LCLType, LCLIntf, LResources;
+  Classes, SysUtils, Types, Math, DateUtils, Graphics, Controls, Forms, StdCtrls, ExtCtrls, ImgList, LCLType, LCLIntf, LResources;
 
 type
   { Enumerações visuais }
@@ -20,6 +20,7 @@ type
   TLazDroidActionIcon = (aiNone, aiBack, aiPlus, aiMenu, aiSearch, aiFilter, aiClose, aiCheck, aiCalendar, aiClock, aiStar, aiDollar, aiTrendingUp, aiTrendingDown, aiUser, aiLock, aiEdit);
   TLazDroidBadgeStyle = (bsSuccess, bsWarning, bsDanger, bsInfo, bsNeutral, bsPrimary);
   TLazDroidInputKind = (ikText, ikPassword, ikNumber, ikPhone, ikEmail, ikCurrency);
+  TLazDroidImageShape = (isRoundedSquare, isCircle, isSquare);
 
   { Eventos personalizados }
   TLazDroidTabChangeEvent = procedure(Sender: TObject; AIndex: Integer) of object;
@@ -247,7 +248,7 @@ type
   end;
 
   { ---------------------------------------------------------------------------
-    TLazDroidListView — Lista mobile com títulos, subtítulos, badges e toque
+    TLazDroidListView — Lista mobile com títulos, subtítulos, badges, imagens e toque
     --------------------------------------------------------------------------- }
   TLazDroidListItem = class(TCollectionItem)
   private
@@ -256,12 +257,40 @@ type
     FBadge: string;
     FValue: string;
     FTag: Integer;
+    FPicture: TPicture;
+    FImageIndex: Integer;
+    FIcon: TLazDroidActionIcon;
+    FIconColor: TColor;
+    FIconBgColor: TColor;
+    FImageShape: TLazDroidImageShape;
+    procedure SetTitle(const AValue: string);
+    procedure SetSubtitle(const AValue: string);
+    procedure SetBadge(const AValue: string);
+    procedure SetValue(const AValue: string);
+    procedure SetPicture(AValue: TPicture);
+    procedure SetImageIndex(const AValue: Integer);
+    procedure SetIcon(const AValue: TLazDroidActionIcon);
+    procedure SetIconColor(const AValue: TColor);
+    procedure SetIconBgColor(const AValue: TColor);
+    procedure SetImageShape(const AValue: TLazDroidImageShape);
+    procedure PictureChanged(Sender: TObject);
+  public
+    constructor Create(ACollection: TCollection); override;
+    destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+    function HasImage: Boolean;
   published
-    property Title: string read FTitle write FTitle;
-    property Subtitle: string read FSubtitle write FSubtitle;
-    property Badge: string read FBadge write FBadge;
-    property Value: string read FValue write FValue;
+    property Title: string read FTitle write SetTitle;
+    property Subtitle: string read FSubtitle write SetSubtitle;
+    property Badge: string read FBadge write SetBadge;
+    property Value: string read FValue write SetValue;
     property Tag: Integer read FTag write FTag default 0;
+    property Picture: TPicture read FPicture write SetPicture;
+    property ImageIndex: Integer read FImageIndex write SetImageIndex default -1;
+    property Icon: TLazDroidActionIcon read FIcon write SetIcon default aiNone;
+    property IconColor: TColor read FIconColor write SetIconColor default clWhite;
+    property IconBgColor: TColor read FIconBgColor write SetIconBgColor default $00D97706;
+    property ImageShape: TLazDroidImageShape read FImageShape write SetImageShape default isRoundedSquare;
   end;
 
   TLazDroidListItems = class(TCollection)
@@ -289,12 +318,17 @@ type
     FAltItemBgColor: TColor;
     FSelectedBgColor: TColor;
     FDividerColor: TColor;
+    FImages: TCustomImageList;
+    FImageSize: Integer;
     FOnItemClick: TLazDroidItemClickEvent;
 
     procedure SetItems(const AValue: TLazDroidListItems);
     procedure SetSelectedIndex(const AValue: Integer);
+    procedure SetImages(const AValue: TCustomImageList);
+    procedure SetImageSize(const AValue: Integer);
     function GetTotalContentHeight: Integer;
   protected
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Paint; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
@@ -303,8 +337,12 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure ScrollToTop;
+    procedure Clear;
+    function AddItem(const ATitle: string; const ASubtitle: string = ''; const AValue: string = ''): TLazDroidListItem;
   published
     property Items: TLazDroidListItems read FItems write SetItems;
+    property Images: TCustomImageList read FImages write SetImages;
+    property ImageSize: Integer read FImageSize write SetImageSize default 44;
     property ItemHeight: Integer read FItemHeight write FItemHeight default 64;
     property SelectedIndex: Integer read FSelectedIndex write SetSelectedIndex default -1;
     property ItemBgColor: TColor read FItemBgColor write FItemBgColor default clWhite;
@@ -1954,6 +1992,148 @@ end;
   TLazDroidListView
   ============================================================================= }
 
+{ TLazDroidListItem }
+
+constructor TLazDroidListItem.Create(ACollection: TCollection);
+begin
+  inherited Create(ACollection);
+  FPicture := TPicture.Create;
+  FPicture.OnChange := @PictureChanged;
+  FImageIndex := -1;
+  FIcon := aiNone;
+  FIconColor := clWhite;
+  FIconBgColor := $00D97706; // Amber / Primary
+  FImageShape := isRoundedSquare;
+end;
+
+destructor TLazDroidListItem.Destroy;
+begin
+  FPicture.Free;
+  inherited Destroy;
+end;
+
+procedure TLazDroidListItem.Assign(Source: TPersistent);
+begin
+  if Source is TLazDroidListItem then
+  begin
+    FTitle := TLazDroidListItem(Source).Title;
+    FSubtitle := TLazDroidListItem(Source).Subtitle;
+    FBadge := TLazDroidListItem(Source).Badge;
+    FValue := TLazDroidListItem(Source).Value;
+    FTag := TLazDroidListItem(Source).Tag;
+    FPicture.Assign(TLazDroidListItem(Source).Picture);
+    FImageIndex := TLazDroidListItem(Source).ImageIndex;
+    FIcon := TLazDroidListItem(Source).Icon;
+    FIconColor := TLazDroidListItem(Source).IconColor;
+    FIconBgColor := TLazDroidListItem(Source).IconBgColor;
+    FImageShape := TLazDroidListItem(Source).ImageShape;
+    Changed(False);
+  end
+  else
+    inherited Assign(Source);
+end;
+
+procedure TLazDroidListItem.PictureChanged(Sender: TObject);
+begin
+  Changed(False);
+end;
+
+function TLazDroidListItem.HasImage: Boolean;
+begin
+  Result := (Assigned(FPicture) and Assigned(FPicture.Graphic) and (not FPicture.Graphic.Empty)) or
+            (FImageIndex >= 0) or
+            (FIcon <> aiNone);
+end;
+
+procedure TLazDroidListItem.SetTitle(const AValue: string);
+begin
+  if FTitle <> AValue then
+  begin
+    FTitle := AValue;
+    Changed(False);
+  end;
+end;
+
+procedure TLazDroidListItem.SetSubtitle(const AValue: string);
+begin
+  if FSubtitle <> AValue then
+  begin
+    FSubtitle := AValue;
+    Changed(False);
+  end;
+end;
+
+procedure TLazDroidListItem.SetBadge(const AValue: string);
+begin
+  if FBadge <> AValue then
+  begin
+    FBadge := AValue;
+    Changed(False);
+  end;
+end;
+
+procedure TLazDroidListItem.SetValue(const AValue: string);
+begin
+  if FValue <> AValue then
+  begin
+    FValue := AValue;
+    Changed(False);
+  end;
+end;
+
+procedure TLazDroidListItem.SetPicture(AValue: TPicture);
+begin
+  FPicture.Assign(AValue);
+  Changed(False);
+end;
+
+procedure TLazDroidListItem.SetImageIndex(const AValue: Integer);
+begin
+  if FImageIndex <> AValue then
+  begin
+    FImageIndex := AValue;
+    Changed(False);
+  end;
+end;
+
+procedure TLazDroidListItem.SetIcon(const AValue: TLazDroidActionIcon);
+begin
+  if FIcon <> AValue then
+  begin
+    FIcon := AValue;
+    Changed(False);
+  end;
+end;
+
+procedure TLazDroidListItem.SetIconColor(const AValue: TColor);
+begin
+  if FIconColor <> AValue then
+  begin
+    FIconColor := AValue;
+    Changed(False);
+  end;
+end;
+
+procedure TLazDroidListItem.SetIconBgColor(const AValue: TColor);
+begin
+  if FIconBgColor <> AValue then
+  begin
+    FIconBgColor := AValue;
+    Changed(False);
+  end;
+end;
+
+procedure TLazDroidListItem.SetImageShape(const AValue: TLazDroidImageShape);
+begin
+  if FImageShape <> AValue then
+  begin
+    FImageShape := AValue;
+    Changed(False);
+  end;
+end;
+
+{ TLazDroidListItems }
+
 constructor TLazDroidListItems.Create(AOwner: TCustomControl);
 begin
   inherited Create(TLazDroidListItem);
@@ -1981,6 +2161,8 @@ begin
   if Assigned(FOwnerControl) then FOwnerControl.Invalidate;
 end;
 
+{ TLazDroidListView }
+
 constructor TLazDroidListView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
@@ -1989,6 +2171,8 @@ begin
   Height := 350;
   FItems := TLazDroidListItems.Create(Self);
   FItemHeight := 64;
+  FImageSize := 44;
+  FImages := nil;
   FSelectedIndex := -1;
   FScrollOffset := 0;
   FItemBgColor := clWhite;
@@ -2005,9 +2189,39 @@ begin
   inherited Destroy;
 end;
 
+procedure TLazDroidListView.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = FImages) then
+  begin
+    FImages := nil;
+    Invalidate;
+  end;
+end;
+
 procedure TLazDroidListView.SetItems(const AValue: TLazDroidListItems);
 begin
   FItems.Assign(AValue);
+end;
+
+procedure TLazDroidListView.SetImages(const AValue: TCustomImageList);
+begin
+  if FImages <> AValue then
+  begin
+    FImages := AValue;
+    if Assigned(FImages) then
+      FImages.FreeNotification(Self);
+    Invalidate;
+  end;
+end;
+
+procedure TLazDroidListView.SetImageSize(const AValue: Integer);
+begin
+  if FImageSize <> AValue then
+  begin
+    FImageSize := AValue;
+    Invalidate;
+  end;
 end;
 
 procedure TLazDroidListView.SetSelectedIndex(const AValue: Integer);
@@ -2032,11 +2246,33 @@ begin
   Invalidate;
 end;
 
+procedure TLazDroidListView.Clear;
+begin
+  FItems.Clear;
+  FSelectedIndex := -1;
+  FScrollOffset := 0;
+  Invalidate;
+end;
+
+function TLazDroidListView.AddItem(const ATitle: string; const ASubtitle: string = ''; const AValue: string = ''): TLazDroidListItem;
+begin
+  Result := FItems.Add;
+  Result.Title := ATitle;
+  Result.Subtitle := ASubtitle;
+  Result.Value := AValue;
+end;
+
 procedure TLazDroidListView.Paint;
 var
   i, ItemTop, ItemBottom: Integer;
-  R: TRect;
+  R, ImgR, BadgeR: TRect;
   Item: TLazDroidListItem;
+  ActualImgSize, ImgLeft, ImgTop, TextLeft, RightBound: Integer;
+  HasImg: Boolean;
+  ValW, ValTop, ValLeft: Integer;
+  BdgW, BdgH, BdgTop, BdgLeft: Integer;
+  TitleTop, SubtitleTop: Integer;
+  ClipR: HRGN;
 begin
   Canvas.Brush.Color := FItemBgColor;
   Canvas.FillRect(ClientRect);
@@ -2058,34 +2294,213 @@ begin
     else
       Canvas.Brush.Color := FItemBgColor;
 
+    Canvas.Pen.Style := psClear;
     Canvas.FillRect(R);
 
-    Canvas.Brush.Style := bsClear;
-    Canvas.Font.Name := 'Segoe UI';
-    Canvas.Font.Size := 11;
-    Canvas.Font.Style := [fsBold];
-    Canvas.Font.Color := $00111827;
-    Canvas.TextOut(16, ItemTop + 10, Item.Title);
+    // Determina se há imagem/ícone configurado
+    HasImg := Item.HasImage and (
+      (Assigned(Item.Picture.Graphic) and (not Item.Picture.Graphic.Empty)) or
+      (Assigned(FImages) and (Item.ImageIndex >= 0) and (Item.ImageIndex < FImages.Count)) or
+      (Item.Icon <> aiNone)
+    );
 
-    if Item.Subtitle <> '' then
+    if HasImg then
     begin
-      Canvas.Font.Size := 9;
-      Canvas.Font.Style := [];
-      Canvas.Font.Color := $006B7280;
-      Canvas.TextOut(16, ItemTop + 34, Item.Subtitle);
-    end;
+      ActualImgSize := FImageSize;
+      if ActualImgSize > FItemHeight - 12 then
+        ActualImgSize := FItemHeight - 12;
+      if ActualImgSize < 16 then
+        ActualImgSize := 16;
 
-    if Item.Value <> '' then
+      ImgLeft := 14;
+      ImgTop := ItemTop + (FItemHeight - ActualImgSize) div 2;
+      ImgR := Rect(ImgLeft, ImgTop, ImgLeft + ActualImgSize, ImgTop + ActualImgSize);
+
+      // 1. TPicture (PNG, JPG, BMP...)
+      if Assigned(Item.Picture.Graphic) and (not Item.Picture.Graphic.Empty) then
+      begin
+        Canvas.Brush.Color := $00F1F5F9;
+        Canvas.Pen.Color := $00E2E8F0;
+        Canvas.Pen.Style := psSolid;
+        Canvas.Pen.Width := 1;
+        case Item.ImageShape of
+          isCircle:
+          begin
+            Canvas.Ellipse(ImgR);
+            ClipR := CreateEllipticRgn(ImgR.Left, ImgR.Top, ImgR.Right, ImgR.Bottom);
+            SelectClipRgn(Canvas.Handle, ClipR);
+            Canvas.StretchDraw(ImgR, Item.Picture.Graphic);
+            SelectClipRgn(Canvas.Handle, 0);
+            DeleteObject(ClipR);
+            Canvas.Brush.Style := bsClear;
+            Canvas.Pen.Color := $00CBD5E1;
+            Canvas.Ellipse(ImgR);
+          end;
+          isRoundedSquare:
+          begin
+            Canvas.RoundRect(ImgR, 14, 14);
+            ClipR := CreateRoundRectRgn(ImgR.Left, ImgR.Top, ImgR.Right + 1, ImgR.Bottom + 1, 14, 14);
+            SelectClipRgn(Canvas.Handle, ClipR);
+            Canvas.StretchDraw(ImgR, Item.Picture.Graphic);
+            SelectClipRgn(Canvas.Handle, 0);
+            DeleteObject(ClipR);
+            Canvas.Brush.Style := bsClear;
+            Canvas.Pen.Color := $00CBD5E1;
+            Canvas.RoundRect(ImgR, 14, 14);
+          end;
+          isSquare:
+          begin
+            Canvas.StretchDraw(ImgR, Item.Picture.Graphic);
+            Canvas.Brush.Style := bsClear;
+            Canvas.Pen.Color := $00CBD5E1;
+            Canvas.Rectangle(ImgR);
+          end;
+        end;
+      end
+      // 2. TCustomImageList
+      else if Assigned(FImages) and (Item.ImageIndex >= 0) and (Item.ImageIndex < FImages.Count) then
+      begin
+        if Item.IconBgColor <> clNone then
+        begin
+          Canvas.Brush.Color := Item.IconBgColor;
+          Canvas.Pen.Color := Item.IconBgColor;
+          Canvas.Pen.Style := psSolid;
+          case Item.ImageShape of
+            isCircle: Canvas.Ellipse(ImgR);
+            isRoundedSquare: Canvas.RoundRect(ImgR, 14, 14);
+            isSquare: Canvas.FillRect(ImgR);
+          end;
+        end;
+        FImages.Draw(Canvas,
+          ImgR.Left + (ActualImgSize - FImages.Width) div 2,
+          ImgR.Top + (ActualImgSize - FImages.Height) div 2,
+          Item.ImageIndex, True);
+        Canvas.Brush.Style := bsClear;
+        Canvas.Pen.Color := $00E2E8F0;
+        Canvas.Pen.Width := 1;
+        Canvas.Pen.Style := psSolid;
+        case Item.ImageShape of
+          isCircle: Canvas.Ellipse(ImgR);
+          isRoundedSquare: Canvas.RoundRect(ImgR, 14, 14);
+          isSquare: Canvas.Rectangle(ImgR);
+        end;
+      end
+      // 3. Ícone vetorial nativo (TLazDroidActionIcon)
+      else if Item.Icon <> aiNone then
+      begin
+        Canvas.Brush.Color := Item.IconBgColor;
+        Canvas.Pen.Color := Item.IconBgColor;
+        Canvas.Pen.Style := psSolid;
+        case Item.ImageShape of
+          isCircle: Canvas.Ellipse(ImgR);
+          isRoundedSquare: Canvas.RoundRect(ImgR, 14, 14);
+          isSquare: Canvas.FillRect(ImgR);
+        end;
+        DrawMobileIcon(Canvas, Item.Icon, ImgR, Item.IconColor);
+      end;
+
+      TextLeft := ImgR.Right + 12;
+    end
+    else
+      TextLeft := 16;
+
+    // Cálculo da margem direita (Value e Badge)
+    RightBound := Width - 16;
+
+    if (Item.Value <> '') and (Item.Badge <> '') then
     begin
+      Canvas.Font.Name := 'Segoe UI';
+      Canvas.Font.Size := 10;
+      Canvas.Font.Style := [fsBold];
+      ValW := Canvas.TextWidth(Item.Value);
+      ValLeft := Width - 16 - ValW;
+      ValTop := ItemTop + 11;
+      Canvas.Brush.Style := bsClear;
+      Canvas.Font.Color := $00047857; // Emerald Green
+      Canvas.TextOut(ValLeft, ValTop, Item.Value);
+
+      Canvas.Font.Size := 8;
+      Canvas.Font.Style := [fsBold];
+      BdgW := Canvas.TextWidth(Item.Badge) + 12;
+      BdgH := 18;
+      BdgLeft := Width - 16 - BdgW;
+      BdgTop := ItemTop + 33;
+      BadgeR := Rect(BdgLeft, BdgTop, BdgLeft + BdgW, BdgTop + BdgH);
+      Canvas.Brush.Color := $00EFF6FF; // Soft Blue
+      Canvas.Pen.Color := $0093C5FD;
+      Canvas.Pen.Style := psSolid;
+      Canvas.Pen.Width := 1;
+      Canvas.RoundRect(BadgeR, 8, 8);
+      Canvas.Font.Color := $001D4ED8;
+      Canvas.TextOut(BdgLeft + 6, BdgTop + 2, Item.Badge);
+
+      RightBound := Min(ValLeft, BdgLeft) - 8;
+    end
+    else if Item.Value <> '' then
+    begin
+      Canvas.Font.Name := 'Segoe UI';
       Canvas.Font.Size := 11;
       Canvas.Font.Style := [fsBold];
+      ValW := Canvas.TextWidth(Item.Value);
+      ValLeft := Width - 16 - ValW;
+      ValTop := ItemTop + (FItemHeight - Canvas.TextHeight(Item.Value)) div 2;
+      Canvas.Brush.Style := bsClear;
       Canvas.Font.Color := $00047857;
-      Canvas.TextOut(Width - Canvas.TextWidth(Item.Value) - 16, ItemTop + 20, Item.Value);
+      Canvas.TextOut(ValLeft, ValTop, Item.Value);
+      RightBound := ValLeft - 8;
+    end
+    else if Item.Badge <> '' then
+    begin
+      Canvas.Font.Name := 'Segoe UI';
+      Canvas.Font.Size := 9;
+      Canvas.Font.Style := [fsBold];
+      BdgW := Canvas.TextWidth(Item.Badge) + 16;
+      BdgH := 22;
+      BdgLeft := Width - 16 - BdgW;
+      BdgTop := ItemTop + (FItemHeight - BdgH) div 2;
+      BadgeR := Rect(BdgLeft, BdgTop, BdgLeft + BdgW, BdgTop + BdgH);
+      Canvas.Brush.Color := $00EFF6FF;
+      Canvas.Pen.Color := $0093C5FD;
+      Canvas.Pen.Style := psSolid;
+      Canvas.Pen.Width := 1;
+      Canvas.RoundRect(BadgeR, 10, 10);
+      Canvas.Font.Color := $001D4ED8;
+      Canvas.TextOut(BdgLeft + 8, BdgTop + 3, Item.Badge);
+      RightBound := BdgLeft - 8;
     end;
 
+    // Título e Subtítulo
+    Canvas.Brush.Style := bsClear;
+    Canvas.Font.Name := 'Segoe UI';
+    if Item.Subtitle <> '' then
+    begin
+      TitleTop := ItemTop + (FItemHeight - 38) div 2;
+      SubtitleTop := TitleTop + 20;
+
+      Canvas.Font.Size := 11;
+      Canvas.Font.Style := [fsBold];
+      Canvas.Font.Color := $00111827; // Slate 900
+      Canvas.TextRect(Rect(TextLeft, TitleTop, RightBound, TitleTop + 20), TextLeft, TitleTop, Item.Title);
+
+      Canvas.Font.Size := 9;
+      Canvas.Font.Style := [];
+      Canvas.Font.Color := $006B7280; // Gray 500
+      Canvas.TextRect(Rect(TextLeft, SubtitleTop, RightBound, SubtitleTop + 18), TextLeft, SubtitleTop, Item.Subtitle);
+    end
+    else
+    begin
+      TitleTop := ItemTop + (FItemHeight - 20) div 2;
+      Canvas.Font.Size := 11;
+      Canvas.Font.Style := [fsBold];
+      Canvas.Font.Color := $00111827;
+      Canvas.TextRect(Rect(TextLeft, TitleTop, RightBound, TitleTop + 20), TextLeft, TitleTop, Item.Title);
+    end;
+
+    // Divisor inferior sutil com recuo elegante (inset divider)
     Canvas.Pen.Color := FDividerColor;
+    Canvas.Pen.Style := psSolid;
     Canvas.Pen.Width := 1;
-    Canvas.Line(16, ItemBottom - 1, Width, ItemBottom - 1);
+    Canvas.Line(TextLeft, ItemBottom - 1, Width, ItemBottom - 1);
   end;
 end;
 
@@ -5441,7 +5856,8 @@ begin
     TLazDroidBottomSheet,
     TLazDroidSpeedDial,
     TLazDroidSectionHeader,
-    TLazDroidAvatar
+    TLazDroidAvatar,
+    TLazDroidListItem
   ]);
 end;
 

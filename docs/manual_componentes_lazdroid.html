@@ -3806,34 +3806,39 @@ end;</code></pre>
                 </header>
 
                 <div class="component-body">
-                    <div class="comp-tagline">Lista mobile de alto desempenho com toque, rolagem inercial e badges</div>
-                    <p class="comp-desc">Lista desenhada especificamente para smartphones. Cada linha pode conter título em negrito, subtítulo explicativo, valor monetário/texto à direita e badge de status colorido. Suporta rolagem touch contínua e destaque suave da linha tocada.</p>
+                    <div class="comp-tagline">Lista mobile de alto desempenho com suporte completo a imagens, fotos, ImageList, ícones vetoriais e badges</div>
+                    <p class="comp-desc">Lista touch-first otimizada para smartphones e tablets Android. Cada item suporta fotos/imagens de alta resolução (PNG, JPG, BMP via <code>Picture</code>), ícones de <code>TImageList</code> (via <code>Images</code> e <code>ImageIndex</code>), ou ícones vetoriais nativos ultra-nítidos (<code>Icon</code>). Os avatares e thumbnails contam com recorte dinâmico de formato (<code>isCircle</code>, <code>isRoundedSquare</code>, <code>isSquare</code>), além de título, subtítulo explicativo com auto-clip, valor monetário e pill badges de status.</p>
                     
                     <div class="comp-touch-tip">
-                        <strong>💡 Dica Touch:</strong> Defina ItemHeight com valor de 64dp para garantir espaço suficiente para títulos de duas linhas e leitura nítida.
+                        <strong>💡 Dica Touch:</strong> Utilize <code>Item.ImageShape := isCircle</code> para perfis de contatos e <code>isRoundedSquare</code> para fotos de produtos ou catálogo. Defina <code>ImageSize</code> entre 40 e 48dp para uma experiência visual no padrão Material Design 3 e iOS.
                     </div>
 
                     <!-- PREVIEW VISUAL DO COMPONENTE -->
                     <div class="preview-container">
-                        <div class="preview-title">Visualização / Live Preview Mobile</div>
+                        <div class="preview-title">Visualização / Live Preview Mobile (Imagens, Ícones e Formatos)</div>
                         
         <div class="preview-listview">
             <div class="lv-item selected">
-                <div class="lv-avatar">AL</div>
-                <div class="lv-info"><div class="lv-title">Empresa Alfa Ltda</div><div class="lv-sub">Última compra há 2 dias</div></div>
-                <div class="lv-right"><span class="lv-val">R$ 4.590,00</span><span class="lv-badge">VIP</span></div>
+                <div class="lv-avatar" style="border-radius: 50%; background: #0284c7; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;">👤</div>
+                <div class="lv-info"><div class="lv-title">Dra. Camila Nogueira</div><div class="lv-sub">Cardiologia • Consulta às 14:30</div></div>
+                <div class="lv-right"><span class="lv-val">Confirmado</span><span class="lv-badge">Hoje</span></div>
             </div>
             <div class="lv-item">
-                <div class="lv-avatar">BS</div>
-                <div class="lv-info"><div class="lv-title">Beta Suprimentos</div><div class="lv-sub">Fatura em aberto</div></div>
-                <div class="lv-right"><span class="lv-val">R$ 1.250,00</span><span class="lv-badge badge-warn">Pendente</span></div>
+                <div class="lv-avatar" style="border-radius: 12px; background: #10b981; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;">⭐</div>
+                <div class="lv-info"><div class="lv-title">Smartphone LazDroid Pro Max</div><div class="lv-sub">Estoque: 18 un • Categoria: Mobile</div></div>
+                <div class="lv-right"><span class="lv-val">R$ 3.899,00</span><span class="lv-badge badge-warn">Destaque</span></div>
+            </div>
+            <div class="lv-item">
+                <div class="lv-avatar" style="border-radius: 6px; background: #6366f1; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;">💲</div>
+                <div class="lv-info"><div class="lv-title">Fatura Fornecedor #4892</div><div class="lv-sub">Vencimento em 10/10/2026</div></div>
+                <div class="lv-right"><span class="lv-val">R$ 740,50</span><span class="lv-badge" style="background:#fee2e2;color:#b91c1c;border-color:#fca5a5;">Aberto</span></div>
             </div>
         </div>
         
                     </div>
 
                     <!-- TABELA DE PROPRIEDADES -->
-                    <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--slate-800);">Propriedades Principais (Inspector de Objetos)</h4>
+                    <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--slate-800);">Propriedades Principais de TLazDroidListView</h4>
                     <div class="table-wrap">
                         <table class="data-table">
                             <thead>
@@ -3849,7 +3854,19 @@ end;</code></pre>
                                     <td><span class="prop-name">Items</span></td>
                                     <td><span class="prop-type">TLazDroidListItems</span></td>
                                     <td><span class="prop-default">(Collection)</span></td>
-                                    <td>Coleção de itens da lista (Title, Subtitle, Badge, Value, Tag).</td>
+                                    <td>Coleção de itens com suporte a título, subtítulo, foto, ícone e badge.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">Images</span></td>
+                                    <td><span class="prop-type">TCustomImageList</span></td>
+                                    <td><span class="prop-default">nil</span></td>
+                                    <td>Componente <code>TImageList</code> associado para exibição de ícones padronizados.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">ImageSize</span></td>
+                                    <td><span class="prop-type">Integer</span></td>
+                                    <td><span class="prop-default">44</span></td>
+                                    <td>Largura e altura (quadrado) reservada para fotos, thumbnails ou ícones do item.</td>
                                 </tr>
                                 <tr>
                                     <td><span class="prop-name">ItemHeight</span></td>
@@ -3861,26 +3878,122 @@ end;</code></pre>
                                     <td><span class="prop-name">SelectedIndex</span></td>
                                     <td><span class="prop-type">Integer</span></td>
                                     <td><span class="prop-default">-1</span></td>
-                                    <td>Índice do item selecionado.</td>
+                                    <td>Índice do item selecionado com feedback visual.</td>
                                 </tr>
                                 <tr>
                                     <td><span class="prop-name">SelectedBgColor</span></td>
                                     <td><span class="prop-type">TColor</span></td>
                                     <td><span class="prop-default">$00E0F2FE</span></td>
-                                    <td>Cor de destaque ao tocar na linha.</td>
+                                    <td>Cor de destaque ao tocar ou selecionar a linha.</td>
                                 </tr>
                                 <tr>
                                     <td><span class="prop-name">DividerColor</span></td>
                                     <td><span class="prop-type">TColor</span></td>
                                     <td><span class="prop-default">$00E5E7EB</span></td>
-                                    <td>Cor da linha divisória sutil entre itens.</td>
+                                    <td>Cor da linha divisória elegante com recuo inteligente (inset divider).</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- TABELA DE PROPRIEDADES DO ITEM -->
+                    <h4 style="font-size: 14px; font-weight: 700; margin-top: 18px; margin-bottom: 8px; color: var(--slate-800);">Propriedades do Item (TLazDroidListItem)</h4>
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 25%;">Propriedade</th>
+                                    <th style="width: 20%;">Tipo</th>
+                                    <th style="width: 15%;">Padrão</th>
+                                    <th>Finalidade & Descrição</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="prop-name">Picture</span></td>
+                                    <td><span class="prop-type">TPicture</span></td>
+                                    <td><span class="prop-default">(None)</span></td>
+                                    <td>Imagem/foto exclusiva do item (suporta PNG transparente, JPG, BMP via arquivo ou stream).</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">ImageIndex</span></td>
+                                    <td><span class="prop-type">Integer</span></td>
+                                    <td><span class="prop-default">-1</span></td>
+                                    <td>Índice da imagem no <code>Images</code> (TImageList) configurado na lista.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">Icon</span></td>
+                                    <td><span class="prop-type">TLazDroidActionIcon</span></td>
+                                    <td><span class="prop-default">aiNone</span></td>
+                                    <td>Ícone vetorial nativo (ex: <code>aiUser</code>, <code>aiCalendar</code>, <code>aiStar</code>, <code>aiDollar</code>, <code>aiCheck</code>).</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">ImageShape</span></td>
+                                    <td><span class="prop-type">TLazDroidImageShape</span></td>
+                                    <td><span class="prop-default">isRoundedSquare</span></td>
+                                    <td>Formato de exibição da imagem: <code>isCircle</code> (circular/avatar), <code>isRoundedSquare</code> (cantos arredondados) ou <code>isSquare</code>.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">IconBgColor</span></td>
+                                    <td><span class="prop-type">TColor</span></td>
+                                    <td><span class="prop-default">$00D97706</span></td>
+                                    <td>Cor de fundo do avatar ou ícone vetorial.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">IconColor</span></td>
+                                    <td><span class="prop-type">TColor</span></td>
+                                    <td><span class="prop-default">clWhite</span></td>
+                                    <td>Cor do traçado do ícone vetorial nativo.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">Badge</span></td>
+                                    <td><span class="prop-type">string</span></td>
+                                    <td><span class="prop-default">''</span></td>
+                                    <td>Texto da etiqueta pill de status à direita.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">Value</span></td>
+                                    <td><span class="prop-type">string</span></td>
+                                    <td><span class="prop-default">''</span></td>
+                                    <td>Valor monetário ou texto em negrito à direita.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- MÉTODOS -->
+                    <h4 style="font-size: 14px; font-weight: 700; margin-top: 18px; margin-bottom: 8px; color: var(--slate-800);">Métodos Utilitários</h4>
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30%;">Método</th>
+                                    <th style="width: 35%;">Assinatura</th>
+                                    <th>Finalidade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="prop-name">Clear</span></td>
+                                    <td><code>procedure Clear;</code></td>
+                                    <td>Limpa todos os itens, reseta a seleção e a posição de rolagem.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">AddItem</span></td>
+                                    <td><code>function AddItem(const ATitle, ASubtitle, AValue: string): TLazDroidListItem;</code></td>
+                                    <td>Cria e adiciona um item na lista de forma rápida com título, subtítulo e valor.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">ScrollToTop</span></td>
+                                    <td><code>procedure ScrollToTop;</code></td>
+                                    <td>Rola a lista instantaneamente para o primeiro item.</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
                     <!-- TABELA DE EVENTOS -->
-                    <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--slate-800);">Eventos Específicos</h4>
+                    <h4 style="font-size: 14px; font-weight: 700; margin-top: 18px; margin-bottom: 8px; color: var(--slate-800);">Eventos Específicos</h4>
                     <div class="table-wrap">
                         <table class="data-table">
                             <thead>
@@ -3894,37 +4007,55 @@ end;</code></pre>
                                 <tr>
                                     <td><span class="prop-name">OnItemClick</span></td>
                                     <td><span class="prop-type">TLazDroidItemClickEvent</span></td>
-                                    <td>Disparado ao tocar em qualquer item: procedure(Sender: TObject; AIndex: Integer).</td>
+                                    <td>Disparado ao tocar em qualquer item: <code>procedure(Sender: TObject; AIndex: Integer)</code>.</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
                     <!-- SNIPPET PASCAL -->
-                    <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 6px; color: var(--slate-800);">Exemplo de Código em Free Pascal / Lazarus</h4>
+                    <h4 style="font-size: 14px; font-weight: 700; margin-top: 18px; margin-bottom: 6px; color: var(--slate-800);">Exemplo de Código Completo com Imagens, ImageList e Ícones Vetoriais</h4>
                     <div class="code-block-wrap">
                         <div class="code-header">
-                            <span>Exemplo de Implementação — TLazDroidListView</span>
+                            <span>Exemplo de Implementação — TLazDroidListView com Imagens e Ícones</span>
                             <div>Pascal (ObjFPC)</div>
                         </div>
-                        <pre class="code-content"><code>// Preenchendo a lista em tempo de execução
-procedure TForm1.CarregarClientes;
+                        <pre class="code-content"><code>// Configuração rica da lista em tempo de execução
+procedure TForm1.CarregarCatalogoEClientes;
 var
   Item: TLazDroidListItem;
 begin
-  ListView1.Items.Clear;
-  
-  Item := ListView1.Items.Add;
-  Item.Title := 'Empresa Alfa Ltda';
-  Item.Subtitle := 'Última compra há 2 dias';
-  Item.Badge := 'VIP';
-  Item.Value := 'R$ 4.590,00';
+  ListView1.Clear;
+  ListView1.ItemHeight := 68;
+  ListView1.ImageSize := 46;
+
+  // 1. Item com FOTO / IMAGEM carregada de arquivo ou stream (Formato Circular)
+  Item := ListView1.AddItem('Dra. Camila Nogueira', 'Cardiologia • Consulta às 14:30', 'Confirmado');
+  Item.ImageShape := isCircle;
+  if FileExists('fotos/camila.png') then
+    Item.Picture.LoadFromFile('fotos/camila.png');
+  Item.Badge := 'Hoje';
   Item.Tag := 101;
+
+  // 2. Item com Ícone Vetorial Nativo (Ultra-nítido, sem arquivo externo)
+  Item := ListView1.AddItem('Smartphone LazDroid Pro Max', 'Estoque: 18 un • Categoria: Mobile', 'R$ 3.899,00');
+  Item.Icon := aiStar;
+  Item.IconColor := clWhite;
+  Item.IconBgColor := $0010B981; // Verde esmeralda
+  Item.ImageShape := isRoundedSquare;
+  Item.Badge := 'Destaque';
+  Item.Tag := 202;
+
+  // 3. Item usando TImageList configurado no ListView1.Images
+  Item := ListView1.AddItem('Fatura Fornecedor #4892', 'Vencimento em 10/10/2026', 'R$ 740,50');
+  Item.ImageIndex := 2; // Ícone de boleto/dinheiro do ImageList
+  Item.Badge := 'Aberto';
+  Item.Tag := 303;
 end;
 
 procedure TForm1.ListView1ItemClick(Sender: TObject; AIndex: Integer);
 begin
-  AbrirDetalhesCliente(ListView1.Items[AIndex].Tag);
+  ShowMobileToast(Self, 'Item tocado: ' + ListView1.Items[AIndex].Title);
 end;</code></pre>
                     </div>
                 </div>
