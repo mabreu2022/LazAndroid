@@ -69,10 +69,19 @@ d:\Projetos AntiGravity\LazarusAndroid\
 │   ├── demo4.lpr                          # Ponto de entrada JNI
 │   └── unit1.pas/.lfm                     # AppBar, BottomNav, Card, Badge, Edit, Button, ListView
 │
+├── demo5/                                 # App Comercial Completo (Login + SQLite + BottomNav)
+│   ├── project1.lpr                       # Ponto de entrada JNI com Activity
+│   ├── unit1.pas/.lfm                     # Tela de Login autenticando no SQLite
+│   ├── unit3.pas/.lfm                     # Tela Principal com BottomNav (Produtos, Pedidos, Clientes, Config)
+│   ├── unit4.pas/.lfm                     # DataModule com TSQLite3Connection e queries
+│   ├── database/app.db                    # Banco de dados SQLite com 5 tabelas e dados de teste
+│   └── imagens/                           # Catálogo de imagens e ícones PNG
+│
 ├── tools/                                 # Utilitários, SQLite, Scripts e Instalador
 └── docs/                                  # Documentação Técnica e Guias
     ├── ARCHITECTURE.md                    # Arquitetura detalhada e diagramas Mermaid
-    └── INSTALL_GUIDE.md                   # Guia passo a passo de instalação e uso
+    ├── INSTALL_GUIDE.md                   # Guia passo a passo de instalação e uso
+    └── manual_componentes_lazdroid.html   # Manual Interativo da Paleta de Componentes Mobile
 ```
 
 ---
@@ -93,19 +102,72 @@ Para acelerar o desenvolvimento de aplicações comerciais e corporativas no And
 
 ---
 
-## 🚀 Como Começar em 1-Clique
+## 🛠️ Guia de Instalação Passo a Passo (Para quem baixou do GitHub)
 
-1. **Execute o Instalador Automático:**
-   - Dê um duplo clique no arquivo [`Instalar-LazDroid.cmd`](file:///d:/Projetos%20AntiGravity/LazarusAndroid/Instalar-LazDroid.cmd) na raiz do projeto.
-   - Ele detecta o Lazarus, instala os compiladores FPC AArch64, copia as units RTL/FCL, compila o widgetset LCL CustomDrawn para Android, registra a paleta **LazDroid** na IDE e detecta automaticamente o SDK, NDK, ADB e JDK em cerca de 15 segundos!
-2. **Crie ou Abra um Projeto:**
-   - No Lazarus, crie um novo aplicativo em `Arquivo -> Novo... -> Aplicação Android (LazDroid)`.
-   - Ou abra qualquer uma das demos (`demo4/demo4.lpi`, `demo3/demo3.lpi`, `demo/LazAndroidDemo.lpi` ou `demo2/project1.lpi`).
-3. **Plug & Play — Conecte o Aparelho no USB:**
-   - Abra a janela `Exibir -> Dispositivos Alvo Android (Target)` (ou ancore-a ao lado do Project Inspector).
-   - Plugue o cabo USB com *Depuração USB* ativada: o LazDroid reconhece o aparelho imediatamente e exibe seu modelo (ex: `🟢 Samsung SM-G780G [RQ8R70BFZEJ] (arm64-v8a | Android 13) ★ [ATIVO]`).
-4. **Execute no Dispositivo:**
-   - Pressione **`Ctrl + Shift + F9`** (ou dê duplo clique no alvo): a compilação, empacotamento e deploy ocorrem direto no celular sem caixas de diálogo!
+Se você acabou de clonar ou baixar o repositório do GitHub, siga o passo a passo abaixo para configurar o ambiente em poucos minutos:
+
+### 1. Pré-Requisitos do Sistema
+Antes de rodar o instalador, certifique-se de possuir instalado no Windows:
+* **Lazarus IDE (v2.2, 3.x ou 4.x)**: instalado (ex: `C:\lazarus`).
+* **Android SDK & ADB**: instalado via Android Studio ou standalone em `%LOCALAPPDATA%\Android\Sdk` (com a pasta `platform-tools` contendo o `adb.exe`).
+* **Android NDK**: versões r21 a r26 (instalado pelo Android Studio em *SDK Tools* -> *NDK (Side by side)*).
+* **Java JDK 17 ou superior**: instalado (ex: Eclipse Adoptium JDK ou o `jbr` do Android Studio).
+* **Celular Android**: conectado via cabo USB com a **Depuração USB** ativada nas *Opções do Desenvolvedor*.
+
+---
+
+### 2. Instalação Automática em 1-Clique
+
+1. Abra a pasta do projeto clonado:
+   ```cmd
+   git clone https://github.com/mabreu2022/LazAndroid.git
+   cd LazAndroid
+   ```
+2. Dê um duplo-clique no arquivo:
+   ```cmd
+   Instalar-LazDroid.cmd
+   ```
+3. O Windows solicitará privilégios de Administrador (UAC). Clique em **Sim**.
+4. O instalador executará automaticamente todas as etapas:
+   - ✅ Localiza o Lazarus IDE instalado (`C:\lazarus`).
+   - ✅ Baixa e extrai automaticamente o compilador cruzado FPC AArch64 e as units da RTL Android.
+   - ✅ Copia os binários `ppcrossa64.exe` e units `aarch64-android` e `arm-android` para o FPC.
+   - ✅ Aplica o patch móvel para acionamento do teclado virtual na LCL CustomDrawn.
+   - ✅ Compila a LCL CustomDrawn e os pacotes para Android AArch64.
+   - ✅ Registra os pacotes **`LazDroidControls.lpk`** (29 componentes mobile) e **`LazDroidDeploy.lpk`** (Deploy e Target Manager) no Lazarus.
+   - ✅ Autodetecta o Android SDK, NDK, ADB, JDK e grava o arquivo de configuração `lazdroiddeploy.xml`.
+5. Ao final, digite **`S`** para autorizar a reconstrução da IDE. O Lazarus será compilado com o LazDroid integrado!
+
+---
+
+### 3. Organizar a IDE no Estilo Delphi (Opcional, porém Recomendado)
+
+Se as janelas do Lazarus estiverem desorganizadas ou flutuantes, dê um duplo clique no arquivo:
+```cmd
+Restaurar-Layout-Lazarus.cmd
+```
+Ele organiza a interface no layout profissional acoplado (*AnchorDocking*) idêntico ao Delphi:
+* **Esquerda:** Inspetor de Objetos (Object Inspector com componentes, propriedades e eventos).
+* **Centro:** Editor de Código e Form Designer no topo, mensagens e depuração na base.
+* **Direita:** Inspetor de Projetos no topo, gerenciador de alvos móveis LazDroid no meio e paleta de componentes na base.
+* *(O layout é bloqueado como somente leitura contra desconfigurações acidentais).*
+
+---
+
+### 4. Como Testar e Executar seu Primeiro Deploy
+
+1. Abra o **Lazarus IDE**.
+2. Conecte seu aparelho celular no cabo USB (com *Depuração USB* ativa).
+3. Abra qualquer um dos projetos de demonstração prontos:
+   * **`demo5/project1.lpi`**: Aplicativo completo de vendas com **Login**, banco **SQLite local (`database/app.db`)** e navegação por abas (**`TLazDroidBottomNav`**).
+   * **`demo4/demo4.lpi`**: Demonstração de botões, cards, badges, inputs e listview touch-first.
+   * **`demo/LazAndroidDemo.lpi`**: Força de vendas com formulários visuais LCL.
+4. Pressione o atalho:
+   ```
+   Ctrl + Shift + F9
+   ```
+   *(Ou clique no menu `Run -> Deploy & Run on Android Device`)*.
+5. O LazDroid compilará a biblioteca nativa ARM64 (`liblazapp.so`), empacotará o APK com o Gradle e instalará o aplicativo direto no seu celular em segundos!
 
 ---
 
