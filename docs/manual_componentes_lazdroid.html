@@ -1865,6 +1865,7 @@
                         <li><a href="#TLazDroidRadioGroup">TLazDroidRadioGroup</a></li>
                         <li><a href="#TLazDroidSegmentedControl">TLazDroidSegmentedControl</a></li>
                         <li><a href="#TLazDroidChipGroup">TLazDroidChipGroup</a></li>
+                        <li><a href="#TLazDroidImageList">TLazDroidImageList</a></li>
                         <li><a href="#TLazDroidListView">TLazDroidListView</a></li>
                         <li><a href="#TLazDroidCard">TLazDroidCard</a></li>
                         <li><a href="#TLazDroidSectionHeader">TLazDroidSectionHeader</a></li>
@@ -2161,6 +2162,7 @@ end;</code></pre>
                     </div>
 
                     <!-- TABELA DE PROPRIEDADES -->
+                    <!-- TABELA DE PROPRIEDADES -->
                     <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--slate-800);">Propriedades Principais (Inspector de Objetos)</h4>
                     <div class="table-wrap">
                         <table class="data-table">
@@ -2175,9 +2177,39 @@ end;</code></pre>
                             <tbody>
                                 <tr>
                                     <td><span class="prop-name">Items</span></td>
-                                    <td><span class="prop-type">TStrings</span></td>
-                                    <td><span class="prop-default">'Início\nPedidos\nProdutos\nPerfil'</span></td>
-                                    <td>Lista de títulos das abas que compõem a barra de navegação.</td>
+                                    <td><span class="prop-type">TLazDroidNavItems</span></td>
+                                    <td><span class="prop-default">(Coleção)</span></td>
+                                    <td>Coleção de abas (idêntica ao <code>TLazDroidListView.Items</code>). Ao clicar em <code>Items (...)</code> no Inspector de Objetos, abre a janela <em>"Editando LazDroidBottomNav1.Items"</em>. Cada item possui <code>Caption</code>, <code>Picture</code> (PNG individual), <code>ImageIndex</code> (índice da ImageList), <code>ImageName</code>, <code>Icon</code> (ícone vetorial embutido), <code>Badge</code> (notificação) e <code>Tag</code>.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">Tabs</span></td>
+                                    <td><span class="prop-type">TLazDroidNavItems</span></td>
+                                    <td><span class="prop-default">(Coleção)</span></td>
+                                    <td>Alias idêntico para <code>Items</code>, garantindo compatibilidade total com o código Pascal e o formulário.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">DroidImages</span></td>
+                                    <td><span class="prop-type">TLazDroidImageList</span></td>
+                                    <td><span class="prop-default">nil</span></td>
+                                    <td>Lista de imagens mobile com transparência alfa 32-bit nativa para renderizar fotos ou ícones PNG nas abas.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">Images</span></td>
+                                    <td><span class="prop-type">TCustomImageList</span></td>
+                                    <td><span class="prop-default">nil</span></td>
+                                    <td>ImageList padrão da LCL para ícones e glifos nas abas.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">ImageSize</span></td>
+                                    <td><span class="prop-type">Integer</span></td>
+                                    <td><span class="prop-default">24</span></td>
+                                    <td>Tamanho em pixels/dp dos ícones e imagens nas abas (ex: 24, 28, 32).</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">AutoIcons</span></td>
+                                    <td><span class="prop-type">Boolean</span></td>
+                                    <td><span class="prop-default">True</span></td>
+                                    <td>Quando True (no modo <code>Items</code>), detecta automaticamente nomes comuns (Início, Pedidos, Clientes, Ajustes, etc.) e desenha ícones vetoriais modernos automaticamente.</td>
                                 </tr>
                                 <tr>
                                     <td><span class="prop-name">ActiveIndex</span></td>
@@ -2189,13 +2221,13 @@ end;</code></pre>
                                     <td><span class="prop-name">ActiveColor</span></td>
                                     <td><span class="prop-type">TColor</span></td>
                                     <td><span class="prop-default">$00D97706</span></td>
-                                    <td>Cor de destaque aplicada no ícone e texto da aba ativa.</td>
+                                    <td>Cor de destaque aplicada no ícone, texto e indicador da aba ativa.</td>
                                 </tr>
                                 <tr>
                                     <td><span class="prop-name">InactiveColor</span></td>
                                     <td><span class="prop-type">TColor</span></td>
                                     <td><span class="prop-default">$008E8E93</span></td>
-                                    <td>Cor suave para as abas inativas.</td>
+                                    <td>Cor suave para os ícones e rótulos das abas inativas.</td>
                                 </tr>
                                 <tr>
                                     <td><span class="prop-name">BarColor</span></td>
@@ -2204,10 +2236,22 @@ end;</code></pre>
                                     <td>Cor de fundo da barra de navegação inferior.</td>
                                 </tr>
                                 <tr>
+                                    <td><span class="prop-name">BadgeColor</span></td>
+                                    <td><span class="prop-type">TColor</span></td>
+                                    <td><span class="prop-default">$002525E1</span></td>
+                                    <td>Cor do balão (badge) de notificação exibido no canto do ícone da aba.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">ShowIndicator</span></td>
+                                    <td><span class="prop-type">Boolean</span></td>
+                                    <td><span class="prop-default">True</span></td>
+                                    <td>Exibe linha de destaque indicadora na borda superior da aba selecionada.</td>
+                                </tr>
+                                <tr>
                                     <td><span class="prop-name">Height</span></td>
                                     <td><span class="prop-type">Integer</span></td>
                                     <td><span class="prop-default">56</span></td>
-                                    <td>Altura padrão mobile da barra.</td>
+                                    <td>Altura padrão mobile da barra (ex: 56 a 70 dp).</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -2241,15 +2285,38 @@ end;</code></pre>
                             <span>Exemplo de Implementação — TLazDroidBottomNav</span>
                             <div>Pascal (ObjFPC)</div>
                         </div>
-                        <pre class="code-content"><code>procedure TForm1.BottomNav1TabSelected(Sender: TObject; AIndex: Integer);
+                        <pre class="code-content"><code>// Exemplo 1: Adicionando abas ricas por código com ícones e badges
+procedure TForm1.ConfigurarAbas;
+var
+  Tab: TLazDroidNavTab;
+begin
+  BottomNav1.Tabs.Clear;
+
+  // Aba 1: Início com ícone vetorial
+  Tab := BottomNav1.AddTab('Início', aiHome);
+
+  // Aba 2: Pedidos com ícone de carrinho e badge de notificação
+  Tab := BottomNav1.AddTab('Pedidos', aiCart);
+  Tab.Badge := '3'; // Alerta de 3 novos pedidos
+
+  // Aba 3: Clientes com imagem da TLazDroidImageList
+  Tab := BottomNav1.Tabs.Add;
+  Tab.Caption := 'Clientes';
+  Tab.ImageName := 'ic_clientes'; // ou Tab.ImageIndex := 2;
+
+  // Aba 4: Ajustes / Configurações
+  Tab := BottomNav1.AddTab('Ajustes', aiSettings);
+end;
+
+// Exemplo 2: Troca de página na seleção da aba
+procedure TForm1.BottomNav1TabSelected(Sender: TObject; AIndex: Integer);
 begin
   case AIndex of
     0: PageControl1.ActivePageIndex := 0; // Início
     1: PageControl1.ActivePageIndex := 1; // Pedidos
-    2: PageControl1.ActivePageIndex := 2; // Produtos
-    3: PageControl1.ActivePageIndex := 3; // Perfil
+    2: PageControl1.ActivePageIndex := 2; // Clientes
+    3: PageControl1.ActivePageIndex := 3; // Ajustes
   end;
-  ShowMobileToast(Self, 'Aba selecionada: ' + BottomNav1.Items[AIndex]);
 end;</code></pre>
                     </div>
                 </div>
@@ -3793,6 +3860,169 @@ end;</code></pre>
                 </div>
             </article>
 
+            <!-- COMPONENTE: TLazDroidImageList -->
+            <article id="TLazDroidImageList" class="component-card" data-category="Listas, Cards & Visualização" data-name="tlazdroidimagelist gerenciador e catálogo de imagens mobile com transparência alfa 32-bit real png">
+                <header class="component-header">
+                    <div class="comp-title-group">
+                        <h3>
+                            <span>TLazDroidImageList</span>
+                        </h3>
+                        <div class="comp-heritage">Herança: TComponent | Paleta: 'LazDroid'</div>
+                    </div>
+                    <div class="comp-badge-cat">Listas, Cards & Visualização</div>
+                </header>
+
+                <div class="component-body">
+                    <div class="comp-tagline">Catálogo de imagens mobile de alta resolução com canal alfa 32-bit real para fotos e ícones transparentes</div>
+                    <p class="comp-desc">Diferente do <code>TImageList</code> tradicional da LCL (que foi concebido na era do Windows 95 e muitas vezes achata o canal alfa, perde resolução ou preenche o fundo de PNGs transparentes com cores sólidas), o <code>TLazDroidImageList</code> armazena imagens em sua resolução e qualidade original (PNG 32-bit RGBA com transparência real, JPG, BMP). Permite atribuir nomes a cada imagem (ex: <code>'coca_cola'</code>, <code>'acucar'</code>) e vincula-se diretamente ao <code>TLazDroidListView</code> sem qualquer borda ou fundo indesejado.</p>
+                    
+                    <div class="comp-touch-tip">
+                        <strong>💡 Dica Visual:</strong> Ao carregar fotos de produtos (latas, embalagens, garrafas) recortadas em PNG transparente, utilize <code>Item.ImageShape := isSquare</code> no ListView. A imagem se fundirá perfeitamente com o fundo da lista sem criar caixas ou molduras coloridas!
+                    </div>
+
+                    <!-- TABELA DE PROPRIEDADES -->
+                    <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--slate-800);">Propriedades de TLazDroidImageList</h4>
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 25%;">Propriedade</th>
+                                    <th style="width: 20%;">Tipo</th>
+                                    <th style="width: 15%;">Padrão</th>
+                                    <th>Finalidade & Descrição</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="prop-name">Items</span></td>
+                                    <td><span class="prop-type">TLazDroidImageItems</span></td>
+                                    <td><span class="prop-default">(Collection)</span></td>
+                                    <td>Coleção visual de imagens gerenciadas. Clique em (...) no Inspector de Objetos para abrir o editor e carregar seus arquivos PNG.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">Width</span></td>
+                                    <td><span class="prop-type">Integer</span></td>
+                                    <td><span class="prop-default">48</span></td>
+                                    <td>Largura de referência padrão para desenho do catálogo em pixels/dp.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">Height</span></td>
+                                    <td><span class="prop-type">Integer</span></td>
+                                    <td><span class="prop-default">48</span></td>
+                                    <td>Altura de referência padrão para desenho do catálogo em pixels/dp.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- TABELA DE PROPRIEDADES DO ITEM -->
+                    <h4 style="font-size: 14px; font-weight: 700; margin-top: 18px; margin-bottom: 8px; color: var(--slate-800);">Propriedades de Cada Imagem (TLazDroidImageItem)</h4>
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 25%;">Propriedade</th>
+                                    <th style="width: 20%;">Tipo</th>
+                                    <th style="width: 15%;">Padrão</th>
+                                    <th>Finalidade & Descrição</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="prop-name">Name</span></td>
+                                    <td><span class="prop-type">string</span></td>
+                                    <td><span class="prop-default">''</span></td>
+                                    <td>Identificador textual amigável da imagem (ex: <code>'coca_cola'</code>, <code>'acucar'</code>, <code>'sazon'</code>).</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">Picture</span></td>
+                                    <td><span class="prop-type">TPicture</span></td>
+                                    <td><span class="prop-default">(None)</span></td>
+                                    <td>Imagem gráfica com canal alfa completo. Suporta carregar arquivo PNG diretamente pelo editor de coleções da IDE.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">Tag</span></td>
+                                    <td><span class="prop-type">Integer</span></td>
+                                    <td><span class="prop-default">0</span></td>
+                                    <td>Código numérico auxiliar (ex: ID do produto no banco de dados).</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- MÉTODOS -->
+                    <h4 style="font-size: 14px; font-weight: 700; margin-top: 18px; margin-bottom: 8px; color: var(--slate-800);">Métodos Utilitários de TLazDroidImageList</h4>
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30%;">Método</th>
+                                    <th style="width: 35%;">Assinatura</th>
+                                    <th>Finalidade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="prop-name">AddFromFile</span></td>
+                                    <td><code>function AddFromFile(const AName, AFilename: string): Integer;</code></td>
+                                    <td>Adiciona um arquivo PNG/JPG à lista em tempo de execução e retorna seu índice.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">Draw</span></td>
+                                    <td><code>procedure Draw(ACanvas: TCanvas; const ARect: TRect; const AName: string; AShape: TLazDroidImageShape);</code></td>
+                                    <td>Desenha a imagem identificada por nome no Canvas de destino com anti-aliasing e transparência alfa pura.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">Clear</span></td>
+                                    <td><code>procedure Clear;</code></td>
+                                    <td>Limpa todas as imagens cadastradas.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- SNIPPET PASCAL -->
+                    <h4 style="font-size: 14px; font-weight: 700; margin-top: 18px; margin-bottom: 6px; color: var(--slate-800);">Exemplo de Código: Associando TLazDroidImageList ao TLazDroidListView</h4>
+                    <div class="code-block-wrap">
+                        <div class="code-header">
+                            <span>Exemplo de Implementação — TLazDroidImageList + TLazDroidListView</span>
+                            <div>Pascal (ObjFPC)</div>
+                        </div>
+                        <pre class="code-content"><code>// 1. Você pode configurar as imagens visualmente no Form Designer clicando em LazDroidImageList1.Items
+// 2. Ou preencher dinamicamente via código:
+procedure TForm1.ConfigurarCatalogoProdutos;
+var
+  Item: TLazDroidListItem;
+begin
+  // Adiciona imagens PNG transparentes no ImageList
+  LazDroidImageList1.Clear;
+  LazDroidImageList1.AddFromFile('coca_cola', 'assets/coca_lata.png');
+  LazDroidImageList1.AddFromFile('acucar',    'assets/acucar_uniao.png');
+  LazDroidImageList1.AddFromFile('sazon',     'assets/sazon_carne.png');
+
+  // Vincula o ImageList ao ListView
+  LazDroidListView1.DroidImages := LazDroidImageList1;
+  LazDroidListView1.Clear;
+  LazDroidListView1.ItemHeight := 68;
+  LazDroidListView1.ImageSize := 48;
+
+  // Adiciona itens referenciando pelo nome com transparência total:
+  Item := LazDroidListView1.AddItem('Coca-Cola Lata 350ml', 'Promoção especial', 'R$ 5,00');
+  Item.ImageName := 'coca_cola';
+  Item.ImageShape := isSquare; // Sem borda ou corte, transparência pura
+
+  Item := LazDroidListView1.AddItem('Açúcar 1kg', 'União', 'R$ 3,45');
+  Item.ImageName := 'acucar';
+  Item.ImageShape := isSquare;
+
+  Item := LazDroidListView1.AddItem('Sazón Carne', 'Tempero', 'R$ 6,00');
+  Item.ImageName := 'sazon';
+  Item.ImageShape := isSquare;
+end;</code></pre>
+                    </div>
+                </div>
+            </article>
+
             <!-- COMPONENTE 16: TLazDroidListView -->
             <article id="TLazDroidListView" class="component-card" data-category="Listas, Cards & Visualização" data-name="tlazdroidlistview lista mobile de alto desempenho com toque, rolagem inercial e badges">
                 <header class="component-header">
@@ -3857,10 +4087,16 @@ end;</code></pre>
                                     <td>Coleção de itens com suporte a título, subtítulo, foto, ícone e badge.</td>
                                 </tr>
                                 <tr>
+                                    <td><span class="prop-name">DroidImages</span></td>
+                                    <td><span class="prop-type">TLazDroidImageList</span></td>
+                                    <td><span class="prop-default">nil</span></td>
+                                    <td>Lista nativa de imagens mobile com suporte a <strong>transparência alfa 32-bit real</strong> e identificação por nome ou índice.</td>
+                                </tr>
+                                <tr>
                                     <td><span class="prop-name">Images</span></td>
                                     <td><span class="prop-type">TCustomImageList</span></td>
                                     <td><span class="prop-default">nil</span></td>
-                                    <td>Componente <code>TImageList</code> associado para exibição de ícones padronizados.</td>
+                                    <td>Componente <code>TImageList</code> padrão da LCL associado.</td>
                                 </tr>
                                 <tr>
                                     <td><span class="prop-name">ImageSize</span></td>
@@ -3916,10 +4152,22 @@ end;</code></pre>
                                     <td>Imagem/foto exclusiva do item (suporta PNG transparente, JPG, BMP via arquivo ou stream).</td>
                                 </tr>
                                 <tr>
+                                    <td><span class="prop-name">ImageName</span></td>
+                                    <td><span class="prop-type">string</span></td>
+                                    <td><span class="prop-default">''</span></td>
+                                    <td>Nome da imagem no <code>DroidImages</code> (TLazDroidImageList), permitindo vincular fotos por identificador amigável (ex: 'coca_cola', 'acucar').</td>
+                                </tr>
+                                <tr>
                                     <td><span class="prop-name">ImageIndex</span></td>
                                     <td><span class="prop-type">Integer</span></td>
                                     <td><span class="prop-default">-1</span></td>
-                                    <td>Índice da imagem no <code>Images</code> (TImageList) configurado na lista.</td>
+                                    <td>Índice numérico da imagem em <code>DroidImages</code> ou no <code>Images</code> tradicional.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="prop-name">ImageBgColor</span></td>
+                                    <td><span class="prop-type">TColor</span></td>
+                                    <td><span class="prop-default">clNone</span></td>
+                                    <td>Cor de fundo sob a foto. Padrão <code>clNone</code> (100% transparente para fotos de produtos sem caixas coloridas indesejadas).</td>
                                 </tr>
                                 <tr>
                                     <td><span class="prop-name">Icon</span></td>
@@ -3937,7 +4185,7 @@ end;</code></pre>
                                     <td><span class="prop-name">IconBgColor</span></td>
                                     <td><span class="prop-type">TColor</span></td>
                                     <td><span class="prop-default">$00D97706</span></td>
-                                    <td>Cor de fundo do avatar ou ícone vetorial.</td>
+                                    <td>Cor de fundo utilizada exclusivamente para o ícone vetorial nativo (<code>Icon</code>).</td>
                                 </tr>
                                 <tr>
                                     <td><span class="prop-name">IconColor</span></td>

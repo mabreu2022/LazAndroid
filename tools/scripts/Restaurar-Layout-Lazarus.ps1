@@ -112,29 +112,36 @@ $dockInnerXml = @"
           <Item2 Name="AnchorDockSplitter3" Type="SplitterVertical" WindowState="Maximized" Monitor="0" PixelsPerInch="120">
             <Bounds Left="1552" Width="11" Height="866" />
           </Item2>
-          <Item3 Name="AnchorDockSite14" Type="Layout" WindowState="Maximized" Monitor="0" ChildCount="3" PixelsPerInch="120">
+          <Item3 Name="AnchorDockSite14" Type="Layout" WindowState="Maximized" Monitor="0" ChildCount="5" PixelsPerInch="120">
             <Bounds Left="1563" Width="357" Height="866" />
             <Anchors Left="AnchorDockSplitter3" />
             <Item1 Name="ProjectInspector" Type="Control" WindowState="Maximized" Monitor="0" PixelsPerInch="120">
-              <Bounds Width="357" Height="450" />
+              <Bounds Width="357" Height="340" />
               <Anchors Bottom="AnchorDockSplitter5" />
             </Item1>
             <Item2 Name="AnchorDockSplitter5" Type="SplitterHorizontal" WindowState="Maximized" Monitor="0" PixelsPerInch="120">
-              <Bounds Top="450" Width="357" Height="5" />
+              <Bounds Top="340" Width="357" Height="5" />
             </Item2>
-            <Item3 Name="AnchorDockSite15" Type="Pages" WindowState="Maximized" Monitor="0" ChildCount="2" PixelsPerInch="120">
-              <Bounds Top="455" Width="357" Height="411" />
-              <Anchors Top="AnchorDockSplitter5" />
+            <Item3 Name="TLazDroidTargetDockForm" Type="Control" WindowState="Maximized" Monitor="0" PixelsPerInch="120">
+              <Bounds Top="345" Width="357" Height="170" />
+              <Anchors Top="AnchorDockSplitter5" Bottom="AnchorDockSplitter6" />
+            </Item3>
+            <Item4 Name="AnchorDockSplitter6" Type="SplitterHorizontal" WindowState="Maximized" Monitor="0" PixelsPerInch="120">
+              <Bounds Top="515" Width="357" Height="5" />
+            </Item4>
+            <Item5 Name="AnchorDockSite15" Type="Pages" WindowState="Maximized" Monitor="0" ChildCount="2" PixelsPerInch="120">
+              <Bounds Top="520" Width="357" Height="346" />
+              <Anchors Top="AnchorDockSplitter6" />
               <Header PageIndex="0" />
               <Item1 Name="CodeExplorerView" Type="Control" WindowState="Maximized" Monitor="0" PixelsPerInch="120">
-                <Bounds Width="327" Height="375" />
+                <Bounds Width="327" Height="310" />
                 <Anchors Align="Client" />
               </Item1>
               <Item2 Name="ComponentList" Type="Control" WindowState="Maximized" Monitor="0" PixelsPerInch="120">
-                <Bounds Width="327" Height="375" />
+                <Bounds Width="327" Height="310" />
                 <Anchors Align="Client" />
               </Item2>
-            </Item3>
+            </Item5>
           </Item3>
           <Item4 Name="ObjectInspectorDlg" Type="Control" WindowState="Maximized" Monitor="0" PixelsPerInch="120">
             <Bounds Width="324" Height="866" />
@@ -165,6 +172,9 @@ $dockInnerXml
 
 # 5. Garantir opções de ativação do AnchorDocking e DockedFormEditor
 $anchorOptPath = Join-Path $configDir "anchordockingoptions.xml"
+if (Test-Path $anchorOptPath) {
+    Set-ItemProperty -Path $anchorOptPath -Name IsReadOnly -Value $false -ErrorAction SilentlyContinue
+}
 $anchorOptXml = @"
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
@@ -175,6 +185,9 @@ $anchorOptXml = @"
 [System.IO.File]::WriteAllText($anchorOptPath, $anchorOptXml, [System.Text.Encoding]::UTF8)
 
 $dockedFormOptPath = Join-Path $configDir "dockedformeditoroptions.xml"
+if (Test-Path $dockedFormOptPath) {
+    Set-ItemProperty -Path $dockedFormOptPath -Name IsReadOnly -Value $false -ErrorAction SilentlyContinue
+}
 $dockedFormOptXml = @"
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
@@ -184,15 +197,21 @@ $dockedFormOptXml = @"
 "@
 [System.IO.File]::WriteAllText($dockedFormOptPath, $dockedFormOptXml, [System.Text.Encoding]::UTF8)
 
-# 6. Atualizar anchordocklayout.xml
+# 6. Atualizar anchordocklayout.xml e travar como SOMENTE LEITURA
 $layoutFilePath = Join-Path $configDir "anchordocklayout.xml"
+if (Test-Path $layoutFilePath) {
+    Set-ItemProperty -Path $layoutFilePath -Name IsReadOnly -Value $false -ErrorAction SilentlyContinue
+}
 [System.IO.File]::WriteAllText($layoutFilePath, $anchorDockLayoutFileContent, [System.Text.Encoding]::UTF8)
-Write-Host "[+] Arquivo 'anchordocklayout.xml' gerado com sucesso." -ForegroundColor Green
+Set-ItemProperty -Path $layoutFilePath -Name IsReadOnly -Value $true
+attrib +r $layoutFilePath
+Write-Host "[+] Arquivo 'anchordocklayout.xml' gerado e bloqueado como SOMENTE LEITURA com sucesso." -ForegroundColor Green
 
 # 7. Atualizar environmentoptions.xml
 $envOptPath = Join-Path $configDir "environmentoptions.xml"
 if (Test-Path $envOptPath) {
     try {
+        Set-ItemProperty -Path $envOptPath -Name IsReadOnly -Value $false -ErrorAction SilentlyContinue
         $envDoc = New-Object System.Xml.XmlDocument
         $envDoc.Load($envOptPath)
 
@@ -232,17 +251,19 @@ if (Test-Path $envOptPath) {
                         $vis.SetAttribute("Value", "True")
                     }
 
-                    # Garantir que as janelas essenciais estejam com Visible=True
-                    foreach ($formName in @("SourceNotebook", "MessagesView", "ObjectInspectorDlg", "ProjectInspector")) {
+                    # Garantir que todas as janelas essenciais estejam com Visible=True
+                    foreach ($formName in @("SourceNotebook", "MessagesView", "SearchResults", "Watches", "BreakPoints", "Assembler", "ObjectInspectorDlg", "ProjectInspector", "TLazDroidTargetDockForm", "CodeExplorerView", "ComponentList")) {
                         $formElem = $desktopNode.SelectSingleNode($formName)
-                        if ($formElem) {
-                            $vis = $formElem.SelectSingleNode("Visible")
-                            if (-not $vis) {
-                                $vis = $envDoc.CreateElement("Visible")
-                                [void]$formElem.AppendChild($vis)
-                            }
-                            $vis.SetAttribute("Value", "True")
+                        if (-not $formElem) {
+                            $formElem = $envDoc.CreateElement($formName)
+                            [void]$desktopNode.AppendChild($formElem)
                         }
+                        $vis = $formElem.SelectSingleNode("Visible")
+                        if (-not $vis) {
+                            $vis = $envDoc.CreateElement("Visible")
+                            [void]$formElem.AppendChild($vis)
+                        }
+                        $vis.SetAttribute("Value", "True")
                     }
 
                     # Substituir o AnchorDocking pelo layout corrigido
