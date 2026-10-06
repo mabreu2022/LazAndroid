@@ -120,9 +120,32 @@ if (-not (Test-Path "$FpcExtracted\bin\i386-win32\ppcrossa64.exe")) {
     $CrossInstaller = "$ToolsDir\fpc-3.2.2.i386-win32.cross.android.exe"
     $InnoExtract = "$ToolsDir\innoextract\innoextract.exe"
 
-    if (-not (Test-Path $CrossInstaller)) {
-        throw "Instalador $CrossInstaller nao encontrado!"
+    if (-not (Test-Path $InnoExtract)) {
+        Write-Info "Utilitario innoextract nao encontrado. Baixando automaticamente..."
+        $InnoZip = "$ToolsDir\innoextract.zip"
+        try {
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            Invoke-WebRequest -Uri "https://constexpr.org/innoextract/files/innoextract-1.9-windows.zip" -OutFile $InnoZip -UseBasicParsing
+            Expand-Archive -Path $InnoZip -DestinationPath "$ToolsDir\innoextract" -Force
+            Write-Success "Utilitario innoextract configurado com sucesso."
+        } catch {
+            Write-Warn "Falha ao baixar innoextract: $_"
+        }
     }
+
+    if (-not (Test-Path $CrossInstaller)) {
+        Write-Info "Instalador cruzado FPC Android nao encontrado. Baixando FPC 3.2.2 Android oficial (~100 MB)..."
+        try {
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            $fpcUrl = "https://downloads.sourceforge.net/project/freepascal/Win32/3.2.2/fpc-3.2.2.i386-win32.cross.android.exe"
+            Invoke-WebRequest -Uri $fpcUrl -OutFile $CrossInstaller -UseBasicParsing
+            Write-Success "Instalador cruzado FPC Android baixado com sucesso."
+        } catch {
+            Write-Err "Nao foi possivel baixar automaticamente o compilador cruzado FPC."
+            throw "Por favor, baixe o arquivo 'fpc-3.2.2.i386-win32.cross.android.exe' e coloque na pasta '$ToolsDir'."
+        }
+    }
+
     if (-not (Test-Path $InnoExtract)) {
         throw "Utilitario innoextract.exe nao encontrado em $InnoExtract!"
     }
