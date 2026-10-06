@@ -86,19 +86,65 @@ d:\Projetos AntiGravity\LazarusAndroid\
 
 ---
 
-## 📱 Paleta de Componentes Mobile "LazDroid"
+## 📱 Suíte Completa de Componentes Mobile "LazDroid" (30 Componentes)
 
-Para acelerar o desenvolvimento de aplicações comerciais e corporativas no Android sem depender apenas de controles de desktop, o LazDroid disponibiliza a paleta **`LazDroid`** no Lazarus Form Designer:
+O **LazDroid** disponibiliza uma biblioteca completa de **30 componentes mobile touch-first**, projetados especificamente para telas de toque Android (Material Design & iOS look-and-feel), eliminando a limitação dos controles tradicionais de desktop do Lazarus.
 
-| Componente | Ícone / Tipo | Finalidade Mobile |
+Todos os componentes ficam disponíveis na paleta **`LazDroid`** do Form Designer:
+
+### 🧭 Navegação & Estrutura
+| Componente | Tipo / Ícone | Descrição & Recursos Mobile |
 | :--- | :---: | :--- |
-| **`TLazDroidAppBar`** | 🧭 Top Bar | Barra superior com título, subtítulo, botão Voltar (`OnBackClick`) e ícone de ação/menu (`OnActionClick`). |
-| **`TLazDroidButton`** | 🔘 Touch Button | Botão com cantos arredondados, altura mínima para touch (48px), variantes semânticas (*Primary, Success, Danger, Outline*) e ícones geométricos. |
-| **`TLazDroidEdit`** | ✏️ Input Field | Campo de entrada com *placeholder*, bordas arredondadas e **acionamento automático do teclado virtual Android**. |
-| **`TLazDroidCard`** | 🃏 Card Container | Cartão mobile para métricas, gráficos ou agrupamentos com cantos arredondados e cabeçalho opcional. |
-| **`TLazDroidBadge`** | 🏷️ Status Pill | Pílula/etiqueta com cores semânticas (*Ativo, Pendente, Aprovado, R$ Valor*). |
-| **`TLazDroidBottomNav`** | 📌 Tab Bar | Barra de navegação inferior com abas táteis, indicador de seleção ativa e evento `OnTabSelected`. |
-| **`TLazDroidListView`** | 📋 Card List | Lista de registros touch com título, subtítulo, valor à direita e **rolagem por arrasto (drag scroll)**. |
+| **`TLazDroidAppBar`** | 🧭 Top Bar | Barra superior mobile com título, subtítulo dinâmico, botão Voltar (`OnBackClick`) e menu de ações (`OnActionClick`). |
+| **`TLazDroidBottomNav`** | 📌 Tab Bar | Barra de navegação inferior por abas táteis com suporte a ícones vetoriais automáticos, badges numéricos e evento `OnTabSelected`. |
+| **`TLazDroidBottomSheet`** | 📥 Modal Drawer | Painel deslizante inferior (gaveta modal) com puxador tátil, ideal para filtros avançados, opções de compartilhamento e ações. |
+| **`TLazDroidSpeedDial`** | ⚡ Floating Menu | Botão de ação flutuante expansível que revela múltiplos sub-botões circulares com rotação de ícone ao toque. |
+| **`TLazDroidLayout`** | 📐 Responsive Box | Container responsivo de tela com suporte a preenchimento inteligente, bordas arredondadas e rolagem vertical suave. |
+
+### ✏️ Entrada de Dados & Formulários
+| Componente | Tipo / Ícone | Descrição & Recursos Mobile |
+| :--- | :---: | :--- |
+| **`TLazDroidEdit`** | ✏️ Input Field | Campo de entrada moderno com *placeholder*, cantos arredondados e **acionamento automático do teclado virtual nativo do Android**. |
+| **`TLazDroidSearchBar`** | 🔍 Search Bar | Barra de pesquisa com ícone de lupa, botão de limpeza rápida (`X`), cantos em pílula e evento disparado ao digitar (`OnSearch`). |
+| **`TLazDroidOtpBox`** | 🔢 PIN / OTP Input | Entrada de código de verificação (PIN/SMS de 4 a 6 dígitos) em caixas individuais com salto automático de foco entre os dígitos. |
+| **`TLazDroidDatePicker`** | 📅 Date Picker | Seletor de data mobile moderno com calendário popup touch-friendly e formatação regional brasileira automática. |
+| **`TLazDroidTimePicker`** | ⏰ Time Picker | Seletor de hora e minutos com alternância 12h/24h e controles em carrossel tátil. |
+| **`TLazDroidCheckBox`** | ☑️ CheckBox | Caixa de seleção touch ampliada com animação de preenchimento, ícone de verificação e texto explicativo. |
+| **`TLazDroidSwitch`** | 🎚️ Toggle Switch | Interruptor moderno liga/desliga estilo iOS/Material com transição animada e suporte a cores ativas/inativas. |
+| **`TLazDroidRadioGroup`** | 🔘 Radio Group | Grupo de opções com seleção mutuamente exclusiva, layout vertical/horizontal e áreas de toque confortáveis. |
+| **`TLazDroidSegmentedControl`** | 📑 Segments | Seletor horizontal segmentado com indicador deslizante, ideal para alternância rápida de visualização ou filtros de status. |
+| **`TLazDroidChipGroup`** | 🏷️ Filter Chips | Conjunto dinâmico de tags/chips com seleção única ou múltipla para categorização rápida e filtros de catálogo. |
+
+### 📋 Listas & Exibição de Dados
+| Componente | Tipo / Ícone | Descrição & Recursos Mobile |
+| :--- | :---: | :--- |
+| **`TLazDroidListView`** | 📋 Card List | Lista de registros touch com título, subtítulo, badges, imagens 32-bit, valores monetários à direita e **rolagem por arrasto (drag scroll)**. |
+| **`TLazDroidCard`** | 🃏 Surface Card | Cartão com elevação, sombra suave, cabeçalho e cantos arredondados para agrupar blocos de informações. |
+| **`TLazDroidMetricCard`** | 📊 KPI Card | Cartão especializado para painéis e dashboards de vendas com indicador numérico, rótulo e badge percentual de variação. |
+| **`TLazDroidSectionHeader`** | 📑 Section Header | Separador visual de seções com título em destaque e botão de ação textual à direita (*ex: "Ver todos"*). |
+| **`TLazDroidImageList`** | 🖼️ Image Manager | Gerenciador de ícones e fotos móveis com suporte a transparência alfa real de 32-bit (PNG) sem perda de qualidade visual. |
+
+### 🔘 Ações, Botões & Feedback
+| Componente | Tipo / Ícone | Descrição & Recursos Mobile |
+| :--- | :---: | :--- |
+| **`TLazDroidButton`** | 🔘 Action Button | Botão com área de toque mínima de 48px, estilos semânticos (*Primary, Success, Danger, Outline*) e ícones vetoriais. |
+| **`TLazDroidFAB`** | ➕ Action Button | Floating Action Button circular elevado com sombra projetada, ideal para a ação principal da tela (*ex: Novo Pedido*). |
+| **`TLazDroidBadge`** | 🏷️ Status Pill | Pílula semântica de destaque para status (*Pendente, Concluído, Cancelado*) ou contadores de notificação (*ex: 3*). |
+| **`TLazDroidProgressBar`** | ⏳ Progress Bar | Barra de progresso com animação suave, indicador percentual centralizado e cores customizáveis por estado. |
+| **`TLazDroidSlider`** | 🎚️ Value Slider | Controle deslizante tátil com indicador numérico flutuante para ajuste contínuo de quantidades, volumes ou faixas de preço. |
+| **`TLazDroidActivityIndicator`** | 🔄 Spinner | Indicador de carregamento assíncrono com anel giratório moderno, ideal para feedback de consultas ao SQLite ou APIs. |
+
+### 📱 Recursos Especiais Mobile
+| Componente | Tipo / Ícone | Descrição & Recursos Mobile |
+| :--- | :---: | :--- |
+| **`TLazDroidRatingBar`** | ⭐ Star Rating | Avaliação por estrelas táteis (1 a 5 estrelas) com suporte a meia-estrela e toque direto no celular. |
+| **`TLazDroidKeypad`** | ⌨️ Numeric Keypad | Teclado numérico virtual mobile dedicado para aplicações de PDV, Frente de Caixa, comandas e digitação ágil de valores. |
+| **`TLazDroidSignaturePad`** | ✍️ Signature Pad | Área de captura de assinatura digital por toque com traço suave e exportação direta para bitmap/imagem. |
+| **`TLazDroidAvatar`** | 👤 Avatar | Foto de perfil circular com iniciais automáticas de fallback e badge de status de conexão (*Online / Ausente*). |
+
+> 📖 **Manual Completo com Exemplos de Código:**  
+> Para consultar a documentação interativa de cada propriedade, evento e exemplo de código Pascal para todos os 30 componentes, abra no seu navegador o arquivo:  
+> [`docs/manual_componentes_lazdroid.html`](docs/manual_componentes_lazdroid.html) (ou execute o atalho `Abrir-Manual-Componentes.cmd`).
 
 ---
 
