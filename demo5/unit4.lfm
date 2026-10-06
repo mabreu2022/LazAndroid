@@ -1,0 +1,10 @@
+object DataModule1: TDataModule1
+  OnCreate = DataModuleCreate
+  OnDestroy = DataModuleDestroy
+  OldCreateOrder = False
+  Height = 699
+  HorizontalOffset = 440
+  VerticalOffset = 40
+  Width = 350
+  PPI = 120
+end
