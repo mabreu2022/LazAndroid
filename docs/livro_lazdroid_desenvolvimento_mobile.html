@@ -1,0 +1,2304 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Livro Oficial de Desenvolvimento Mobile com LazDroid e Free Pascal: Guia Prático da Instalação ao Aplicativo de Força de Vendas com SQLite e Deploy em 1-Clique">
+    <meta name="author" content="Equipe LazDroid & Comunidade Lazarus / Free Pascal">
+    <title>Desenvolvimento Mobile com LazDroid & Free Pascal — O Guia Definitivo</title>
+    <style>
+        /* ==========================================================================
+           LIVRO LAZDROID - DESIGN SYSTEM & PRINT ENGINE
+           ========================================================================== */
+        :root {
+            --primary: #c2410c;         /* Laranja escuro / Terracota elegante */
+            --primary-light: #ffedd5;
+            --primary-dark: #9a3412;
+            --accent: #0284c7;          /* Azul moderno */
+            --accent-light: #e0f2fe;
+            --success: #15803d;
+            --success-light: #dcfce7;
+            --warning: #b45309;
+            --warning-light: #fef3c7;
+            --danger: #b91c1c;
+            --danger-light: #fee2e2;
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-600: #475569;
+            --slate-500: #64748b;
+            --slate-300: #cbd5e1;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --slate-50: #f8fafc;
+            --bg-page: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --code-bg: #0f172a;
+            --code-text: #f8fafc;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-serif: Georgia, Cambria, "Times New Roman", Times, serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        /* Tema Escuro (Web) */
+        body.dark-mode {
+            --bg-page: #0b0f19;
+            --bg-card: #131c2e;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+            --slate-50: #0f172a;
+            --slate-100: #1e293b;
+            --code-bg: #050811;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            line-height: 1.75;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ==========================================================================
+           BARRA DE CONTROLE SUPERIOR (FIXA NA TELA)
+           ========================================================================== */
+        .reader-toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(12px);
+            color: #ffffff;
+            padding: 10px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            box-shadow: var(--shadow-md);
+        }
+
+        .toolbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .toolbar-badge {
+            background: linear-gradient(135deg, #c2410c, #ea580c);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 800;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-tool {
+            background: rgba(255,255,255,0.12);
+            color: #ffffff;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-tool:hover {
+            background: rgba(255,255,255,0.22);
+            border-color: rgba(255,255,255,0.35);
+            transform: translateY(-1px);
+        }
+
+        .btn-tool.btn-primary {
+            background: linear-gradient(135deg, #ea580c, #c2410c);
+            border-color: #ea580c;
+            box-shadow: 0 2px 8px rgba(234, 88, 12, 0.4);
+        }
+
+        .btn-tool.btn-primary:hover {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+        }
+
+        /* Barra de progresso de leitura */
+        .reading-progress-container {
+            position: fixed;
+            top: 53px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            z-index: 999;
+        }
+
+        .reading-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ea580c, #0284c7);
+            transition: width 0.1s ease;
+        }
+
+        /* ==========================================================================
+           ESTRUTURA DO LIVRO (BOOK LAYOUT)
+           ========================================================================== */
+        .book-container {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 40px 24px 80px 24px;
+        }
+
+        /* ==========================================================================
+           CAPA DO LIVRO (COVER PAGE)
+           ========================================================================== */
+        .book-cover {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            border-radius: 20px;
+            color: #ffffff;
+            padding: 80px 48px;
+            margin-bottom: 60px;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+
+        .book-cover::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(234, 88, 12, 0.25) 0%, rgba(2, 132, 199, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .book-cover::after {
+            content: "";
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(2, 132, 199, 0.2) 0%, rgba(234, 88, 12, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .cover-badge-top {
+            display: inline-block;
+            background: rgba(234, 88, 12, 0.2);
+            border: 1px solid rgba(234, 88, 12, 0.5);
+            color: #fdba74;
+            padding: 6px 16px;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 24px;
+        }
+
+        .cover-title {
+            font-size: 42px;
+            font-weight: 900;
+            line-height: 1.15;
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 70%, #fdba74 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cover-subtitle {
+            font-size: 20px;
+            color: #cbd5e1;
+            font-weight: 400;
+            max-width: 780px;
+            margin: 0 auto 36px auto;
+            line-height: 1.5;
+        }
+
+        .cover-features-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 48px;
+        }
+
+        .feature-pill {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #e2e8f0;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .cover-meta {
+            border-top: 1px solid rgba(255,255,255,0.15);
+            padding-top: 28px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        .cover-meta strong {
+            color: #ffffff;
+            display: block;
+            font-size: 15px;
+            margin-top: 2px;
+        }
+
+        /* ==========================================================================
+           FICHA CATALOGRÁFICA & PREFÁCIO
+           ========================================================================== */
+        .book-preface {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 36px;
+            margin-bottom: 50px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .catalog-box {
+            background: var(--slate-50);
+            border-left: 4px solid var(--primary);
+            padding: 16px 20px;
+            font-size: 13px;
+            color: var(--text-muted);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 24px;
+            font-family: var(--font-mono);
+            line-height: 1.6;
+        }
+
+        /* ==========================================================================
+           SUMÁRIO EXECUTIVO (TOC)
+           ========================================================================== */
+        .book-toc {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 36px;
+            margin-bottom: 60px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .toc-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 12px;
+        }
+
+        .toc-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toc-chapter-item {
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 10px;
+        }
+
+        .toc-chapter-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 16px;
+            transition: color 0.2s ease;
+        }
+
+        .toc-chapter-link:hover {
+            color: var(--primary);
+        }
+
+        .toc-sublist {
+            list-style: none;
+            margin-top: 8px;
+            padding-left: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .toc-sublink {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            transition: color 0.2s ease;
+        }
+
+        .toc-sublink:hover {
+            color: var(--accent);
+        }
+
+        /* ==========================================================================
+           CAPÍTULOS E CONTEÚDO PRINCIPAL
+           ========================================================================== */
+        .book-chapter {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 48px;
+            margin-bottom: 50px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+
+        .chapter-header {
+            margin-bottom: 36px;
+            border-bottom: 2px solid var(--slate-100);
+            padding-bottom: 20px;
+        }
+
+        .chapter-tag {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+
+        .chapter-title {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--slate-900);
+            line-height: 1.25;
+            letter-spacing: -0.5px;
+        }
+
+        body.dark-mode .chapter-title {
+            color: #ffffff;
+        }
+
+        .chapter-intro {
+            font-size: 18px;
+            color: var(--text-muted);
+            margin-top: 12px;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--slate-800);
+            margin: 36px 0 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+
+        body.dark-mode .section-title {
+            color: #f1f5f9;
+        }
+
+        .section-title::before {
+            content: "";
+            display: inline-block;
+            width: 4px;
+            height: 22px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .subsection-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--slate-700);
+            margin: 24px 0 12px 0;
+        }
+
+        body.dark-mode .subsection-title {
+            color: #cbd5e1;
+        }
+
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+
+        /* ==========================================================================
+           DIAGRAMAS, TABELAS E CARDS DE CONTEÚDO
+           ========================================================================== */
+        .diagram-box {
+            background: var(--slate-50);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            text-align: center;
+        }
+
+        .diagram-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .diagram-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .diagram-node {
+            background: #ffffff;
+            border: 2px solid var(--slate-300);
+            border-radius: 10px;
+            padding: 12px 18px;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: var(--shadow-sm);
+            color: var(--slate-800);
+            min-width: 140px;
+        }
+
+        .diagram-node.highlight {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .diagram-node.accent {
+            border-color: var(--accent);
+            background: var(--accent-light);
+            color: #0369a1;
+        }
+
+        .diagram-arrow {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--slate-400);
+        }
+
+        /* Tabelas Estilizadas */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            margin: 24px 0;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            background: var(--bg-card);
+        }
+
+        th {
+            background: var(--slate-100);
+            color: var(--slate-800);
+            padding: 12px 16px;
+            font-weight: 700;
+            text-align: left;
+            border-bottom: 2px solid var(--border);
+        }
+
+        body.dark-mode th {
+            background: #1e293b;
+            color: #f1f5f9;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:nth-child(even) td {
+            background: rgba(0,0,0,0.015);
+        }
+
+        body.dark-mode tr:nth-child(even) td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        /* ==========================================================================
+           CALLOUTS / ALERTAS DE DESTAQUE
+           ========================================================================== */
+        .callout {
+            border-radius: 10px;
+            padding: 18px 22px;
+            margin: 24px 0;
+            border-left: 5px solid;
+            font-size: 14.5px;
+            line-height: 1.6;
+        }
+
+        .callout-title {
+            font-weight: 700;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .callout-info {
+            background: #eff6ff;
+            border-color: #3b82f6;
+            color: #1e3a8a;
+        }
+
+        .callout-success {
+            background: #f0fdf4;
+            border-color: #22c55e;
+            color: #14532d;
+        }
+
+        .callout-warning {
+            background: #fffbeb;
+            border-color: #f59e0b;
+            color: #78350f;
+        }
+
+        .callout-danger {
+            background: #fef2f2;
+            border-color: #ef4444;
+            color: #7f1d1d;
+        }
+
+        body.dark-mode .callout-info { background: #172554; color: #bfdbfe; }
+        body.dark-mode .callout-success { background: #052e16; color: #bbf7d0; }
+        body.dark-mode .callout-warning { background: #451a03; color: #fde68a; }
+        body.dark-mode .callout-danger { background: #450a0a; color: #fecaca; }
+
+        /* ==========================================================================
+           BLOCOS DE CÓDIGO (SYNTAX HIGHLIGHTING SUAVE)
+           ========================================================================== */
+        .code-container {
+            background: var(--code-bg);
+            border-radius: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .code-header {
+            background: rgba(255,255,255,0.05);
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 12px;
+            font-family: var(--font-mono);
+            color: #94a3b8;
+        }
+
+        .copy-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.2);
+            color: #ffffff;
+        }
+
+        pre {
+            padding: 18px 20px;
+            overflow-x: auto;
+            color: var(--code-text);
+            font-family: var(--font-mono);
+            font-size: 13.5px;
+            line-height: 1.6;
+        }
+
+        code {
+            font-family: var(--font-mono);
+        }
+
+        p code, li code, td code {
+            background: var(--slate-100);
+            color: var(--primary-dark);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        body.dark-mode p code, body.dark-mode li code, body.dark-mode td code {
+            background: #1e293b;
+            color: #fdba74;
+        }
+
+        /* Cores de sintaxe Pascal */
+        .syn-kwd { color: #f43f5e; font-weight: 700; }    /* Palavras-chave: procedure, class, begin, var */
+        .syn-type { color: #38bdf8; font-weight: 600; }   /* Tipos: string, Boolean, Integer, TLazDroidEdit */
+        .syn-str { color: #a3e635; }                      /* Strings: 'texto' */
+        .syn-num { color: #fbbf24; }                      /* Números: 123, 0.45 */
+        .syn-com { color: #64748b; font-style: italic; }  /* Comentários: // ou { } */
+        .syn-dir { color: #c084fc; font-weight: 700; }    /* Diretivas: {$mode objfpc} */
+
+        /* ==========================================================================
+           GRID DE COMPONENTES
+           ========================================================================== */
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .component-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .component-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .component-name {
+            font-weight: 800;
+            font-size: 16px;
+            color: var(--primary-dark);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .component-badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            background: var(--slate-100);
+            border-radius: 9999px;
+            color: var(--slate-600);
+            font-weight: 600;
+        }
+
+        .component-desc {
+            font-size: 13.5px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* ==========================================================================
+           RODAPÉ DO LIVRO
+           ========================================================================== */
+        .book-footer {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-muted);
+            font-size: 14px;
+            border-top: 1px solid var(--border);
+            margin-top: 60px;
+        }
+
+        /* ==========================================================================
+           MOTOR DE IMPRESSÃO PROFISSIONAL (EXPORT TO PDF / PRINT CSS)
+           ========================================================================== */
+        @media print {
+            /* Configuração da Página A4 */
+            @page {
+                size: A4 portrait;
+                margin: 20mm 15mm 20mm 15mm;
+            }
+
+            @page :first {
+                margin: 0; /* Capa sem margens externas */
+            }
+
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                font-size: 11pt !important;
+                line-height: 1.5 !important;
+            }
+
+            .reader-toolbar,
+            .reading-progress-container,
+            .copy-btn,
+            .no-print {
+                display: none !important;
+            }
+
+            .book-container {
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            /* Capa Ocupando Exatamente a 1ª Página */
+            .book-cover {
+                background: #0f172a !important;
+                color: #ffffff !important;
+                min-height: 100vh !important;
+                height: 100vh !important;
+                border-radius: 0 !important;
+                padding: 120px 40px !important;
+                margin: 0 !important;
+                page-break-after: always !important;
+                break-after: page !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .cover-title {
+                color: #ffffff !important;
+                -webkit-text-fill-color: #ffffff !important;
+                font-size: 32pt !important;
+            }
+
+            .cover-subtitle {
+                color: #cbd5e1 !important;
+                font-size: 14pt !important;
+            }
+
+            /* Ficha Catalográfica e Sumário */
+            .book-preface {
+                page-break-after: always !important;
+                break-after: page !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 20px 0 !important;
+            }
+
+            .book-toc {
+                page-break-after: always !important;
+                break-after: page !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 20px 0 !important;
+            }
+
+            /* Cada Capítulo Inicia em Nova Página */
+            .book-chapter {
+                page-break-before: always !important;
+                break-before: page !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 20px 0 !important;
+                margin: 0 !important;
+            }
+
+            .chapter-title {
+                color: #000000 !important;
+                font-size: 22pt !important;
+            }
+
+            .section-title {
+                font-size: 15pt !important;
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+            }
+
+            .subsection-title {
+                font-size: 12pt !important;
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+            }
+
+            /* Evita quebras de página no meio de blocos cruciais */
+            pre, .code-container, .callout, table, tr, .component-card, .diagram-box {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+
+            .code-container {
+                border: 1px solid #cbd5e1 !important;
+                background: #f8fafc !important;
+                color: #0f172a !important;
+            }
+
+            pre {
+                color: #0f172a !important;
+                font-size: 9.5pt !important;
+                background: #f8fafc !important;
+            }
+
+            /* Ajuste de cores para impressão nítida em P&B / Tons de cinza */
+            .syn-kwd { color: #b91c1c !important; }
+            .syn-type { color: #0369a1 !important; }
+            .syn-str { color: #15803d !important; }
+            .syn-num { color: #b45309 !important; }
+            .syn-com { color: #64748b !important; }
+
+            .callout {
+                border: 1px solid #cbd5e1 !important;
+                border-left-width: 5px !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            p code, li code, td code {
+                border: 1px solid #e2e8f0 !important;
+                background: #f1f5f9 !important;
+                color: #0f172a !important;
+            }
+
+            .component-grid {
+                grid-template-columns: 1fr 1fr !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BARRA FIXA DE LEITURA E IMPRESSÃO (NÃO APARECE NO PDF) -->
+    <header class="reader-toolbar no-print">
+        <a href="#inicio" class="toolbar-brand">
+            <span>📖 Livro Oficial LazDroid</span>
+            <span class="toolbar-badge">1ª Edição</span>
+        </a>
+        <div class="toolbar-actions">
+            <button class="btn-tool" onclick="toggleTheme()" title="Alternar entre modo claro e escuro">
+                <span id="theme-icon">🌙</span> Modo Leitura
+            </button>
+            <a href="#sumario" class="btn-tool">
+                📑 Sumário
+            </a>
+            <button class="btn-tool btn-primary" onclick="exportToPdf()" title="Salvar livro completo em formato PDF via janela de impressão">
+                🖨️ Exportar para PDF / Imprimir
+            </button>
+        </div>
+    </header>
+
+    <!-- BARRA DE PROGRESSO DE LEITURA -->
+    <div class="reading-progress-container no-print">
+        <div class="reading-progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- RECIPIENTE PRINCIPAL DO LIVRO -->
+    <div class="book-container" id="inicio">
+
+        <!-- ==========================================================================
+             CAPA DO LIVRO (PAGE 1 EM PDF)
+             ========================================================================== -->
+        <header class="book-cover">
+            <div class="cover-badge-top">Manual Técnico & Guia de Engenharia Mobile</div>
+            <h1 class="cover-title">Desenvolvimento Mobile com LazDroid & Free Pascal</h1>
+            <p class="cover-subtitle">
+                O Guia Definitivo: Da Instalação e Configuração da Toolchain à Construção de um Aplicativo Completo de Força de Vendas com SQLite, Telas Touch-First e Deploy em 1-Clique.
+            </p>
+
+            <div class="cover-features-pills">
+                <span class="feature-pill">⚡ 100% Código Pascal Nativo</span>
+                <span class="feature-pill">📱 Suíte com 30 Controles Touch-First</span>
+                <span class="feature-pill">💾 Banco SQLite Embutido no Android</span>
+                <span class="feature-pill">🚀 Compilação Cruzada AArch64 / ARMv7</span>
+                <span class="feature-pill">🛡️ Layout Delphi Travado sem Bagunça</span>
+            </div>
+
+            <div class="cover-meta">
+                <div>
+                    Publicação Oficial
+                    <strong>Comunidade LazDroid & Pascal</strong>
+                </div>
+                <div>
+                    Edição
+                    <strong>1ª Edição — 2026</strong>
+                </div>
+                <div>
+                    Alvo da Plataforma
+                    <strong>Android 8.0 até 14+ (ARM64)</strong>
+                </div>
+            </div>
+        </header>
+
+        <!-- ==========================================================================
+             FICHA CATALOGRÁFICA E PREFÁCIO
+             ========================================================================== -->
+        <section class="book-preface">
+            <div class="catalog-box">
+                <strong>DADOS INTERNACIONAIS DE CATALOGAÇÃO NA PUBLICAÇÃO (CIP)</strong><br>
+                LazDroid: O Guia Definitivo de Desenvolvimento Mobile com Free Pascal e Lazarus.<br>
+                1. Engenharia de Software Mobile. 2. Free Pascal Compiler (FPC). 3. Lazarus IDE.<br>
+                4. Android NDK e Compilação Cruzada AArch64. 5. Banco de Dados SQLite Embarcado.<br>
+                6. Componentes Visuais Touch-First. I. Título. CDD: 005.133 (Pascal) / 005.432 (Android).
+            </div>
+
+            <h2 class="section-title">Prefácio: O Renascimento do Pascal no Mundo Mobile</h2>
+            <p>
+                Durante décadas, a linguagem Pascal e os ambientes Delphi/Lazarus formaram a espinha dorsal dos sistemas comerciais mais robustos do mundo: ERPs, pontos de venda (PDV), faturamento, automação comercial e logística industrial. No entanto, com a ascensão dos smartphones, desenvolvedores Pascal depararam-se com uma barreira histórica: a complexidade de transpor suas bases de código para telas táteis sem incorrer em pilhas lentas de JavaScript, bibliotecas web pesadas ou reescritas traumáticas em Kotlin e Java.
+            </p>
+            <p>
+                O <strong>LazDroid</strong> nasceu para eliminar definitivamente essa barreira. Mais do que um simples plugin, ele é uma arquitetura de engenharia que integra o compilador <strong>Free Pascal (FPC 3.2.2+)</strong> à infraestrutura do <strong>Android NDK</strong> e ao <strong>Lazarus IDE</strong>, permitindo que você escreva código Pascal puro, compile diretamente para código de máquina <strong>ARM64 (aarch64)</strong> e execute telas fluidas a 60 quadros por segundo.
+            </p>
+            <p>
+                Este livro foi escrito para ser um guia prático de cabeceira. Ele conduz você desde a preparação e blindagem do ambiente de trabalho até a construção completa de um software comercial de <strong>Força de Vendas</strong> com autenticação, catálogo de mercadorias, carrinho e persistência atômica em <strong>SQLite</strong>.
+            </p>
+        </section>
+
+        <!-- ==========================================================================
+             SUMÁRIO COMPLETO (TOC)
+             ========================================================================== -->
+        <nav class="book-toc" id="sumario">
+            <h2 class="toc-title">📑 Sumário do Livro</h2>
+            <ul class="toc-list">
+                <li class="toc-chapter-item">
+                    <a href="#capitulo-1" class="toc-chapter-link">
+                        <span>Capítulo 1: Arquitetura & Fundamentos do LazDroid</span>
+                        <span class="no-print">➜</span>
+                    </a>
+                    <ul class="toc-sublist">
+                        <li><a href="#sec-1-1" class="toc-sublink"><span>1.1 O Desafio Mobile para Desenvolvedores Desktop</span></a></li>
+                        <li><a href="#sec-1-2" class="toc-sublink"><span>1.2 Arquitetura Interna: FPC + LCL CustomDrawn + Scaffold</span></a></li>
+                        <li><a href="#sec-1-3" class="toc-sublink"><span>1.3 Ciclo de Vida da Aplicação no Android</span></a></li>
+                        <li><a href="#sec-1-4" class="toc-sublink"><span>1.4 Compilação Cruzada AArch64 Nativa vs Soluções Híbridas</span></a></li>
+                    </ul>
+                </li>
+
+                <li class="toc-chapter-item">
+                    <a href="#capitulo-2" class="toc-chapter-link">
+                        <span>Capítulo 2: Instalação e Configuração Passo a Passo</span>
+                        <span class="no-print">➜</span>
+                    </a>
+                    <ul class="toc-sublist">
+                        <li><a href="#sec-2-1" class="toc-sublink"><span>2.1 Pré-Requisitos: JDK 17, Android SDK, NDK e FPC</span></a></li>
+                        <li><a href="#sec-2-2" class="toc-sublink"><span>2.2 Instalação com 1-Clique via Script Automatizado</span></a></li>
+                        <li><a href="#sec-2-3" class="toc-sublink"><span>2.3 Instalação Manual dos Pacotes no Lazarus</span></a></li>
+                        <li><a href="#sec-2-4" class="toc-sublink"><span>2.4 Configurando a Toolchain nas Opções da IDE</span></a></li>
+                        <li><a href="#sec-2-5" class="toc-sublink"><span>2.5 Travando o Layout no Estilo Delphi (AnchorDocking)</span></a></li>
+                        <li><a href="#sec-2-6" class="toc-sublink"><span>2.6 Preparação do Smartphone Físico (Depuração USB)</span></a></li>
+                    </ul>
+                </li>
+
+                <li class="toc-chapter-item">
+                    <a href="#capitulo-3" class="toc-chapter-link">
+                        <span>Capítulo 3: Catálogo Completo dos 30 Componentes Mobile</span>
+                        <span class="no-print">➜</span>
+                    </a>
+                    <ul class="toc-sublist">
+                        <li><a href="#sec-3-1" class="toc-sublink"><span>3.1 A Filosofia Touch-First e Áreas de Toque</span></a></li>
+                        <li><a href="#sec-3-2" class="toc-sublink"><span>3.2 Navegação & Estrutura (5 Componentes)</span></a></li>
+                        <li><a href="#sec-3-3" class="toc-sublink"><span>3.3 Entrada de Dados & Formulários (10 Componentes)</span></a></li>
+                        <li><a href="#sec-3-4" class="toc-sublink"><span>3.4 Listas & Exibição de Dados (5 Componentes)</span></a></li>
+                        <li><a href="#sec-3-5" class="toc-sublink"><span>3.5 Ações, Botões & Feedback (6 Componentes)</span></a></li>
+                        <li><a href="#sec-3-6" class="toc-sublink"><span>3.6 Recursos Especiais Mobile (4 Componentes)</span></a></li>
+                    </ul>
+                </li>
+
+                <li class="toc-chapter-item">
+                    <a href="#capitulo-4" class="toc-chapter-link">
+                        <span>Capítulo 4: Projeto Prático — Aplicativo de Força de Vendas com SQLite</span>
+                        <span class="no-print">➜</span>
+                    </a>
+                    <ul class="toc-sublist">
+                        <li><a href="#sec-4-1" class="toc-sublink"><span>4.1 Visão Geral e Arquitetura do Sistema de Vendas</span></a></li>
+                        <li><a href="#sec-4-2" class="toc-sublink"><span>4.2 Modelagem do Banco SQLite e Tratamento de Caminhos</span></a></li>
+                        <li><a href="#sec-4-3" class="toc-sublink"><span>4.3 Implementação do DataModule (Conexão, Consultas e Transações)</span></a></li>
+                        <li><a href="#sec-4-4" class="toc-sublink"><span>4.4 Tela de Login com Teclado Nativo e Validação</span></a></li>
+                        <li><a href="#sec-4-5" class="toc-sublink"><span>4.5 Tela Principal: Abas, Catálogo e Histórico de Pedidos</span></a></li>
+                        <li><a href="#sec-4-6" class="toc-sublink"><span>4.6 Assinatura Digital do Cliente e Fechamento da Venda</span></a></li>
+                    </ul>
+                </li>
+
+                <li class="toc-chapter-item">
+                    <a href="#capitulo-5" class="toc-chapter-link">
+                        <span>Capítulo 5: Compilação, Debug e Deploy em 1-Clique</span>
+                        <span class="no-print">➜</span>
+                    </a>
+                    <ul class="toc-sublist">
+                        <li><a href="#sec-5-1" class="toc-sublink"><span>5.1 O Pipeline de 6 Estágios de Deploy</span></a></li>
+                        <li><a href="#sec-5-2" class="toc-sublink"><span>5.2 O Atalho Ctrl + Shift + F9 e Seleção de Aparelho</span></a></li>
+                        <li><a href="#sec-5-3" class="toc-sublink"><span>5.3 Depuração em Tempo Real com Logcat na IDE</span></a></li>
+                        <li><a href="#sec-5-4" class="toc-sublink"><span>5.4 Geração de APK Release Assinado para Distribuição</span></a></li>
+                    </ul>
+                </li>
+
+                <li class="toc-chapter-item">
+                    <a href="#capitulo-6" class="toc-chapter-link">
+                        <span>Capítulo 6: Boas Práticas, Performance & Solução de Problemas</span>
+                        <span class="no-print">➜</span>
+                    </a>
+                    <ul class="toc-sublist">
+                        <li><a href="#sec-6-1" class="toc-sublink"><span>6.1 Gestão de Memória e Objetos no FPC Android</span></a></li>
+                        <li><a href="#sec-6-2" class="toc-sublink"><span>6.2 Dicas de Otimização no SQLite Mobile</span></a></li>
+                        <li><a href="#sec-6-3" class="toc-sublink"><span>6.3 Resolução dos Erros Mais Frequentes</span></a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- ==========================================================================
+             CAPÍTULO 1: ARQUITETURA & FUNDAMENTOS
+             ========================================================================== -->
+        <article class="book-chapter" id="capitulo-1">
+            <header class="chapter-header">
+                <span class="chapter-tag">Capítulo 1</span>
+                <h2 class="chapter-title">Arquitetura & Fundamentos do LazDroid</h2>
+                <p class="chapter-intro">
+                    Como o LazDroid une a velocidade do código compilado em Free Pascal ao ecossistema moderno do Android através da ponte NDK e do LCL CustomDrawn.
+                </p>
+            </header>
+
+            <h3 class="section-title" id="sec-1-1">1.1 O Desafio Mobile para Desenvolvedores Desktop</h3>
+            <p>
+                Por mais de duas décadas, a maioria dos sistemas corporativos foi projetada para telas de 19 a 27 polegadas com resolução fixa, utilizando teclado físico e cursor de mouse com precisão de um pixel. Quando esses sistemas precisam ser levados para a mão do vendedor externo, do operador de estoque ou do entregador, tentar simplesmente "reduzir" as telas do desktop resulta em uma experiência frustrante: botões minúsculos impossíveis de clicar com o polegar, fontes ilegíveis e janelas modais que quebram o layout.
+            </p>
+            <p>
+                A alternativa clássica seria aprender Kotlin ou Flutter do zero, duplicando toda a lógica de negócios, regras fiscais e cálculos já validados em Pascal. O <strong>LazDroid</strong> elimina esse dilema ao permitir que você mantenha sua lógica de negócio em Pascal, enquanto projeta interfaces com componentes genuinamente móveis.
+            </p>
+
+            <h3 class="section-title" id="sec-1-2">1.2 Arquitetura Interna: FPC + LCL CustomDrawn + Scaffold</h3>
+            <p>
+                Para entender o poder do LazDroid, é indispensável compreender seu fluxo arquitetural. Ao contrário de ferramentas que emulam navegadores dentro de webviews, o LazDroid compila seu código Pascal diretamente para uma biblioteca dinâmica compartilhada (<code>.so</code>) de arquitetura <strong>ARM64 (ELF 64-bit LSB shared object, ARM aarch64)</strong>.
+            </p>
+
+            <div class="diagram-box">
+                <div class="diagram-title">Figura 1.1 — Arquitetura da Solução LazDroid no Android</div>
+                <div class="diagram-flow">
+                    <div class="diagram-node highlight">
+                        <strong>Lazarus IDE</strong><br>
+                        <small>Form Designer & Código Pascal</small>
+                    </div>
+                    <div class="diagram-arrow">➔</div>
+                    <div class="diagram-node">
+                        <strong>FPC Cross (ppca64)</strong><br>
+                        <small>Gera liblclapp.so</small>
+                    </div>
+                    <div class="diagram-arrow">➔</div>
+                    <div class="diagram-node accent">
+                        <strong>Scaffold Gradle</strong><br>
+                        <small>NativeActivity + JNI Bridge</small>
+                    </div>
+                    <div class="diagram-arrow">➔</div>
+                    <div class="diagram-node highlight">
+                        <strong>Dispositivo Android</strong><br>
+                        <small>APK Instalado & Executando</small>
+                    </div>
+                </div>
+            </div>
+
+            <p>
+                A arquitetura divide-se em três pilares fundamentais:
+            </p>
+            <ol style="margin-left: 24px; margin-bottom: 20px;">
+                <li style="margin-bottom: 8px;">
+                    <strong>Motor Visual CustomDrawn:</strong> A interface gráfica é desenhada em tempo real na tela via canvas de alta performance gerenciado pelo LCL CustomDrawn. Isso garante que cada botão, lista ou gráfico tenha exatamente a mesma aparência em qualquer fabricante de smartphone (Samsung, Motorola, Xiaomi).
+                </li>
+                <li style="margin-bottom: 8px;">
+                    <strong>Ponte JNI & Teclado Virtual:</strong> Quando um campo <code>TLazDroidEdit</code> recebe o foco tátil, o LazDroid dispara uma mensagem JNI para a <code>LCLActivity.java</code>, abrindo suavemente o <strong>InputMethodManager</strong> (teclado nativo do Android com corretor e caracteres especiais).
+                </li>
+                <li>
+                    <strong>Scaffold Gradle & Empacotamento:</strong> Um template Android padronizado (com <code>build.gradle</code>, <code>AndroidManifest.xml</code> e recursos) recebe a biblioteca <code>liblclapp.so</code> compilada e gera um arquivo APK assinado pronto para execução.
+                </li>
+            </ol>
+
+            <h3 class="section-title" id="sec-1-3">1.3 Ciclo de Vida da Aplicação no Android</h3>
+            <p>
+                Diferente do Windows, onde uma janela permanece aberta até o usuário clicar no botão Fechar, o Android suspende e retoma aplicativos conforme o usuário atende chamadas, abre outras telas ou desliga o display. O LazDroid intercepta esses eventos nos ganchos da <code>NativeActivity</code>:
+            </p>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Evento Android</th>
+                            <th>Ação no LazDroid</th>
+                            <th>Recomendação para seu Código Pascal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>onCreate / onStart</code></td>
+                            <td>Inicializa o motor LCL e instancia os Forms.</td>
+                            <td>Abrir conexões de banco de dados e carregar preferências locais.</td>
+                        </tr>
+                        <tr>
+                            <td><code>onResume</code></td>
+                            <td>A tela volta a receber toques e foco.</td>
+                            <td>Reativar temporizadores (TTimer) e atualizar status de conexão.</td>
+                        </tr>
+                        <tr>
+                            <td><code>onPause</code></td>
+                            <td>App vai para segundo plano temporariamente.</td>
+                            <td>Efetivar transações pendentes no SQLite com <code>Commit</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>onDestroy</code></td>
+                            <td>App encerrado pelo sistema para liberar RAM.</td>
+                            <td>Liberar instâncias de DataModule e fechar conexões de arquivo.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="section-title" id="sec-1-4">1.4 Compilação Cruzada AArch64 Nativa vs Soluções Híbridas</h3>
+            <p>
+                Frameworks baseados em JavaScript ou HTML/CSS adicionam múltiplas camadas de abstração, resultando em inicialização lenta (efeito <em>white screen</em>) e alto consumo de bateria. Com o LazDroid e o compilador <strong>Free Pascal</strong>:
+            </p>
+            <ul style="margin-left: 24px; margin-bottom: 20px;">
+                <li><strong>Consumo de Memória Mínimo:</strong> Um app LazDroid básico consome menos de 25 MB de memória RAM, permitindo execução fluida até em smartphones de entrada com 2 GB de RAM.</li>
+                <li><strong>Inicialização Instantânea:</strong> Como o binário é código de máquina nativo ELF compilado, o app abre em menos de 400 milissegundos.</li>
+                <li><strong>Independência de Conexão:</strong> A aplicação funciona 100% offline com banco de dados local SQLite, perfeita para vendedores externos que atendem em áreas rurais ou sem sinal de celular.</li>
+            </ul>
+        </article>
+
+        <!-- ==========================================================================
+             CAPÍTULO 2: INSTALAÇÃO E CONFIGURAÇÃO
+             ========================================================================== -->
+        <article class="book-chapter" id="capitulo-2">
+            <header class="chapter-header">
+                <span class="chapter-tag">Capítulo 2</span>
+                <h2 class="chapter-title">Instalação e Configuração Passo a Passo</h2>
+                <p class="chapter-intro">
+                    Guia detalhado para preparar o ambiente de desenvolvimento, instalar as ferramentas, blindar o layout da IDE Lazarus no estilo Delphi e parear seu smartphone via USB.
+                </p>
+            </header>
+
+            <h3 class="section-title" id="sec-2-1">2.1 Pré-Requisitos do Sistema</h3>
+            <p>
+                Antes de iniciar, certifique-se de que seu computador com Windows 10 ou 11 possui os seguintes softwares instalados:
+            </p>
+            <ul style="margin-left: 24px; margin-bottom: 20px;">
+                <li><strong>Lazarus IDE (v2.2, 3.0 ou 3.4+)</strong> de 32 ou 64 bits com Free Pascal 3.2.2 ou superior.</li>
+                <li><strong>Java Development Kit (JDK 17 ou 21)</strong>: Necessário para a execução do Gradle (ex: Eclipse Adoptium Temurin ou JBR do Android Studio).</li>
+                <li><strong>Android SDK Command-Line Tools & Platform-Tools:</strong> Contendo o <code>adb.exe</code> para comunicação com o celular.</li>
+                <li><strong>Android NDK (r21b a r26c):</strong> Fornecendo o linker <code>lld</code> e as bibliotecas C da plataforma Android.</li>
+                <li><strong>Cross-Compiler FPC para Android (ppca64.exe):</strong> Compilador cruzado para a arquitetura <code>aarch64-android</code>.</li>
+            </ul>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Dica de Ouro para o Cross-Compilador FPC</div>
+                A forma mais simples e recomendada de obter o compilador cruzado AArch64 no Windows é através da ferramenta oficial <strong>fpcupdeluxe</strong>: basta selecionar CPU <code>aarch64</code> e OS <code>android</code> e clicar em <em>Install Cross-compiler</em>. Os arquivos serão instalados em <code>C:\lazarus\fpc\3.2.2\bin\i386-win32\ppcrossa64.exe</code>.
+            </div>
+
+            <h3 class="section-title" id="sec-2-2">2.2 Instalação com 1-Clique via Script Automatizado</h3>
+            <p>
+                O repositório do LazDroid acompanha um assistente em lote inteligente chamado <code>Instalar-LazDroid.cmd</code>. Ele automatiza toda a verificação de ferramentas, extração de NDK e registro dos pacotes:
+            </p>
+
+            <div class="code-container">
+                <div class="code-header">
+                    <span>Terminal Windows (CMD ou PowerShell)</span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                </div>
+                <pre><code><span class="syn-com">REM Execute no diretório raiz do projeto LazDroid:</span>
+d:\Projetos AntiGravity\LazarusAndroid\Instalar-LazDroid.cmd</code></pre>
+            </div>
+
+            <p>
+                O script realiza as seguintes verificações automaticamente:
+            </p>
+            <ol style="margin-left: 24px; margin-bottom: 20px;">
+                <li>Localiza o Lazarus e o executável <code>lazbuild.exe</code>.</li>
+                <li>Verifica a presença do compilador cruzado <code>ppcrossa64.exe</code> ou <code>ppca64.exe</code>.</li>
+                <li>Localiza o Android NDK no diretório padrão do Android SDK. Se não encontrar, ele verifica se existe o instalador zip em <code>tools\</code> e o extrai silenciosamente. Caso contrário, oferece o download oficial direto do repositório Google.</li>
+                <li>Compila e registra os pacotes <code>LazDroidDeploy.lpk</code> e <code>LazDroidControls.lpk</code>.</li>
+            </ol>
+
+            <h3 class="section-title" id="sec-2-3">2.3 Instalação Manual dos Pacotes no Lazarus</h3>
+            <p>
+                Se preferir instalar diretamente através da interface gráfica do Lazarus, siga os passos abaixo:
+            </p>
+            <ol style="margin-left: 24px; margin-bottom: 20px;">
+                <li>Abra o <strong>Lazarus IDE</strong>.</li>
+                <li>Acesse o menu: <code>Package ➔ Open Package File (.lpk)...</code></li>
+                <li>Selecione o arquivo do pacote de deploy:
+                    <br><code>d:\Projetos AntiGravity\LazarusAndroid\package\LazDroidDeploy.lpk</code>
+                </li>
+                <li>Na janela do Gerenciador de Pacotes, clique em <strong>Compile</strong> e depois em <strong>Use ➔ Install</strong>.</li>
+                <li>Repita o mesmo procedimento para o pacote de componentes mobile:
+                    <br><code>d:\Projetos AntiGravity\LazarusAndroid\package\LazDroidControls.lpk</code>
+                </li>
+                <li>O Lazarus exibirá um diálogo solicitando confirmação para recompilar a IDE. Clique em <strong>Yes</strong>.</li>
+                <li>Aguarde a recompilação. O Lazarus reiniciará sozinho com o menu e a paleta <strong>LazDroid</strong> ativos.</li>
+            </ol>
+
+            <h3 class="section-title" id="sec-2-4">2.4 Configurando a Toolchain nas Opções da IDE</h3>
+            <p>
+                Após a instalação, abra a configuração central em:
+                <br><code>Tools ➔ Options... ➔ Environment ➔ LazDroid Android Deploy</code>
+            </p>
+            <p>
+                Clique no botão <strong>"Autodetectar Ferramentas"</strong>. A IDE preencherá os caminhos automaticamente:
+            </p>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Caminho Típico no Windows</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Android SDK Root</strong></td>
+                            <td><code>C:\Users\&lt;Usuario&gt;\AppData\Local\Android\Sdk</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Android NDK Root</strong></td>
+                            <td><code>C:\Users\&lt;Usuario&gt;\AppData\Local\Android\Sdk\ndk\25.2.9519653</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Executável ADB</strong></td>
+                            <td><code>C:\Users\&lt;Usuario&gt;\AppData\Local\Android\Sdk\platform-tools\adb.exe</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Java Home (JDK 17+)</strong></td>
+                            <td><code>C:\Program Files\Eclipse Adoptium\jdk-17.0.x-hotspot</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Compilador AArch64</strong></td>
+                            <td><code>C:\lazarus\fpc\3.2.2\bin\i386-win32\ppcrossa64.exe</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Diretório do Scaffold</strong></td>
+                            <td><code>d:\Projetos AntiGravity\LazarusAndroid\scaffold</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="section-title" id="sec-2-5">2.5 Travando o Layout no Estilo Delphi (AnchorDocking)</h3>
+            <p>
+                Um problema clássico de desenvolvedores que migram do Delphi para o Lazarus é o comportamento do pacote <code>AnchorDocking</code>: ao fechar a IDE ou abrir múltiplos projetos, os painéis laterais (Inspetor de Objetos, Form Designer, Gerenciador de Projetos e Janela de Mensagens) costumam se desencaixar e criar janelas soltas e desordenadas.
+            </p>
+            <p>
+                O LazDroid resolve esse incômodo com um script dedicado que restaura e <strong>marca o arquivo de layout como Somente Leitura (Read-Only)</strong> no Windows, garantindo que a IDE sempre abra no layout limpo e ancorado idêntico ao Delphi:
+            </p>
+
+            <div class="code-container">
+                <div class="code-header">
+                    <span>Executar no CMD do Windows</span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                </div>
+                <pre><code><span class="syn-com">REM Restaura a organização das janelas e trava o layout contra alterações:</span>
+d:\Projetos AntiGravity\LazarusAndroid\Restaurar-Layout-Lazarus.cmd</code></pre>
+            </div>
+
+            <div class="callout callout-success">
+                <div class="callout-title">🔒 Como funciona o bloqueio de layout?</div>
+                O script copia o arquivo mestre com o layout organizado para <code>%APPDATA%\Lazarus\anchordocklayout.xml</code> e em seguida aplica o comando <code>attrib +r</code>. Mesmo se você arrastar uma janela por engano, ao reiniciar o Lazarus seu layout retornará 100% perfeito!
+            </div>
+
+            <h3 class="section-title" id="sec-2-6">2.6 Preparação do Smartphone Físico (Depuração USB)</h3>
+            <p>
+                Para rodar seus aplicativos diretamente em um celular conectado via cabo USB:
+            </p>
+            <ol style="margin-left: 24px; margin-bottom: 20px;">
+                <li>No celular, acesse <strong>Configurações ➔ Sobre o Telefone</strong>.</li>
+                <li>Toque repetidamente 7 vezes sobre a opção <strong>"Número da Versão"</strong> (ou <em>Versão da MIUI/Build Number</em>) até surgir a mensagem <em>"Você agora é um desenvolvedor!"</em>.</li>
+                <li>Volte às configurações, entre em <strong>Opções do Desenvolvedor</strong> e ative:
+                    <br>• <strong>Depuração USB (USB Debugging)</strong>.
+                    <br>• <strong>Instalar via USB (Install via USB)</strong> (em aparelhos Xiaomi/Redmi).
+                </li>
+                <li>Conecte o smartphone ao computador via cabo USB de dados.</li>
+                <li>Na tela do smartphone, surgirá o alerta <em>"Permitir depuração USB deste computador?"</em>. Marque a caixa <strong>"Sempre permitir a partir deste computador"</strong> e toque em <strong>Permitir</strong>.</li>
+                <li>Verifique a conexão abrindo o terminal e executando:
+                    <br><code>adb devices -l</code>
+                    <br>O aparelho deve aparecer com o status <code>device</code>.
+                </li>
+            </ol>
+        </article>
+
+        <!-- ==========================================================================
+             CAPÍTULO 3: CATÁLOGO DOS 30 COMPONENTES MOBILE
+             ========================================================================== -->
+        <article class="book-chapter" id="capitulo-3">
+            <header class="chapter-header">
+                <span class="chapter-tag">Capítulo 3</span>
+                <h2 class="chapter-title">Catálogo Completo dos 30 Componentes Mobile</h2>
+                <p class="chapter-intro">
+                    Referência prática e visual dos 30 controles touch-first da paleta LazDroid, projetados especificamente para interfaces de toque, ergonomia de polegar e alta performance visual.
+                </p>
+            </header>
+
+            <h3 class="section-title" id="sec-3-1">3.1 A Filosofia Touch-First e Áreas de Toque</h3>
+            <p>
+                Projetar para dispositivos móveis exige respeitar a anatomia humana. A ponta do polegar médio ocupa uma área de aproximadamente <strong>48 x 48 pixels lógicos</strong> na tela. Se um botão tiver apenas 24 pixels de altura (padrão de botões de desktop), a taxa de cliques acidentais e erros de digitação ultrapassa 40%.
+            </p>
+            <p>
+                Todos os 30 controles da biblioteca <strong>LazDroid</strong> foram criados do zero respeitando essas diretrizes:
+            </p>
+            <ul style="margin-left: 24px; margin-bottom: 20px;">
+                <li><strong>Padding e Hitbox Generosos:</strong> Altura mínima de 44 a 52 pixels em campos e botões.</li>
+                <li><strong>Rolagem Suave por Arrasto (Drag Scrolling):</strong> Listas que reagem ao gesto natural de deslizar o dedo com desaceleração inercial.</li>
+                <li><strong>Feedback Tátil Visual:</strong> Estados de toque instantâneos (*pressed/active states*) com realce de cor e sombras dinâmicas.</li>
+                <li><strong>Renderização Vetorial Nítida:</strong> Ícones desenhados com matemática vetorial precisa, mantendo nitidez absoluta tanto em telas de 720p quanto em displays de altíssima densidade (AMOLED 1440p).</li>
+            </ul>
+
+            <!-- GRUPO 1: NAVEGAÇÃO -->
+            <h3 class="section-title" id="sec-3-2">3.2 Grupo 1: Navegação & Estrutura (5 Componentes)</h3>
+            <div class="component-grid">
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>🧭 TLazDroidAppBar</span>
+                        <span class="component-badge">Top Bar</span>
+                    </div>
+                    <p class="component-desc">
+                        Barra superior mobile para títulos, subtítulos, botão Voltar automático (<code>OnBackClick</code>) e botões de ação e busca (<code>OnActionClick</code>).
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>📌 TLazDroidBottomNav</span>
+                        <span class="component-badge">Tab Bar</span>
+                    </div>
+                    <p class="component-desc">
+                        Barra de abas inferior ergonômica com suporte a badges numéricos, ícones automáticos de alta resolução e evento de seleção <code>OnTabSelected</code>.
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>📥 TLazDroidBottomSheet</span>
+                        <span class="component-badge">Modal Drawer</span>
+                    </div>
+                    <p class="component-desc">
+                        Painel deslizante que sobe a partir da parte inferior da tela, perfeito para filtros, seleções de pagamento e menus contextuais touch.
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>⚡ TLazDroidSpeedDial</span>
+                        <span class="component-badge">Floating Menu</span>
+                    </div>
+                    <p class="component-desc">
+                        Botão de ação flutuante expansível que se desdobra em sub-botões circulares com animação e rotação de ícone ao toque.
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>📐 TLazDroidLayout</span>
+                        <span class="component-badge">Container</span>
+                    </div>
+                    <p class="component-desc">
+                        Container responsivo com preenchimento interno, cantos arredondados, bordas sutis e capacidade de rolagem vertical fluida para formulários extensos.
+                    </p>
+                </div>
+            </div>
+
+            <!-- GRUPO 2: ENTRADA DE DADOS -->
+            <h3 class="section-title" id="sec-3-3">3.3 Grupo 2: Entrada de Dados & Formulários (10 Componentes)</h3>
+            <div class="component-grid">
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>✏️ TLazDroidEdit</span>
+                        <span class="component-badge">Input</span>
+                    </div>
+                    <p class="component-desc">
+                        Campo de texto moderno com <code>Placeholder</code>, cantos arredondados e suporte nativo à propriedade <code>IsPassword := True</code> com abertura automática do teclado virtual Android.
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>🔍 TLazDroidSearchBar</span>
+                        <span class="component-badge">Search</span>
+                    </div>
+                    <p class="component-desc">
+                        Barra de pesquisa em pílula com ícone de busca, botão de limpeza rápida em 1 toque (<code>X</code>) e evento instantâneo <code>OnSearch</code> ao digitar.
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>🔢 TLazDroidOtpBox</span>
+                        <span class="component-badge">PIN / OTP</span>
+                    </div>
+                    <p class="component-desc">
+                        Entrada segmentada para códigos de verificação de 4 a 6 dígitos com avanço de foco automático e ocultação de caracteres.
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>📅 TLazDroidDatePicker</span>
+                        <span class="component-badge">Date Picker</span>
+                    </div>
+                    <p class="component-desc">
+                        Seletor de data tátil com calendário popup otimizado para dedos e formatação brasileira automática (DD/MM/AAAA).
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>⏰ TLazDroidTimePicker</span>
+                        <span class="component-badge">Time Picker</span>
+                    </div>
+                    <p class="component-desc">
+                        Controle seletor de horários (horas e minutos) com alternância entre formato 12 horas (AM/PM) e 24 horas.
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>☑️ TLazDroidCheckBox</span>
+                        <span class="component-badge">Checkbox</span>
+                    </div>
+                    <p class="component-desc">
+                        Caixa de seleção touch ampliada com ícone de verificação nítido, transição de preenchimento e área de clique de 48px.
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>🎚️ TLazDroidSwitch</span>
+                        <span class="component-badge">Toggle</span>
+                    </div>
+                    <p class="component-desc">
+                        Interruptor liga/desliga estilo iOS/Material com transição animada e suporte a personalização de cores ativas e inativas.
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>🔘 TLazDroidRadioGroup</span>
+                        <span class="component-badge">Radio</span>
+                    </div>
+                    <p class="component-desc">
+                        Grupo de opções mutuamente exclusivas com suporte a alinhamento horizontal ou vertical e espaçamento generoso para toque.
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>📑 TLazDroidSegmentedControl</span>
+                        <span class="component-badge">Tabs</span>
+                    </div>
+                    <p class="component-desc">
+                        Seletor horizontal segmentado com indicador deslizante, ideal para alternar filtros rápidos (ex: Todos / Ativos / Concluídos).
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>🏷️ TLazDroidChipGroup</span>
+                        <span class="component-badge">Chips</span>
+                    </div>
+                    <p class="component-desc">
+                        Conjunto dinâmico de etiquetas/chips com seleção única ou múltipla para categorização de produtos e tags de busca.
+                    </p>
+                </div>
+            </div>
+
+            <!-- GRUPO 3: LISTAS & EXIBIÇÃO -->
+            <h3 class="section-title" id="sec-3-4">3.4 Grupo 3: Listas & Exibição de Dados (5 Componentes)</h3>
+            <div class="component-grid">
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>📋 TLazDroidListView</span>
+                        <span class="component-badge">Lista Touch</span>
+                    </div>
+                    <p class="component-desc">
+                        Lista de alta performance com suporte a rolagem por arrasto (drag scroll), cartões com foto, título, subtítulo, badges e valores monetários à direita.
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>🃏 TLazDroidCard</span>
+                        <span class="component-badge">Surface</span>
+                    </div>
+                    <p class="component-desc">
+                        Cartão com elevação e sombra suave projetada para agrupar blocos lógicos de informação com cantos arredondados elegantes.
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>📊 TLazDroidMetricCard</span>
+                        <span class="component-badge">KPI Card</span>
+                    </div>
+                    <p class="component-desc">
+                        Cartão especializado para painéis de venda e dashboards: exibe grande indicador numérico, título e badge de variação percentual.
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>📑 TLazDroidSectionHeader</span>
+                        <span class="component-badge">Header</span>
+                    </div>
+                    <p class="component-desc">
+                        Divisor visual de seções com título em destaque e botão de ação textual secundário à direita (ex: "Ver todos ➔").
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>🖼️ TLazDroidImageList</span>
+                        <span class="component-badge">Images</span>
+                    </div>
+                    <p class="component-desc">
+                        Repositório de ícones e fotografias mobile com suporte nativo a canal alfa de 32 bits (PNG sem bordas serrilhadas).
+                    </p>
+                </div>
+            </div>
+
+            <!-- GRUPO 4: AÇÕES & FEEDBACK -->
+            <h3 class="section-title" id="sec-3-5">3.5 Grupo 4: Ações, Botões & Feedback (6 Componentes)</h3>
+            <div class="component-grid">
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>🔘 TLazDroidButton</span>
+                        <span class="component-badge">Button</span>
+                    </div>
+                    <p class="component-desc">
+                        Botão semântico com altura mínima para toque, ícones vetoriais embutidos e temas automáticos (<em>Primary, Success, Danger, Outline</em>).
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>➕ TLazDroidFAB</span>
+                        <span class="component-badge">FAB</span>
+                    </div>
+                    <p class="component-desc">
+                        Floating Action Button circular elevado com sombra projetada, ideal para a ação principal da tela (ex: Adicionar Pedido).
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>🏷️ TLazDroidBadge</span>
+                        <span class="component-badge">Badge</span>
+                    </div>
+                    <p class="component-desc">
+                        Pílula compacta de status (ex: "Aprovado", "Pendente") ou contador numérico de notificações (ex: "3 itens no carrinho").
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>⏳ TLazDroidProgressBar</span>
+                        <span class="component-badge">Progress</span>
+                    </div>
+                    <p class="component-desc">
+                        Barra de progresso animada com indicador numérico de porcentagem centralizado e cores customizáveis por faixa de conclusão.
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>🎚️ TLazDroidSlider</span>
+                        <span class="component-badge">Slider</span>
+                    </div>
+                    <p class="component-desc">
+                        Controle deslizante tátil com exibição de valor contínuo flutuante para ajuste fino de quantidades, descontos e valores.
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>🔄 TLazDroidActivityIndicator</span>
+                        <span class="component-badge">Spinner</span>
+                    </div>
+                    <p class="component-desc">
+                        Indicador de carregamento assíncrono com anel giratório moderno, fornecendo feedback ao usuário durante consultas lentas ao SQLite.
+                    </p>
+                </div>
+            </div>
+
+            <!-- GRUPO 5: ESPECIAIS -->
+            <h3 class="section-title" id="sec-3-6">3.6 Grupo 5: Recursos Especiais Mobile (4 Componentes)</h3>
+            <div class="component-grid">
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>⭐ TLazDroidRatingBar</span>
+                        <span class="component-badge">Rating</span>
+                    </div>
+                    <p class="component-desc">
+                        Barra de avaliação por estrelas (1 a 5) com suporte a meia-estrela e captura de toques diretos para satisfação do cliente.
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>⌨️ TLazDroidKeypad</span>
+                        <span class="component-badge">PDV Keypad</span>
+                    </div>
+                    <p class="component-desc">
+                        Teclado numérico virtual dedicado na tela, perfeito para aplicações de frente de caixa, comandas eletrônicas e entrada ágil de valores monetários.
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>✍️ TLazDroidSignaturePad</span>
+                        <span class="component-badge">Assinatura</span>
+                    </div>
+                    <p class="component-desc">
+                        Área de captura de assinatura digital com traço ultra suave por interpolação e método de exportação direta para imagem Bitmap.
+                    </p>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-name">
+                        <span>👤 TLazDroidAvatar</span>
+                        <span class="component-badge">Avatar</span>
+                    </div>
+                    <p class="component-desc">
+                        Foto de perfil circular com suporte a iniciais automáticas de texto em caso de ausência de foto e badge de status (Online/Offline).
+                    </p>
+                </div>
+            </div>
+        </article>
+
+        <!-- ==========================================================================
+             CAPÍTULO 4: PROJETO PRÁTICO - FORÇA DE VENDAS COM SQLITE
+             ========================================================================== -->
+        <article class="book-chapter" id="capitulo-4">
+            <header class="chapter-header">
+                <span class="chapter-tag">Capítulo 4</span>
+                <h2 class="chapter-title">Projeto Prático — Aplicativo de Força de Vendas com SQLite</h2>
+                <p class="chapter-intro">
+                    Construção completa, passo a passo e comentada de uma aplicação comercial real com login de vendedores, catálogo de produtos, histórico de pedidos, métricas de vendas e banco de dados SQLite local.
+                </p>
+            </header>
+
+            <h3 class="section-title" id="sec-4-1">4.1 Visão Geral e Arquitetura do Sistema de Vendas</h3>
+            <p>
+                Para demonstrar o potencial da suíte LazDroid em um cenário do mundo corporativo, projetaremos o aplicativo <strong>Força de Vendas Mobile</strong> (baseado no projeto <code>demo5/</code>). Ele foi estruturado para resolver os requisitos diários de equipes externas:
+            </p>
+            <ul style="margin-left: 24px; margin-bottom: 20px;">
+                <li><strong>Operação 100% Offline:</strong> Todos os cadastros e pedidos ficam gravados no banco de dados local SQLite no celular, dispensando conexão com internet em campo.</li>
+                <li><strong>Segurança:</strong> Tela de login com validação de senha por usuário.</li>
+                <li><strong>Ergonomia Mobile:</strong> Navegação centralizada via <code>TLazDroidBottomNav</code> (Início/Produtos, Pedidos, Clientes, Painel).</li>
+                <li><strong>Desacoplamento por DataModule:</strong> Acesso a banco isolado em <code>TDataModule1</code> (em <code>Unit4.pas</code>), facilitando manutenção e testes.</li>
+            </ul>
+
+            <h3 class="section-title" id="sec-4-2">4.2 Modelagem do Banco SQLite e Tratamento de Caminhos</h3>
+            <p>
+                Um dos pontos mais críticos ao desenvolver com SQLite no Android é saber <strong>onde gravar o arquivo do banco de dados</strong>. No Windows, costumamos salvar ao lado do <code>.exe</code> via <code>ExtractFilePath(ParamStr(0))</code>. No Android, o sistema de arquivos é protegido por sandboxing, e o banco deve ficar no diretório de dados privativo do aplicativo (ex: <code>/data/user/0/&lt;package&gt;/files/app.db</code>).
+            </p>
+            <p>
+                O código a seguir, retirado do <code>Unit4.pas</code>, resolve esse caminho de forma transparente tanto ao testar no computador quanto ao rodar no celular:
+            </p>
+
+            <div class="code-container">
+                <div class="code-header">
+                    <span>Pascal — Unit4.pas (Obtenção do Caminho Multiplataforma)</span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                </div>
+                <pre><code><span class="syn-kwd">function</span> <span class="syn-type">TDataModule1</span>.ObterCaminhoBanco: <span class="syn-type">string</span>;
+<span class="syn-kwd">var</span>
+  AppDir: <span class="syn-type">string</span>;
+<span class="syn-kwd">begin</span>
+  <span class="syn-dir">{$IFDEF ANDROID}</span>
+  <span class="syn-com">// No Android, gravamos no diretório de arquivos privado do pacote:</span>
+  AppDir := <span class="syn-str">'/data/user/0/com.lazarus.android.demo/files'</span>;
+  <span class="syn-kwd">if not</span> DirectoryExists(AppDir) <span class="syn-kwd">then</span>
+    AppDir := <span class="syn-str">'/data/data/com.lazarus.android.demo/files'</span>;
+  ForceDirectories(AppDir);
+  Result := AppDir + <span class="syn-str">'/app.db'</span>;
+  <span class="syn-dir">{$ELSE}</span>
+  <span class="syn-com">// No Desktop (testes locais), usamos a pasta database do projeto:</span>
+  AppDir := ExtractFilePath(ParamStr(<span class="syn-num">0</span>));
+  <span class="syn-kwd">if</span> FileExists(AppDir + <span class="syn-str">'database'</span> + DirectorySeparator + <span class="syn-str">'app.db'</span>) <span class="syn-kwd">then</span>
+    Result := AppDir + <span class="syn-str">'database'</span> + DirectorySeparator + <span class="syn-str">'app.db'</span>
+  <span class="syn-kwd">else</span>
+  <span class="syn-kwd">begin</span>
+    ForceDirectories(AppDir + <span class="syn-str">'database'</span>);
+    Result := AppDir + <span class="syn-str">'database'</span> + DirectorySeparator + <span class="syn-str">'app.db'</span>;
+  <span class="syn-kwd">end</span>;
+  <span class="syn-dir">{$ENDIF}</span>
+<span class="syn-kwd">end</span>;</code></pre>
+            </div>
+
+            <p>
+                O esquema do banco de dados compreende cinco tabelas fundamentais:
+            </p>
+
+            <div class="code-container">
+                <div class="code-header">
+                    <span>SQL DDL — Estrutura das Tabelas do SQLite</span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                </div>
+                <pre><code><span class="syn-com">-- 1. Usuários do Sistema / Vendedores</span>
+<span class="syn-kwd">CREATE TABLE IF NOT EXISTS</span> usuarios (
+    id <span class="syn-type">INTEGER PRIMARY KEY AUTOINCREMENT</span>,
+    nome <span class="syn-type">VARCHAR(100) NOT NULL</span>,
+    login <span class="syn-type">VARCHAR(50) UNIQUE NOT NULL</span>,
+    senha <span class="syn-type">VARCHAR(50) NOT NULL</span>,
+    nivel <span class="syn-type">VARCHAR(20) DEFAULT</span> <span class="syn-str">'vendedor'</span>
+);
+
+<span class="syn-com">-- 2. Carteira de Clientes</span>
+<span class="syn-kwd">CREATE TABLE IF NOT EXISTS</span> clientes (
+    id <span class="syn-type">INTEGER PRIMARY KEY AUTOINCREMENT</span>,
+    nome <span class="syn-type">VARCHAR(100) NOT NULL</span>,
+    telefone <span class="syn-type">VARCHAR(20)</span>,
+    email <span class="syn-type">VARCHAR(100)</span>,
+    cidade <span class="syn-type">VARCHAR(60)</span>,
+    documento <span class="syn-type">VARCHAR(20)</span>
+);
+
+<span class="syn-com">-- 3. Catálogo de Produtos e Estoque</span>
+<span class="syn-kwd">CREATE TABLE IF NOT EXISTS</span> produtos (
+    id <span class="syn-type">INTEGER PRIMARY KEY AUTOINCREMENT</span>,
+    nome <span class="syn-type">VARCHAR(100) NOT NULL</span>,
+    descricao <span class="syn-type">VARCHAR(200)</span>,
+    preco <span class="syn-type">REAL NOT NULL</span>,
+    estoque <span class="syn-type">INTEGER DEFAULT 0</span>,
+    imagem <span class="syn-type">VARCHAR(100)</span>
+);
+
+<span class="syn-com">-- 4. Cabeçalho de Pedidos</span>
+<span class="syn-kwd">CREATE TABLE IF NOT EXISTS</span> pedidos (
+    id <span class="syn-type">INTEGER PRIMARY KEY AUTOINCREMENT</span>,
+    cliente_id <span class="syn-type">INTEGER NOT NULL</span>,
+    data_hora <span class="syn-type">DATETIME DEFAULT CURRENT_TIMESTAMP</span>,
+    total <span class="syn-type">REAL NOT NULL</span>,
+    status <span class="syn-type">VARCHAR(30) DEFAULT</span> <span class="syn-str">'Pendente'</span>,
+    <span class="syn-kwd">FOREIGN KEY</span>(cliente_id) <span class="syn-kwd">REFERENCES</span> clientes(id)
+);
+
+<span class="syn-com">-- 5. Itens Detalhados do Pedido</span>
+<span class="syn-kwd">CREATE TABLE IF NOT EXISTS</span> itens_pedido (
+    id <span class="syn-type">INTEGER PRIMARY KEY AUTOINCREMENT</span>,
+    pedido_id <span class="syn-type">INTEGER NOT NULL</span>,
+    produto_id <span class="syn-type">INTEGER NOT NULL</span>,
+    quantidade <span class="syn-type">INTEGER NOT NULL</span>,
+    preco_unitario <span class="syn-type">REAL NOT NULL</span>,
+    subtotal <span class="syn-type">REAL NOT NULL</span>,
+    <span class="syn-kwd">FOREIGN KEY</span>(pedido_id) <span class="syn-kwd">REFERENCES</span> pedidos(id),
+    <span class="syn-kwd">FOREIGN KEY</span>(produto_id) <span class="syn-kwd">REFERENCES</span> produtos(id)
+);</code></pre>
+            </div>
+
+            <h3 class="section-title" id="sec-4-3">4.3 Implementação do DataModule (Conexão e Consultas)</h3>
+            <p>
+                O <code>TDataModule1</code> encapsula os componentes <code>TSQLite3Connection</code>, <code>TSQLTransaction</code> e <code>TSQLQuery</code> da paleta <em>SQLdb</em> do Free Pascal.
+            </p>
+
+            <div class="code-container">
+                <div class="code-header">
+                    <span>Pascal — Unit4.pas (Inicialização e Carga Dinâmica de Produtos)</span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                </div>
+                <pre><code><span class="syn-kwd">procedure</span> <span class="syn-type">TDataModule1</span>.CarregarProdutos(AListView: <span class="syn-type">TLazDroidListView</span>; <span class="syn-kwd">const</span> AFiltro: <span class="syn-type">string</span> = <span class="syn-str">''</span>);
+<span class="syn-kwd">var</span>
+  Qry: <span class="syn-type">TSQLQuery</span>;
+  Item: <span class="syn-type">TLazDroidListItem</span>;
+<span class="syn-kwd">begin</span>
+  <span class="syn-kwd">if not</span> Assigned(AListView) <span class="syn-kwd">then</span> Exit;
+  AListView.Items.Clear;
+
+  Qry := <span class="syn-type">TSQLQuery</span>.Create(<span class="syn-kwd">nil</span>);
+  <span class="syn-kwd">try</span>
+    Qry.DataBase := FConn;
+    Qry.Transaction := FTran;
+
+    <span class="syn-kwd">if</span> Trim(AFiltro) = <span class="syn-str">''</span> <span class="syn-kwd">then</span>
+    <span class="syn-kwd">begin</span>
+      Qry.SQL.Text := <span class="syn-str">'SELECT id, nome, descricao, preco, estoque FROM produtos ORDER BY nome'</span>;
+    <span class="syn-kwd">end</span>
+    <span class="syn-kwd">else</span>
+    <span class="syn-kwd">begin</span>
+      Qry.SQL.Text := <span class="syn-str">'SELECT id, nome, descricao, preco, estoque FROM produtos '</span> +
+                      <span class="syn-str">'WHERE nome LIKE :busca OR descricao LIKE :busca ORDER BY nome'</span>;
+      Qry.Params.ParamByName(<span class="syn-str">'busca'</span>).AsString := <span class="syn-str">'%'</span> + AFiltro + <span class="syn-str">'%'</span>;
+    <span class="syn-kwd">end</span>;
+
+    Qry.Open;
+    <span class="syn-kwd">while not</span> Qry.EOF <span class="syn-kwd">do</span>
+    <span class="syn-kwd">begin</span>
+      Item := AListView.Items.Add;
+      Item.Title := Qry.FieldByName(<span class="syn-str">'nome'</span>).AsString;
+      Item.Subtitle := Qry.FieldByName(<span class="syn-str">'descricao'</span>).AsString +
+                       <span class="syn-str">' • Estoque: '</span> + Qry.FieldByName(<span class="syn-str">'estoque'</span>).AsString;
+      Item.Value := Format(<span class="syn-str">'R$ %.2f'</span>, [Qry.FieldByName(<span class="syn-str">'preco'</span>).AsFloat]);
+      Item.Tag := Qry.FieldByName(<span class="syn-str">'id'</span>).AsInteger;
+      Item.Badge := <span class="syn-str">'DISPONÍVEL'</span>;
+      Item.BadgeColor := clGreen;
+      Item.IconIndex := <span class="syn-num">0</span>;
+      Qry.Next;
+    <span class="syn-kwd">end</span>;
+    Qry.Close;
+  <span class="syn-kwd">finally</span>
+    Qry.Free;
+  <span class="syn-kwd">end</span>;
+<span class="syn-kwd">end</span>;</code></pre>
+            </div>
+
+            <h3 class="section-title" id="sec-4-4">4.4 Tela de Login com Teclado Nativo e Validação</h3>
+            <p>
+                A tela de autenticação inicial (<code>Unit1.pas</code>) emprega dois componentes <code>TLazDroidEdit</code> e um botão <code>TLazDroidButton</code>. No <code>FormCreate</code>, configuramos o modo senha:
+            </p>
+
+            <div class="code-container">
+                <div class="code-header">
+                    <span>Pascal — Unit1.pas (Validação de Login e Abertura do Form Principal)</span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                </div>
+                <pre><code><span class="syn-kwd">procedure</span> <span class="syn-type">TForm1</span>.FormCreate(Sender: <span class="syn-type">TObject</span>);
+<span class="syn-kwd">begin</span>
+  LazDroidEdit1.Placeholder := <span class="syn-str">'Usuário (admin / vendedor)'</span>;
+  LazDroidEdit2.Placeholder := <span class="syn-str">'Senha (1234)'</span>;
+  LazDroidEdit2.IsPassword := <span class="syn-kwd">True</span>; <span class="syn-com">// Ativa ocultação de caracteres e teclado seguro</span>
+<span class="syn-kwd">end</span>;
+
+<span class="syn-kwd">procedure</span> <span class="syn-type">TForm1</span>.LazDroidButton1Click(Sender: <span class="syn-type">TObject</span>);
+<span class="syn-kwd">var</span>
+  NomeUser, NivelUser: <span class="syn-type">string</span>;
+<span class="syn-kwd">begin</span>
+  <span class="syn-kwd">if</span> Trim(LazDroidEdit1.Text) = <span class="syn-str">''</span> <span class="syn-kwd">then</span>
+  <span class="syn-kwd">begin</span>
+    ShowMessage(<span class="syn-str">'Por favor, informe o seu usuário.'</span>);
+    Exit;
+  <span class="syn-kwd">end</span>;
+
+  <span class="syn-com">// Valida contra a tabela "usuarios" no SQLite via DataModule:</span>
+  <span class="syn-kwd">if</span> Assigned(DataModule1) <span class="syn-kwd">then</span>
+  <span class="syn-kwd">begin</span>
+    <span class="syn-kwd">if</span> DataModule1.ValidarLogin(Trim(LazDroidEdit1.Text), Trim(LazDroidEdit2.Text), NomeUser, NivelUser) <span class="syn-kwd">then</span>
+    <span class="syn-kwd">begin</span>
+      ShowMessage(<span class="syn-str">'Bem-vindo, '</span> + NomeUser + <span class="syn-str">'!'</span>);
+      Form2.Show;
+      Self.Hide;
+    <span class="syn-kwd">end</span>
+    <span class="syn-kwd">else</span>
+      ShowMessage(<span class="syn-str">'Usuário ou senha inválidos. Tente: admin / 1234'</span>);
+  <span class="syn-kwd">end</span>;
+<span class="syn-kwd">end</span>;</code></pre>
+            </div>
+
+            <h3 class="section-title" id="sec-4-5">4.5 Tela Principal: Abas, Catálogo e Histórico de Pedidos</h3>
+            <p>
+                O formulário principal (<code>Unit3.pas</code>) implementa o layout mais comum em aplicações móveis modernas:
+            </p>
+            <ul style="margin-left: 24px; margin-bottom: 20px;">
+                <li><strong>No Topo:</strong> <code>TLazDroidAppBar</code> com botão Voltar e título dinâmico da tela.</li>
+                <li><strong>No Centro:</strong> Barra de busca <code>TLazDroidSearchBar</code> e lista <code>TLazDroidListView</code> com rolagem inercial por arrasto.</li>
+                <li><strong>No Rodapé:</strong> <code>TLazDroidBottomNav</code> com quatro abas:
+                    <br>• <strong>Índice 0:</strong> Início / Produtos (Catálogo geral).
+                    <br>• <strong>Índice 1:</strong> Pedidos (Histórico de vendas e totais).
+                    <br>• <strong>Índice 2:</strong> Clientes (Telefone, e-mail e documento).
+                    <br>• <strong>Índice 3:</strong> Painel (Métricas de desempenho e resumo de vendas).
+                </li>
+            </ul>
+
+            <div class="code-container">
+                <div class="code-header">
+                    <span>Pascal — Unit3.pas (Alternância de Abas no BottomNav)</span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                </div>
+                <pre><code><span class="syn-kwd">procedure</span> <span class="syn-type">TForm2</span>.LazDroidBottomNav1TabSelected(Sender: <span class="syn-type">TObject</span>; AIndex: <span class="syn-type">Integer</span>);
+<span class="syn-kwd">begin</span>
+  <span class="syn-kwd">case</span> AIndex <span class="syn-kwd">of</span>
+    <span class="syn-num">0</span>: <span class="syn-com">// Aba Início / Produtos</span>
+    <span class="syn-kwd">begin</span>
+      LazDroidAppBar1.Title := <span class="syn-str">'Início / Produtos'</span>;
+      LazDroidAppBar1.Subtitle := <span class="syn-str">'Catálogo de Itens Disponíveis'</span>;
+      LazDroidEdit1.Placeholder := <span class="syn-str">'Pesquisar produto pelo nome...'</span>;
+      <span class="syn-kwd">if</span> Assigned(DataModule1) <span class="syn-kwd">then</span>
+        DataModule1.CarregarProdutos(LazDroidListView1);
+    <span class="syn-kwd">end</span>;
+
+    <span class="syn-num">1</span>: <span class="syn-com">// Aba Pedidos</span>
+    <span class="syn-kwd">begin</span>
+      LazDroidAppBar1.Title := <span class="syn-str">'Pedidos'</span>;
+      LazDroidAppBar1.Subtitle := <span class="syn-str">'Histórico de Vendas em Campo'</span>;
+      LazDroidEdit1.Placeholder := <span class="syn-str">'Buscar pedido por cliente...'</span>;
+      <span class="syn-kwd">if</span> Assigned(DataModule1) <span class="syn-kwd">then</span>
+        DataModule1.CarregarPedidos(LazDroidListView1);
+    <span class="syn-kwd">end</span>;
+
+    <span class="syn-num">2</span>: <span class="syn-com">// Aba Clientes</span>
+    <span class="syn-kwd">begin</span>
+      LazDroidAppBar1.Title := <span class="syn-str">'Clientes'</span>;
+      LazDroidAppBar1.Subtitle := <span class="syn-str">'Carteira e Contatos'</span>;
+      LazDroidEdit1.Placeholder := <span class="syn-str">'Buscar cliente por nome ou cidade...'</span>;
+      <span class="syn-kwd">if</span> Assigned(DataModule1) <span class="syn-kwd">then</span>
+        DataModule1.CarregarClientes(LazDroidListView1);
+    <span class="syn-kwd">end</span>;
+
+    <span class="syn-num">3</span>: <span class="syn-com">// Aba Painel / Dashboard</span>
+    <span class="syn-kwd">begin</span>
+      LazDroidAppBar1.Title := <span class="syn-str">'Painel de Vendas'</span>;
+      LazDroidAppBar1.Subtitle := <span class="syn-str">'Desempenho Comercial'</span>;
+      <span class="syn-com">// Exibição de totais consolidados</span>
+    <span class="syn-kwd">end</span>;
+  <span class="syn-kwd">end</span>;
+<span class="syn-kwd">end</span>;</code></pre>
+            </div>
+
+            <h3 class="section-title" id="sec-4-6">4.6 Assinatura Digital do Cliente e Fechamento da Venda</h3>
+            <p>
+                No fechamento de um pedido presencial, coletar a assinatura do cliente na própria tela do celular é um recurso de alto valor para comprovação de entrega. Usando o componente <code>TLazDroidSignaturePad</code>:
+            </p>
+
+            <div class="code-container">
+                <div class="code-header">
+                    <span>Pascal — Captura e Exportação da Assinatura Digital</span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                </div>
+                <pre><code><span class="syn-kwd">procedure</span> <span class="syn-type">TForm2</span>.ConfirmarEntregaPedido(APedidoId: <span class="syn-type">Integer</span>);
+<span class="syn-kwd">var</span>
+  BmpAssinatura: <span class="syn-type">TBitmap</span>;
+  CaminhoArquivo: <span class="syn-type">string</span>;
+<span class="syn-kwd">begin</span>
+  <span class="syn-kwd">if</span> LazDroidSignaturePad1.IsEmpty <span class="syn-kwd">then</span>
+  <span class="syn-kwd">begin</span>
+    ShowMessage(<span class="syn-str">'Solicite a assinatura do cliente antes de confirmar.'</span>);
+    Exit;
+  <span class="syn-kwd">end</span>;
+
+  BmpAssinatura := <span class="syn-type">TBitmap</span>.Create;
+  <span class="syn-kwd">try</span>
+    <span class="syn-com">// Exporta o traço vetorial desenhado pelo cliente na tela para bitmap:</span>
+    LazDroidSignaturePad1.SaveToBitmap(BmpAssinatura);
+
+    CaminhoArquivo := DataModule1.ObterDiretorioArquivos + <span class="syn-str">'/assinatura_'</span> + IntToStr(APedidoId) + <span class="syn-str">'.png'</span>;
+    BmpAssinatura.SaveToFile(CaminhoArquivo);
+
+    ShowMessage(<span class="syn-str">'Pedido #'</span> + IntToStr(APedidoId) + <span class="syn-str">' confirmado com sucesso!'</span>);
+  <span class="syn-kwd">finally</span>
+    BmpAssinatura.Free;
+  <span class="syn-kwd">end</span>;
+<span class="syn-kwd">end</span>;</code></pre>
+            </div>
+        </article>
+
+        <!-- ==========================================================================
+             CAPÍTULO 5: COMPILAÇÃO, DEBUG E DEPLOY
+             ========================================================================== -->
+        <article class="book-chapter" id="capitulo-5">
+            <header class="chapter-header">
+                <span class="chapter-tag">Capítulo 5</span>
+                <h2 class="chapter-title">Compilação, Debug e Deploy em 1-Clique</h2>
+                <p class="chapter-intro">
+                    Como opera a esteira automatizada de deploy do LazDroid: da resolução de ABI ao empacotamento Gradle, instalação via ADB e captura de logs em tempo real.
+                </p>
+            </header>
+
+            <h3 class="section-title" id="sec-5-1">5.1 O Pipeline de 6 Estágios de Deploy</h3>
+            <p>
+                Quando você pressiona <strong>Ctrl + Shift + F9</strong> ou clica em <em>Run ➔ Deploy & Run on Android Device</em>, a unit <code>LazDroidPipeline.pas</code> executa automaticamente uma esteira de 6 fases:
+            </p>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Estágio</th>
+                            <th>Ação Executada</th>
+                            <th>Detalhamento Técnico</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1. Pre-Check</strong></td>
+                            <td>Inspeção do Sistema & Resolução de ABI</td>
+                            <td>Consulta o ADB para identificar se o celular conectado é <code>arm64-v8a</code> (AArch64) ou <code>armeabi-v7a</code> (ARMv7).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2. Compilação Cruzada</strong></td>
+                            <td>Invocação do FPC Cross (ppca64 / ppcarm)</td>
+                            <td>Compila as units Pascal em uma biblioteca compartilhada <code>liblclapp.so</code> com otimizações de nível -O2 ou -O3.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3. Sincronização</strong></td>
+                            <td>Cópia para o Scaffold Android</td>
+                            <td>Copia a <code>liblclapp.so</code> para <code>scaffold/app/src/main/jniLibs/arm64-v8a/</code> e atualiza assets.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>4. Build Gradle</strong></td>
+                            <td>Geração do Pacote APK</td>
+                            <td>Executa <code>gradlew.bat assembleDebug</code> silenciosamente, gerando o arquivo APK instalável.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>5. Instalação ADB</strong></td>
+                            <td>Deploy no Dispositivo Físico</td>
+                            <td>Executa <code>adb install -r app-debug.apk</code> substituindo a versão anterior sem apagar dados do SQLite.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>6. Launch & Monitor</strong></td>
+                            <td>Abertura da Activity & Logcat</td>
+                            <td>Dispara <code>am start -n com.lazarus.android.demo/.LCLActivity</code> e conecta o coletor de logs à aba Messages da IDE.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="section-title" id="sec-5-2">5.2 O Atalho Ctrl + Shift + F9 e Seleção de Aparelho</h3>
+            <p>
+                Se você possuir mais de um smartphone conectado simultaneamente (por exemplo, um aparelho físico de teste e um emulador oficial), o diálogo <strong>LazDroidDeviceSelectDlg</strong> surgirá na tela:
+            </p>
+            <ul style="margin-left: 24px; margin-bottom: 20px;">
+                <li>Exibe o <strong>Modelo Comercial</strong> do celular (ex: <em>Samsung Galaxy S23, Xiaomi Redmi Note 12</em>).</li>
+                <li>Exibe o <strong>Número de Série</strong> do ADB.</li>
+                <li>Exibe a <strong>Arquitetura da CPU</strong> detectada (AArch64 / ARMv7).</li>
+            </ul>
+            <p>
+                Basta selecionar o dispositivo desejado e clicar em <strong>Deploy & Run</strong>. Todo o processo leva tipicamente de 5 a 12 segundos em builds incrementais!
+            </p>
+
+            <h3 class="section-title" id="sec-5-3">5.3 Depuração em Tempo Real com Logcat na IDE</h3>
+            <p>
+                Para depurar mensagens, exceções ou verificar o tempo de execução de queries do SQLite, utilize a unit <code>AndroidLog.pas</code> presente no projeto:
+            </p>
+
+            <div class="code-container">
+                <div class="code-header">
+                    <span>Pascal — Exemplo de Log Direto no Android Logcat</span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                </div>
+                <pre><code><span class="syn-kwd">uses</span>
+  AndroidLog;
+
+<span class="syn-kwd">procedure</span> <span class="syn-type">TForm1</span>.ProcessarVenda;
+<span class="syn-kwd">begin</span>
+  AndroidLogInfo(<span class="syn-str">'LAZDROID'</span>, <span class="syn-str">'Iniciando processamento de venda...'</span>);
+  <span class="syn-kwd">try</span>
+    <span class="syn-com">// Operações de cálculo e banco</span>
+    AndroidLogInfo(<span class="syn-str">'LAZDROID'</span>, <span class="syn-str">'Venda gravada com sucesso no SQLite.'</span>);
+  <span class="syn-kwd">except</span>
+    <span class="syn-kwd">on</span> E: Exception <span class="syn-kwd">do</span>
+      AndroidLogError(<span class="syn-str">'LAZDROID'</span>, <span class="syn-str">'Falha ao processar: '</span> + E.Message);
+  <span class="syn-kwd">end</span>;
+<span class="syn-kwd">end</span>;</code></pre>
+            </div>
+
+            <p>
+                As mensagens enviadas com tag <code>LAZDROID</code> aparecerão instantaneamente na janela de mensagens do Lazarus e no terminal do ADB através do comando <code>adb logcat -s LAZDROID:V</code>.
+            </p>
+
+            <h3 class="section-title" id="sec-5-4">5.4 Geração de APK Release Assinado para Distribuição</h3>
+            <p>
+                Quando seu aplicativo de força de vendas estiver pronto para ser distribuído aos representantes comerciais ou publicado na Google Play Store:
+            </p>
+            <ol style="margin-left: 24px; margin-bottom: 20px;">
+                <li>No Lazarus, mude o modo de compilação para <strong>Release</strong> (com remoção de símbolos de debug <code>-Xs -XX</code> para diminuir o tamanho do binário).</li>
+                <li>Compile a biblioteca para gerar o <code>liblclapp.so</code> otimizado.</li>
+                <li>Navegue até o diretório <code>scaffold/</code> e execute:
+                    <br><code>gradlew assembleRelease</code>
+                </li>
+                <li>O APK final otimizado será gerado em:
+                    <br><code>scaffold/app/build/outputs/apk/release/app-release-unsigned.apk</code>
+                </li>
+                <li>Assine o APK com sua chave corporativa utilizando o utilitário <code>apksigner</code> do Android SDK.</li>
+            </ol>
+        </article>
+
+        <!-- ==========================================================================
+             CAPÍTULO 6: BOAS PRÁTICAS, PERFORMANCE & SOLUÇÃO DE PROBLEMAS
+             ========================================================================== -->
+        <article class="book-chapter" id="capitulo-6">
+            <header class="chapter-header">
+                <span class="chapter-tag">Capítulo 6</span>
+                <h2 class="chapter-title">Boas Práticas, Performance & Solução de Problemas</h2>
+                <p class="chapter-intro">
+                    Diretrizes essenciais de engenharia para obter o máximo desempenho de memória no Free Pascal, manter o SQLite ultra rápido e solucionar os erros mais comuns.
+                </p>
+            </header>
+
+            <h3 class="section-title" id="sec-6-1">6.1 Gestão de Memória e Objetos no FPC Android</h3>
+            <p>
+                Diferente do ecossistema Java/Kotlin que depende de um coletor de lixo (<em>Garbage Collector</em>) com pausas imprevisíveis na execução, o Free Pascal opera com alocação e desalocação determinística na memória RAM:
+            </p>
+            <ul style="margin-left: 24px; margin-bottom: 20px;">
+                <li><strong>Sempre libere objetos criados dinamicamente em blocos <code>try..finally</code>:</strong> Bitmaps, Queries e StringsLists devem ser destruídos com <code>Free</code> ou <code>FreeAndNil</code> assim que concluído seu uso.</li>
+                <li><strong>Evite carregar imagens gigantes na memória:</strong> Fotos tiradas pela câmera do celular com resolução de 50 Megapixels podem consumir mais de 100 MB se carregadas diretamente em um Bitmap. Redimensione a imagem para no máximo 1024x1024 pixels antes de desenhá-la no <code>TLazDroidListView</code>.</li>
+            </ul>
+
+            <h3 class="section-title" id="sec-6-2">6.2 Dicas de Otimização no SQLite Mobile</h3>
+            <p>
+                O SQLite é extremamente rápido, mas a escrita na memória flash dos celulares pode ser lenta se as transações não forem configuradas corretamente:
+            </p>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Regra de Ouro do SQLite: Transações Explícitas</div>
+                Nunca insira 100 registros executando 100 <code>INSERTs</code> soltos! Sem uma transação explícita, o SQLite realiza um acesso físico ao disco (sync flush) para cada registro, demorando até 5 segundos. Envolva todos os inserts em um único bloco <code>FTran.StartTransaction ... FTran.Commit</code> e os 100 registros serão gravados em menos de 15 milissegundos!
+            </div>
+
+            <p>
+                Pragmas recomendados para aplicar logo após conectar ao banco:
+            </p>
+            <div class="code-container">
+                <div class="code-header">
+                    <span>SQL — Pragmas de Alta Performance para Mobile</span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                </div>
+                <pre><code><span class="syn-com">-- Ativa journaling em memória ou WAL para concorrência fluida:</span>
+<span class="syn-kwd">PRAGMA</span> journal_mode = WAL;
+<span class="syn-com">-- Reduz operações de escrita no flash sem comprometer integridade comercial:</span>
+<span class="syn-kwd">PRAGMA</span> synchronous = NORMAL;
+<span class="syn-com">-- Garante suporte a chaves estrangeiras ativas:</span>
+<span class="syn-kwd">PRAGMA</span> foreign_keys = <span class="syn-kwd">ON</span>;</code></pre>
+            </div>
+
+            <h3 class="section-title" id="sec-6-3">6.3 Resolução dos Erros Mais Frequentes</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sintoma / Mensagem de Erro</th>
+                            <th>Causa Raiz</th>
+                            <th>Como Corrigir</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>adb: device unauthorized</code></td>
+                            <td>Chave RSA do computador não foi autorizada no celular.</td>
+                            <td>Desconecte o cabo USB, reconecte e marque <em>"Sempre permitir a partir deste computador"</em> na tela do celular.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Fatal: Can't find unit LazDroidMobileControls</code></td>
+                            <td>Pacote não adicionado aos requisitos do projeto.</td>
+                            <td>No Lazarus, abra <code>Project ➔ Project Inspector ➔ Add ➔ New Requirement</code> e adicione <code>LazDroidControls</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Layout da IDE desconfigurado ao reiniciar</code></td>
+                            <td>Arquivo de layout salvo pelo Lazarus com sobreposição.</td>
+                            <td>Execute o script <code>Restaurar-Layout-Lazarus.cmd</code> na raiz do projeto para travar a interface no modo Delphi.</td>
+                        </tr>
+                        <tr>
+                            <td><code>INSTALL_FAILED_INSUFFICIENT_STORAGE</code></td>
+                            <td>Espaço interno esgotado na memória do celular.</td>
+                            <td>Desinstale versões antigas ou libere ao menos 100 MB de armazenamento no aparelho Android.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <!-- ==========================================================================
+             RODAPÉ DO LIVRO
+             ========================================================================== -->
+        <footer class="book-footer">
+            <p><strong>Desenvolvimento Mobile com LazDroid & Free Pascal</strong></p>
+            <p>Guia Oficial da Comunidade Lazarus & Free Pascal • Publicado sob Licença Aberta</p>
+            <p style="margin-top: 10px; font-size: 12px;">Para dúvidas, sugestões e contribuições, acesse o repositório oficial no GitHub: <code>mabreu2022/LazAndroid</code></p>
+        </footer>
+
+    </div>
+
+    <!-- SCRIPTS INTERATIVOS DO LIVRO -->
+    <script>
+        // Função para acionar a janela de exportação para PDF / Impressão
+        function exportToPdf() {
+            window.print();
+        }
+
+        // Alternância de Tema Claro / Escuro
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.getElementById('theme-icon');
+            if (document.body.classList.contains('dark-mode')) {
+                icon.textContent = '☀️';
+            } else {
+                icon.textContent = '🌙';
+            }
+        }
+
+        // Copiar snippets de código
+        function copyCode(btn) {
+            const pre = btn.parentElement.nextElementSibling;
+            const code = pre.innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = btn.innerText;
+                btn.innerText = 'Copiado! ✓';
+                btn.style.background = '#15803d';
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = '';
+                }, 2000);
+            });
+        }
+
+        // Atualizar barra de progresso de leitura
+        window.addEventListener('scroll', () => {
+            const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            const bar = document.getElementById('progressBar');
+            if (bar) {
+                bar.style.width = scrolled + '%';
+            }
+        });
+    </script>
+</body>
+</html>

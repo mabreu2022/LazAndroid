@@ -1,0 +1,3 @@
+@echo off
+title Abrindo Livro Oficial LazDroid...
+start "" "%~dp0docs\livro_lazdroid_desenvolvimento_mobile.html"

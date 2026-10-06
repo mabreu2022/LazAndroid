@@ -142,9 +142,15 @@ Todos os componentes ficam disponíveis na paleta **`LazDroid`** do Form Designe
 | **`TLazDroidSignaturePad`** | ✍️ Signature Pad | Área de captura de assinatura digital por toque com traço suave e exportação direta para bitmap/imagem. |
 | **`TLazDroidAvatar`** | 👤 Avatar | Foto de perfil circular com iniciais automáticas de fallback e badge de status de conexão (*Online / Ausente*). |
 
-> 📖 **Manual Completo com Exemplos de Código:**  
+> 📖 **Manual de Referência Rápida da Paleta:**  
 > Para consultar a documentação interativa de cada propriedade, evento e exemplo de código Pascal para todos os 30 componentes, abra no seu navegador o arquivo:  
 > [`docs/manual_componentes_lazdroid.html`](docs/manual_componentes_lazdroid.html) (ou execute o atalho `Abrir-Manual-Componentes.cmd`).
+
+> 📚 **Livro Oficial Completo (HTML & Exportação para PDF):**  
+> Criamos um livro técnico completo e diagramado abordando desde a instalação e blindagem do ambiente até a construção do aplicativo comercial de **Força de Vendas com SQLite**:  
+> - **Arquivo:** [`docs/livro_lazdroid_desenvolvimento_mobile.html`](docs/livro_lazdroid_desenvolvimento_mobile.html) (ou execute o atalho `Abrir-Livro-LazDroid.cmd`).  
+> - **Exportação para PDF:** O livro conta com botão integrado no topo para gerar/imprimir em PDF instantaneamente em formato A4, com capa profissional, sumário, paginação e quebra limpa de capítulos.
+
 
 ---
 
