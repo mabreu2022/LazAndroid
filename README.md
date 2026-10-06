@@ -1,5 +1,9 @@
 # LazDroid-Deploy — IDE Plugin & Pipeline de Deploy Android para Lazarus
 
+<p align="center">
+  <b>🇧🇷 Português</b> &nbsp;|&nbsp; <a href="README.en.md">🇺🇸 English</a>
+</p>
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Lazarus: 2.2+](https://img.shields.io/badge/Lazarus-2.2%2B-blue.svg)](https://www.lazarus-ide.org/)
 [![Target: Android](https://img.shields.io/badge/Target-Android%205.0%2B%20(API%2021%2B)-green.svg)](https://developer.android.com)
