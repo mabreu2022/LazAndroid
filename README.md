@@ -242,3 +242,20 @@ Ele organiza a interface no layout profissional acoplado (*AnchorDocking*) idên
 | **Banco SQLite** | ✅ Pronto | Acesso via `libsqlite.so` compilada nativa |
 
 Para detalhes da arquitetura, consulte [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). Para o guia de instalação passo a passo, veja [`docs/INSTALL_GUIDE.md`](docs/INSTALL_GUIDE.md).
+
+---
+
+## 🤝 Como Contribuir com o Projeto
+
+Contribuições de toda a comunidade Delphi, Lazarus e Free Pascal são muito bem-vindas! Se você deseja sugerir uma melhoria, corrigir um bug ou criar um novo componente mobile:
+
+1. Faça um **Fork** do repositório ([github.com/mabreu2022/LazAndroid](https://github.com/mabreu2022/LazAndroid)).
+2. Crie uma branch para sua funcionalidade (`git checkout -b feat/minha-melhoria`).
+3. Desenvolva sua alteração e valide a compilação no Lazarus e cross-compilador AArch64.
+4. Abra um **Pull Request (PR)** detalhando as mudanças realizadas.
+
+> 🛡️ **Política de Governança & Aprovação:**  
+> A branch principal (`main`) possui proteção ativada. Nenhum commit entra diretamente na branch de produção sem passar por **revisão e aprovação explícita do mantenedor (@mabreu2022)**.
+> 
+> Consulte nosso [Guia de Contribuição Completo (`CONTRIBUTING.md`)](CONTRIBUTING.md) e o [Código de Conduta (`CODE_OF_CONDUCT.md`)](CODE_OF_CONDUCT.md).
+
