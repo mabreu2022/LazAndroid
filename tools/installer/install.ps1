@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Instalador e Configurador Automatico do LazDroid-Deploy para Lazarus IDE.
 .DESCRIPTION
@@ -138,7 +138,7 @@ if (-not (Test-Path "$FpcExtracted\bin\i386-win32\ppcrossa64.exe")) {
         try {
             [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
             $fpcUrl = "https://downloads.sourceforge.net/project/freepascal/Win32/3.2.2/fpc-3.2.2.i386-win32.cross.android.exe"
-            Invoke-WebRequest -Uri $fpcUrl -OutFile $CrossInstaller -UseBasicParsing
+            & curl.exe -L -A Wget/1.21.4 -o $CrossInstaller $fpcUrl
             Write-Success "Instalador cruzado FPC Android baixado com sucesso."
         } catch {
             Write-Err "Nao foi possivel baixar automaticamente o compilador cruzado FPC."
