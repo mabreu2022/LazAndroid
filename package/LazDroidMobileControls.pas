@@ -47,6 +47,7 @@ type
     FTitle: string;
     FSubtitle: string;
     FShowBack: Boolean;
+    FLeftIcon: TLazDroidActionIcon;
     FActionIcon: TLazDroidActionIcon;
     FTitleColor: TColor;
     FSubtitleColor: TColor;
@@ -70,6 +71,7 @@ type
     property Title: string read FTitle write FTitle;
     property Subtitle: string read FSubtitle write FSubtitle;
     property ShowBack: Boolean read FShowBack write FShowBack default True;
+    property LeftIcon: TLazDroidActionIcon read FLeftIcon write FLeftIcon default aiBack;
     property ActionIcon: TLazDroidActionIcon read FActionIcon write FActionIcon default aiMenu;
     property BarColor: TColor read FBarColor write FBarColor default $00241A14; // Dark Navy / Indigo
     property TitleColor: TColor read FTitleColor write FTitleColor default clWhite;
@@ -1603,6 +1605,7 @@ begin
   FTitle := 'LazDroid Mobile';
   FSubtitle := '';
   FShowBack := True;
+  FLeftIcon := aiBack;
   FActionIcon := aiMenu;
   FBarColor := $00241A14; // Dark Navy
   FTitleColor := clWhite;
@@ -1646,7 +1649,7 @@ begin
       Canvas.Brush.Color := TColor($003A2A20);
       Canvas.RoundRect(R.Left, R.Top, R.Right, R.Bottom, Height div 8, Height div 8);
     end;
-    DrawMobileIcon(Canvas, aiBack, R, FTitleColor);
+    DrawMobileIcon(Canvas, FLeftIcon, R, FTitleColor);
   end;
 
   if FActionIcon <> aiNone then
@@ -2868,19 +2871,28 @@ begin
   case AShape of
     isCircle:
     begin
+      {$IFNDEF ANDROID}
+      // CustomDrawn/Android: regioes (TLazRegion) corrompem memoria e o clip e no-op
       ClipR := CreateEllipticRgn(ARect.Left, ARect.Top, ARect.Right, ARect.Bottom);
       SelectClipRgn(ACanvas.Handle, ClipR);
+      {$ENDIF}
       ACanvas.StretchDraw(ARect, Item.Picture.Graphic);
+      {$IFNDEF ANDROID}
       SelectClipRgn(ACanvas.Handle, 0);
       DeleteObject(ClipR);
+      {$ENDIF}
     end;
     isRoundedSquare:
     begin
+      {$IFNDEF ANDROID}
       ClipR := CreateRoundRectRgn(ARect.Left, ARect.Top, ARect.Right + 1, ARect.Bottom + 1, 14, 14);
       SelectClipRgn(ACanvas.Handle, ClipR);
+      {$ENDIF}
       ACanvas.StretchDraw(ARect, Item.Picture.Graphic);
+      {$IFNDEF ANDROID}
       SelectClipRgn(ACanvas.Handle, 0);
       DeleteObject(ClipR);
+      {$ENDIF}
     end;
     isSquare:
     begin
@@ -3297,19 +3309,27 @@ begin
         case Item.ImageShape of
           isCircle:
           begin
+            {$IFNDEF ANDROID}
             ClipR := CreateEllipticRgn(ImgR.Left, ImgR.Top, ImgR.Right, ImgR.Bottom);
             SelectClipRgn(Canvas.Handle, ClipR);
+            {$ENDIF}
             Canvas.StretchDraw(ImgR, Item.Picture.Graphic);
+            {$IFNDEF ANDROID}
             SelectClipRgn(Canvas.Handle, 0);
             DeleteObject(ClipR);
+            {$ENDIF}
           end;
           isRoundedSquare:
           begin
+            {$IFNDEF ANDROID}
             ClipR := CreateRoundRectRgn(ImgR.Left, ImgR.Top, ImgR.Right + 1, ImgR.Bottom + 1, 14, 14);
             SelectClipRgn(Canvas.Handle, ClipR);
+            {$ENDIF}
             Canvas.StretchDraw(ImgR, Item.Picture.Graphic);
+            {$IFNDEF ANDROID}
             SelectClipRgn(Canvas.Handle, 0);
             DeleteObject(ClipR);
+            {$ENDIF}
           end;
           isSquare:
           begin
@@ -6825,5 +6845,41 @@ end;
 
 initialization
   {$I LazDroidControls.lrs}
+  RegisterClasses([
+    TLazDroidAppBar,
+    TLazDroidButton,
+    TLazDroidEdit,
+    TLazDroidCard,
+    TLazDroidBadge,
+    TLazDroidSwitch,
+    TLazDroidActivityIndicator,
+    TLazDroidFAB,
+    TLazDroidLayout,
+    TLazDroidBottomNav,
+    TLazDroidListView,
+    TLazDroidImageList,
+    TLazDroidDatePicker,
+    TLazDroidTimePicker,
+    TLazDroidProgressBar,
+    TLazDroidSlider,
+    TLazDroidSegmentedControl,
+    TLazDroidCheckBox,
+    TLazDroidRatingBar,
+    TLazDroidSearchBar,
+    TLazDroidChipGroup,
+    TLazDroidRadioGroup,
+    TLazDroidOtpBox,
+    TLazDroidSignaturePad,
+    TLazDroidKeypad,
+    TLazDroidMetricCard,
+    TLazDroidBottomSheet,
+    TLazDroidSpeedDial,
+    TLazDroidSectionHeader,
+    TLazDroidAvatar,
+    TLazDroidListItem,
+    TLazDroidImageItem,
+    TLazDroidNavItem,
+    TLazDroidNavTab
+  ]);
 
 end.

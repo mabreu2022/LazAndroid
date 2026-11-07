@@ -39,7 +39,9 @@ begin
 end;
 {$ENDIF}
 
+{$IFNDEF ANDROID}
 {$R *.res}
+{$ENDIF}
 
 begin
   {$IFDEF ANDROID}

@@ -5,9 +5,18 @@ unit Unit4;
 interface
 
 uses
-  Classes, SysUtils, DB, sqldb, sqlite3conn, LazDroidMobileControls;
+  Classes, SysUtils, DB, sqldb, sqlite3conn, sqlite3dyn, LazDroidMobileControls
+  {$IFDEF ANDROID}, BaseUnix, ctypes{$ENDIF};
 
 type
+  TClienteRecord = record
+    Id: Integer;
+    Nome: string;
+    Telefone: string;
+    Email: string;
+    Cidade: string;
+    Documento: string;
+  end;
 
   { TDataModule1 }
 
@@ -17,6 +26,9 @@ type
   private
     FConn: TSQLite3Connection;
     FTran: TSQLTransaction;
+    FMemClientes: array of TClienteRecord;
+    FNextMemId: Integer;
+    procedure InicializarClientesMemoria;
     function ObterCaminhoBanco: string;
     procedure CriarTabelasSeNecessario;
   public
@@ -24,16 +36,96 @@ type
     procedure CarregarProdutos(AListView: TLazDroidListView; const AFiltro: string = '');
     procedure CarregarClientes(AListView: TLazDroidListView; const AFiltro: string = '');
     procedure CarregarPedidos(AListView: TLazDroidListView; const AFiltro: string = '');
+    function ObterClientePorId(AId: Integer; out ANome, ATelefone, AEmail, ACidade, ADocumento: string): Boolean;
+    function SalvarCliente(var AId: Integer; const ANome, ATelefone, AEmail, ACidade, ADocumento: string): Boolean;
+    function ExcluirCliente(AId: Integer): Boolean;
+    function TotalClientes: Integer;
   end;
 
 var
   DataModule1: TDataModule1;
 
+procedure DLog(const S: string);
+
 implementation
+
+{$IFDEF ANDROID}
+function android_log_write(prio: Integer; tag, text: PChar): Integer; cdecl; external 'log' name '__android_log_write';
+{$ENDIF}
+
+procedure DLog(const S: string);
+begin
+  {$IFDEF ANDROID}
+  android_log_write(4, 'DEMO5', PChar(S));
+  {$ENDIF}
+end;
+
+{$IFDEF ANDROID}
+procedure CrashHandler(Sig: cint); cdecl;
+var
+  Fp, Addr: Pointer;
+  i: Integer;
+begin
+  DLog('CRASH sig=' + IntToStr(Sig) + ' DLog@' + IntToHex(PtrUInt(@DLog), 1));
+  Fp := get_frame;
+  for i := 0 to 20 do
+  begin
+    if (Fp = nil) or (PtrUInt(Fp) < $10000) then Break;
+    Addr := get_caller_addr(Fp);
+    DLog('  BT#' + IntToStr(i) + ' ' + IntToHex(PtrUInt(Addr), 1));
+    Fp := get_caller_frame(Fp);
+  end;
+  Halt(1);
+end;
+
+procedure InstalarCrashHandler;
+var
+  Act: SigActionRec;
+begin
+  FillChar(Act, SizeOf(Act), 0);
+  Act.sa_handler := SigActionHandler(@CrashHandler);
+  fpsigaction(SIGBUS, @Act, nil);
+  fpsigaction(SIGSEGV, @Act, nil);
+end;
+{$ENDIF}
 
 {$R *.lfm}
 
 { TDataModule1 }
+
+procedure TDataModule1.InicializarClientesMemoria;
+begin
+  SetLength(FMemClientes, 4);
+  FMemClientes[0].Id := 1;
+  FMemClientes[0].Nome := 'Mercado São José';
+  FMemClientes[0].Telefone := '(11) 98765-4321';
+  FMemClientes[0].Email := 'contato@saojose.com.br';
+  FMemClientes[0].Cidade := 'São Paulo - SP';
+  FMemClientes[0].Documento := '12.345.678/0001-90';
+
+  FMemClientes[1].Id := 2;
+  FMemClientes[1].Nome := 'Padaria Pão de Mel';
+  FMemClientes[1].Telefone := '(19) 97654-3210';
+  FMemClientes[1].Email := 'paodemel@gmail.com';
+  FMemClientes[1].Cidade := 'Campinas - SP';
+  FMemClientes[1].Documento := '98.765.432/0001-10';
+
+  FMemClientes[2].Id := 3;
+  FMemClientes[2].Nome := 'Supermercado Estrela';
+  FMemClientes[2].Telefone := '(19) 99123-4567';
+  FMemClientes[2].Email := 'compras@estrela.com.br';
+  FMemClientes[2].Cidade := 'Piracicaba - SP';
+  FMemClientes[2].Documento := '45.678.901/0001-23';
+
+  FMemClientes[3].Id := 4;
+  FMemClientes[3].Nome := 'Distribuidora Horizonte';
+  FMemClientes[3].Telefone := '(21) 99888-1122';
+  FMemClientes[3].Email := 'vendas@horizonte.com.br';
+  FMemClientes[3].Cidade := 'Rio de Janeiro - RJ';
+  FMemClientes[3].Documento := '33.444.555/0001-66';
+
+  FNextMemId := 5;
+end;
 
 function TDataModule1.ObterCaminhoBanco: string;
 var
@@ -126,9 +218,10 @@ begin
     Qry.ExecSQL;
 
     Qry.SQL.Text := 'INSERT OR IGNORE INTO clientes (id, nome, telefone, email, cidade, documento) VALUES ' +
-                    '(1, ''Mercado São José'', ''(11) 98765-4321'', ''contato@saojose.com'', ''São Paulo'', ''12.345.678/0001-90''), ' +
-                    '(2, ''Padaria Pão de Mel'', ''(11) 97654-3210'', ''paodemel@gmail.com'', ''Campinas'', ''98.765.432/0001-10''), ' +
-                    '(3, ''Supermercado Estrela'', ''(19) 99123-4567'', ''compras@estrela.com.br'', ''Piracicaba'', ''45.678.901/0001-23'');';
+                    '(1, ''Mercado São José'', ''(11) 98765-4321'', ''contato@saojose.com.br'', ''São Paulo - SP'', ''12.345.678/0001-90''), ' +
+                    '(2, ''Padaria Pão de Mel'', ''(19) 97654-3210'', ''paodemel@gmail.com'', ''Campinas - SP'', ''98.765.432/0001-10''), ' +
+                    '(3, ''Supermercado Estrela'', ''(19) 99123-4567'', ''compras@estrela.com.br'', ''Piracicaba - SP'', ''45.678.901/0001-23''), ' +
+                    '(4, ''Distribuidora Horizonte'', ''(21) 99888-1122'', ''vendas@horizonte.com.br'', ''Rio de Janeiro - RJ'', ''33.444.555/0001-66'');';
     Qry.ExecSQL;
 
     Qry.SQL.Text := 'INSERT OR IGNORE INTO produtos (id, nome, descricao, preco, estoque, imagem) VALUES ' +
@@ -153,6 +246,10 @@ end;
 
 procedure TDataModule1.DataModuleCreate(Sender: TObject);
 begin
+  InicializarClientesMemoria;
+  {$IFDEF ANDROID}
+  SQLiteDefaultLibrary := 'libsqlite.so';
+  {$ENDIF}
   FConn := TSQLite3Connection.Create(Self);
   FTran := TSQLTransaction.Create(Self);
 
@@ -169,7 +266,17 @@ begin
     CriarTabelasSeNecessario;
   except
     on E: Exception do
-      ;
+    begin
+      {$IFDEF ANDROID}
+      try
+        SQLiteDefaultLibrary := 'libsqlite3.so';
+        FConn.Open;
+        CriarTabelasSeNecessario;
+      except
+        on E2: Exception do ;
+      end;
+      {$ENDIF}
+    end;
   end;
 end;
 
@@ -193,8 +300,8 @@ begin
 
   if not Assigned(FConn) or not FConn.Connected then
   begin
-    if ((Trim(ALogin) = 'admin') and (Trim(ASenha) = '1234')) or
-       ((Trim(ALogin) = 'vendedor') and (Trim(ASenha) = '1234')) then
+    if ((LowerCase(Trim(ALogin)) = 'admin') and (Trim(ASenha) = '1234')) or
+       ((LowerCase(Trim(ALogin)) = 'vendedor') and (Trim(ASenha) = '1234')) then
     begin
       ANome := 'Administrador';
       ANivel := 'admin';
@@ -233,9 +340,26 @@ begin
 
   if not Assigned(FConn) or not FConn.Connected then
   begin
-    with AListView.AddItem('Coca-Cola Lata 350ml', 'Refrigerante de cola', 'R$ 5,00') do Icon := aiCart;
-    with AListView.AddItem('Nescal 500mg', 'Achocolatado instantâneo', 'R$ 7,00') do Icon := aiCart;
-    with AListView.AddItem('Arroz Kicaldo 5kg', 'Arroz branco tipo 1', 'R$ 28,50') do Icon := aiCart;
+    with AListView.AddItem('Coca-Cola Lata 350ml', 'Refrigerante de cola', 'R$ 5,00') do
+    begin
+      Icon := aiCart;
+      Badge := 'Est: 120';
+    end;
+    with AListView.AddItem('Nescal 500mg', 'Achocolatado instantâneo', 'R$ 7,00') do
+    begin
+      Icon := aiCart;
+      Badge := 'Est: 50';
+    end;
+    with AListView.AddItem('Arroz Kicaldo 5kg', 'Arroz branco tipo 1', 'R$ 28,50') do
+    begin
+      Icon := aiCart;
+      Badge := 'Est: 80';
+    end;
+    with AListView.AddItem('Feijão Preto Kicaldo 1kg', 'Feijão preto carioca', 'R$ 8,90') do
+    begin
+      Icon := aiCart;
+      Badge := 'Est: 65';
+    end;
     Exit;
   end;
 
@@ -274,14 +398,32 @@ procedure TDataModule1.CarregarClientes(AListView: TLazDroidListView; const AFil
 var
   Qry: TSQLQuery;
   Item: TLazDroidListItem;
+  I: Integer;
+  FiltroLow: string;
 begin
   if not Assigned(AListView) then Exit;
   AListView.Clear;
+  FiltroLow := LowerCase(Trim(AFiltro));
 
   if not Assigned(FConn) or not FConn.Connected then
   begin
-    with AListView.AddItem('Mercado São José', 'São Paulo - (11) 98765-4321', 'CNPJ') do Icon := aiUser;
-    with AListView.AddItem('Padaria Pão de Mel', 'Campinas - (11) 97654-3210', 'CNPJ') do Icon := aiUser;
+    for I := 0 to High(FMemClientes) do
+    begin
+      if (FiltroLow = '') or
+         (Pos(FiltroLow, LowerCase(FMemClientes[I].Nome)) > 0) or
+         (Pos(FiltroLow, LowerCase(FMemClientes[I].Cidade)) > 0) or
+         (Pos(FiltroLow, LowerCase(FMemClientes[I].Documento)) > 0) then
+      begin
+        Item := AListView.AddItem(
+          FMemClientes[I].Nome,
+          FMemClientes[I].Cidade + ' • ' + FMemClientes[I].Telefone,
+          FMemClientes[I].Documento
+        );
+        Item.Icon := aiUser;
+        Item.Badge := Format('#%d', [FMemClientes[I].Id]);
+        Item.Tag := FMemClientes[I].Id;
+      end;
+    end;
     Exit;
   end;
 
@@ -289,13 +431,13 @@ begin
   try
     Qry.DataBase := FConn;
     Qry.Transaction := FTran;
-    if Trim(AFiltro) <> '' then
+    if FiltroLow <> '' then
     begin
-      Qry.SQL.Text := 'SELECT * FROM clientes WHERE LOWER(nome) LIKE :filtro OR LOWER(cidade) LIKE :filtro ORDER BY nome;';
-      Qry.Params.ParamByName('filtro').AsString := '%' + LowerCase(Trim(AFiltro)) + '%';
+      Qry.SQL.Text := 'SELECT * FROM clientes WHERE LOWER(nome) LIKE :filtro OR LOWER(cidade) LIKE :filtro OR LOWER(documento) LIKE :filtro ORDER BY id DESC;';
+      Qry.Params.ParamByName('filtro').AsString := '%' + FiltroLow + '%';
     end
     else
-      Qry.SQL.Text := 'SELECT * FROM clientes ORDER BY nome;';
+      Qry.SQL.Text := 'SELECT * FROM clientes ORDER BY id DESC;';
 
     Qry.Open;
     while not Qry.EOF do
@@ -306,9 +448,205 @@ begin
         Qry.FieldByName('documento').AsString
       );
       Item.Icon := aiUser;
+      Item.Badge := Format('#%d', [Qry.FieldByName('id').AsInteger]);
       Item.Tag := Qry.FieldByName('id').AsInteger;
       Qry.Next;
     end;
+    Qry.Close;
+  finally
+    Qry.Free;
+  end;
+end;
+
+function TDataModule1.ObterClientePorId(AId: Integer; out ANome, ATelefone, AEmail, ACidade, ADocumento: string): Boolean;
+var
+  Qry: TSQLQuery;
+  I: Integer;
+begin
+  Result := False;
+  ANome := '';
+  ATelefone := '';
+  AEmail := '';
+  ACidade := '';
+  ADocumento := '';
+
+  if not Assigned(FConn) or not FConn.Connected then
+  begin
+    for I := 0 to High(FMemClientes) do
+      if FMemClientes[I].Id = AId then
+      begin
+        ANome := FMemClientes[I].Nome;
+        ATelefone := FMemClientes[I].Telefone;
+        AEmail := FMemClientes[I].Email;
+        ACidade := FMemClientes[I].Cidade;
+        ADocumento := FMemClientes[I].Documento;
+        Exit(True);
+      end;
+    Exit;
+  end;
+
+  Qry := TSQLQuery.Create(nil);
+  try
+    Qry.DataBase := FConn;
+    Qry.Transaction := FTran;
+    Qry.SQL.Text := 'SELECT * FROM clientes WHERE id = :id LIMIT 1;';
+    Qry.Params.ParamByName('id').AsInteger := AId;
+    Qry.Open;
+    if not Qry.EOF then
+    begin
+      ANome := Qry.FieldByName('nome').AsString;
+      ATelefone := Qry.FieldByName('telefone').AsString;
+      AEmail := Qry.FieldByName('email').AsString;
+      ACidade := Qry.FieldByName('cidade').AsString;
+      ADocumento := Qry.FieldByName('documento').AsString;
+      Result := True;
+    end;
+    Qry.Close;
+  finally
+    Qry.Free;
+  end;
+end;
+
+function TDataModule1.SalvarCliente(var AId: Integer; const ANome, ATelefone, AEmail, ACidade, ADocumento: string): Boolean;
+var
+  Qry: TSQLQuery;
+  I, Len: Integer;
+begin
+  Result := False;
+  if Trim(ANome) = '' then Exit;
+
+  // Atualiza também lista em memória como espelho
+  if AId <= 0 then
+  begin
+    Len := Length(FMemClientes);
+    SetLength(FMemClientes, Len + 1);
+    FMemClientes[Len].Id := FNextMemId;
+    FMemClientes[Len].Nome := Trim(ANome);
+    FMemClientes[Len].Telefone := Trim(ATelefone);
+    FMemClientes[Len].Email := Trim(AEmail);
+    FMemClientes[Len].Cidade := Trim(ACidade);
+    FMemClientes[Len].Documento := Trim(ADocumento);
+    if not Assigned(FConn) or not FConn.Connected then
+    begin
+      AId := FNextMemId;
+      Inc(FNextMemId);
+      Exit(True);
+    end;
+    Inc(FNextMemId);
+  end
+  else
+  begin
+    for I := 0 to High(FMemClientes) do
+      if FMemClientes[I].Id = AId then
+      begin
+        FMemClientes[I].Nome := Trim(ANome);
+        FMemClientes[I].Telefone := Trim(ATelefone);
+        FMemClientes[I].Email := Trim(AEmail);
+        FMemClientes[I].Cidade := Trim(ACidade);
+        FMemClientes[I].Documento := Trim(ADocumento);
+        Break;
+      end;
+    if not Assigned(FConn) or not FConn.Connected then
+      Exit(True);
+  end;
+
+  Qry := TSQLQuery.Create(nil);
+  try
+    Qry.DataBase := FConn;
+    Qry.Transaction := FTran;
+    if not FTran.Active then
+      FTran.StartTransaction;
+
+    if AId <= 0 then
+    begin
+      Qry.SQL.Text := 'INSERT INTO clientes (nome, telefone, email, cidade, documento) ' +
+                      'VALUES (:nome, :telefone, :email, :cidade, :documento);';
+      Qry.Params.ParamByName('nome').AsString := Trim(ANome);
+      Qry.Params.ParamByName('telefone').AsString := Trim(ATelefone);
+      Qry.Params.ParamByName('email').AsString := Trim(AEmail);
+      Qry.Params.ParamByName('cidade').AsString := Trim(ACidade);
+      Qry.Params.ParamByName('documento').AsString := Trim(ADocumento);
+      Qry.ExecSQL;
+      FTran.Commit;
+
+      Qry.SQL.Text := 'SELECT last_insert_rowid() AS novo_id;';
+      Qry.Open;
+      if not Qry.EOF then
+        AId := Qry.FieldByName('novo_id').AsInteger;
+      Qry.Close;
+    end
+    else
+    begin
+      Qry.SQL.Text := 'UPDATE clientes SET nome = :nome, telefone = :telefone, ' +
+                      'email = :email, cidade = :cidade, documento = :documento ' +
+                      'WHERE id = :id;';
+      Qry.Params.ParamByName('nome').AsString := Trim(ANome);
+      Qry.Params.ParamByName('telefone').AsString := Trim(ATelefone);
+      Qry.Params.ParamByName('email').AsString := Trim(AEmail);
+      Qry.Params.ParamByName('cidade').AsString := Trim(ACidade);
+      Qry.Params.ParamByName('documento').AsString := Trim(ADocumento);
+      Qry.Params.ParamByName('id').AsInteger := AId;
+      Qry.ExecSQL;
+      FTran.Commit;
+    end;
+    Result := True;
+  finally
+    Qry.Free;
+  end;
+end;
+
+function TDataModule1.ExcluirCliente(AId: Integer): Boolean;
+var
+  Qry: TSQLQuery;
+  I, J: Integer;
+begin
+  Result := False;
+  if AId <= 0 then Exit;
+
+  for I := 0 to High(FMemClientes) do
+    if FMemClientes[I].Id = AId then
+    begin
+      for J := I to High(FMemClientes) - 1 do
+        FMemClientes[J] := FMemClientes[J + 1];
+      SetLength(FMemClientes, Length(FMemClientes) - 1);
+      Break;
+    end;
+
+  if not Assigned(FConn) or not FConn.Connected then
+    Exit(True);
+
+  Qry := TSQLQuery.Create(nil);
+  try
+    Qry.DataBase := FConn;
+    Qry.Transaction := FTran;
+    if not FTran.Active then
+      FTran.StartTransaction;
+    Qry.SQL.Text := 'DELETE FROM clientes WHERE id = :id;';
+    Qry.Params.ParamByName('id').AsInteger := AId;
+    Qry.ExecSQL;
+    FTran.Commit;
+    Result := True;
+  finally
+    Qry.Free;
+  end;
+end;
+
+function TDataModule1.TotalClientes: Integer;
+var
+  Qry: TSQLQuery;
+begin
+  if not Assigned(FConn) or not FConn.Connected then
+    Exit(Length(FMemClientes));
+
+  Result := 0;
+  Qry := TSQLQuery.Create(nil);
+  try
+    Qry.DataBase := FConn;
+    Qry.Transaction := FTran;
+    Qry.SQL.Text := 'SELECT COUNT(*) AS total FROM clientes;';
+    Qry.Open;
+    if not Qry.EOF then
+      Result := Qry.FieldByName('total').AsInteger;
     Qry.Close;
   finally
     Qry.Free;
@@ -325,7 +663,16 @@ begin
 
   if not Assigned(FConn) or not FConn.Connected then
   begin
-    with AListView.AddItem('Pedido #001', 'Mercado São José • 05/10/2026', 'R$ 58,50') do Icon := aiDollar;
+    with AListView.AddItem('Pedido #001 - Mercado São José', '05/10/2026 14:30', 'R$ 58,50') do
+    begin
+      Icon := aiDollar;
+      Badge := 'Concluído';
+    end;
+    with AListView.AddItem('Pedido #002 - Padaria Pão de Mel', '05/10/2026 16:15', 'R$ 35,00') do
+    begin
+      Icon := aiDollar;
+      Badge := 'Em Andamento';
+    end;
     Exit;
   end;
 
@@ -335,7 +682,7 @@ begin
     Qry.Transaction := FTran;
     Qry.SQL.Text := 'SELECT p.id, c.nome as cliente_nome, p.data_pedido, p.valor_total, p.status ' +
                     'FROM pedidos p ' +
-                    'JOIN clientes c ON c.id = p.cliente_id ' +
+                    'LEFT JOIN clientes c ON c.id = p.cliente_id ' +
                     'ORDER BY p.id DESC;';
     Qry.Open;
     while not Qry.EOF do
@@ -355,5 +702,10 @@ begin
     Qry.Free;
   end;
 end;
+
+{$IFDEF ANDROID}
+initialization
+  InstalarCrashHandler;
+{$ENDIF}
 
 end.
