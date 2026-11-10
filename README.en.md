@@ -1,7 +1,7 @@
 # LazDroid-Deploy — IDE Plugin & Android Deployment Pipeline for Lazarus
 
 <p align="center">
-  <a href="README.md">🇧🇷 Português</a> &nbsp;|&nbsp; <b>🇺🇸 English</b>
+  <b>🇺🇸 English</b> &nbsp;|&nbsp; <a href="README.md#readme-pt">🇧🇷 Português</a>
 </p>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
