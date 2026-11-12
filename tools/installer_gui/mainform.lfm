@@ -1,0 +1,377 @@
+object FrmMain: TFrmMain
+  Left = 350
+  Height = 720
+  Top = 120
+  Width = 840
+  Caption = 'LazDroid — Assistente de Instalação e Configuração'
+  ClientHeight = 720
+  ClientWidth = 840
+  Color = 16448250
+  Font.CharSet = DEFAULT_CHARSET
+  Font.Color = clBlack
+  Font.Height = -13
+  Font.Name = 'Segoe UI'
+  OnCreate = FormCreate
+  OnShow = FormShow
+  Position = poScreenCenter
+  LCLVersion = '4.8.0.0'
+  object pnlHeader: TPanel
+    Left = 0
+    Height = 75
+    Top = 0
+    Width = 840
+    Align = alTop
+    BevelOuter = bvNone
+    Color = 2102542
+    ParentBackground = False
+    TabOrder = 0
+    object lblTitle: TLabel
+      Left = 20
+      Height = 28
+      Top = 12
+      Width = 460
+      Caption = 'LazDroid — Assistente de Instalação'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -20
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object lblSubTitle: TLabel
+      Left = 20
+      Height = 19
+      Top = 44
+      Width = 590
+      Caption = 'Configurador Automático de Ambiente Android Nativo para Lazarus IDE (LCL CustomDrawn)'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = 14211288
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      ParentColor = False
+      ParentFont = False
+    end
+  end
+  object grpLazarus: TGroupBox
+    Left = 16
+    Height = 90
+    Top = 85
+    Width = 808
+    Caption = ' 1. Instalação do Lazarus IDE '
+    ClientHeight = 67
+    ClientWidth = 804
+    Font.CharSet = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -13
+    Font.Name = 'Segoe UI'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 1
+    object lblLazarusPath: TLabel
+      Left = 14
+      Height = 17
+      Top = 10
+      Width = 117
+      Caption = 'Diretório do Lazarus:'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      ParentColor = False
+      ParentFont = False
+    end
+    object edtLazarusDir: TEdit
+      Left = 138
+      Height = 25
+      Top = 6
+      Width = 530
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      OnChange = edtLazarusDirChange
+      ParentFont = False
+      TabOrder = 0
+      Text = 'C:\lazarus'
+    end
+    object btnBrowse: TButton
+      Left = 678
+      Height = 25
+      Top = 6
+      Width = 112
+      Caption = 'Procurar...'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      OnClick = btnBrowseClick
+      ParentFont = False
+      TabOrder = 1
+    end
+    object lblLazarusDetected: TLabel
+      Left = 14
+      Height = 17
+      Top = 38
+      Width = 450
+      Caption = 'Verificando presença do Lazarus...'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = 8011274
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      ParentColor = False
+      ParentFont = False
+    end
+  end
+  object grpEnvironment: TGroupBox
+    Left = 16
+    Height = 110
+    Top = 182
+    Width = 808
+    Caption = ' 2. Ferramentas do Android & Java '
+    ClientHeight = 87
+    ClientWidth = 804
+    Font.CharSet = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -13
+    Font.Name = 'Segoe UI'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 2
+    object lblJdk: TLabel
+      Left = 14
+      Height = 17
+      Top = 5
+      Width = 770
+      AutoSize = False
+      Caption = 'Java JDK: Verificando...'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clGray
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      ParentColor = False
+      ParentFont = False
+    end
+    object lblSdk: TLabel
+      Left = 14
+      Height = 17
+      Top = 24
+      Width = 770
+      AutoSize = False
+      Caption = 'Android SDK: Verificando...'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clGray
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      ParentColor = False
+      ParentFont = False
+    end
+    object lblNdk: TLabel
+      Left = 14
+      Height = 17
+      Top = 43
+      Width = 770
+      AutoSize = False
+      Caption = 'Android NDK: Verificando...'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clGray
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      ParentColor = False
+      ParentFont = False
+    end
+    object lblFpcCross: TLabel
+      Left = 14
+      Height = 17
+      Top = 62
+      Width = 770
+      AutoSize = False
+      Caption = 'FPC AArch64 Cross: Verificando...'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clGray
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      ParentColor = False
+      ParentFont = False
+    end
+  end
+  object grpSteps: TGroupBox
+    Left = 16
+    Height = 115
+    Top = 298
+    Width = 808
+    Caption = ' 3. Checklist de Configuração '
+    ClientHeight = 92
+    ClientWidth = 804
+    Font.CharSet = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -13
+    Font.Name = 'Segoe UI'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 3
+    object clbSteps: TCheckListBox
+      Left = 10
+      Height = 78
+      Top = 4
+      Width = 784
+      Columns = 2
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      Items.Strings = (
+        'Compiladores FPC Android'
+        'Units RTL Android'
+        'Patches LCL CustomDrawn'
+        'Units LCL CustomDrawn Android'
+        'Paleta LazDroidControls'
+        'Plugin LazDroidDeploy'
+        'Configurações XML / Properties'
+        'Reconstrução Lazarus IDE'
+      )
+      ItemHeight = 19
+      ParentFont = False
+      TabOrder = 0
+      Data = {
+        080000000000000000000000
+      }
+    end
+  end
+  object pnlButtons: TPanel
+    Left = 16
+    Height = 44
+    Top = 419
+    Width = 808
+    BevelOuter = bvNone
+    ClientHeight = 44
+    ClientWidth = 808
+    TabOrder = 4
+    object btnInstallAll: TButton
+      Left = 0
+      Height = 40
+      Top = 2
+      Width = 260
+      Caption = '⚡ Instalar Tudo (1-Clique)'
+      Color = 3256094
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -14
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      OnClick = btnInstallAllClick
+      ParentFont = False
+      TabOrder = 0
+    end
+    object btnCheckEnv: TButton
+      Left = 268
+      Height = 40
+      Top = 2
+      Width = 140
+      Caption = '🔍 Verificar'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      OnClick = btnCheckEnvClick
+      ParentFont = False
+      TabOrder = 1
+    end
+    object btnDelphiLayout: TButton
+      Left = 416
+      Height = 40
+      Top = 2
+      Width = 145
+      Caption = '🎨 Layout Delphi'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      OnClick = btnDelphiLayoutClick
+      ParentFont = False
+      TabOrder = 2
+    end
+    object btnOpenLazarus: TButton
+      Left = 569
+      Height = 40
+      Top = 2
+      Width = 125
+      Caption = '🚀 Abrir IDE'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      OnClick = btnOpenLazarusClick
+      ParentFont = False
+      TabOrder = 3
+    end
+    object btnOpenDemos: TButton
+      Left = 702
+      Height = 40
+      Top = 2
+      Width = 106
+      Caption = '📂 Demos'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      OnClick = btnOpenDemosClick
+      ParentFont = False
+      TabOrder = 4
+    end
+  end
+  object pnlBottom: TPanel
+    Left = 16
+    Height = 240
+    Top = 469
+    Width = 808
+    BevelOuter = bvNone
+    ClientHeight = 240
+    ClientWidth = 808
+    TabOrder = 5
+    object progressBar: TProgressBar
+      Left = 0
+      Height = 16
+      Top = 0
+      Width = 808
+      Align = alTop
+      TabOrder = 0
+    end
+    object lblProgress: TLabel
+      Left = 0
+      Height = 17
+      Top = 18
+      Width = 808
+      Align = alTop
+      Caption = 'Pronto para iniciar a instalação.'
+      Font.CharSet = DEFAULT_CHARSET
+      Font.Color = clGray
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      ParentColor = False
+      ParentFont = False
+    end
+    object memLog: TMemo
+      Left = 0
+      Height = 200
+      Top = 38
+      Width = 808
+      Align = alClient
+      Color = 1381653
+      Font.CharSet = ANSI_CHARSET
+      Font.Color = 65495
+      Font.Height = -12
+      Font.Name = 'Consolas'
+      ParentFont = False
+      ReadOnly = True
+      ScrollBars = ssAutoVertical
+      TabOrder = 1
+    end
+  end
+  object dlgBrowse: TSelectDirectoryDialog
+    Title = 'Selecione a pasta onde o Lazarus está instalado'
+    Left = 760
+    Top = 100
+  end
+end
+

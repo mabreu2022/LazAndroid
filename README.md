@@ -1,278 +1,8 @@
-<a id="readme-en"></a>
-# LazDroid-Deploy — IDE Plugin & Android Deployment Pipeline for Lazarus
-
-<p align="center">
-  <b>🇺🇸 English</b> &nbsp;|&nbsp; <a href="#readme-pt">🇧🇷 Português</a>
-</p>
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Lazarus: 2.2+](https://img.shields.io/badge/Lazarus-2.2%2B-blue.svg)](https://www.lazarus-ide.org/)
-[![Target: Android](https://img.shields.io/badge/Target-Android%205.0%2B%20(API%2021%2B)-green.svg)](https://developer.android.com)
-[![Architecture: AArch64](https://img.shields.io/badge/Arch-ARM64%20%7C%20ARMv7-orange.svg)](https://developer.android.com/ndk)
-
-**LazDroid-Deploy** is a professional automation suite (Open Tools Package) for **Lazarus IDE / Free Pascal (FPC)** that provides a *"1-Click Deploy & Run (Ctrl+Shift+F9)"* experience with support for real **LCL Visual Forms (CustomDrawn Android)**, identical to the Delphi and Android Studio ecosystems.
-
----
-
-## 🎯 Key Features
-
-- ⚡ **1-Click IDE Deployment**: Trigger compilation, packaging, installation, and execution with a single shortcut (`Ctrl+Shift+F9`) or via the `Run` menu.
-- 🎯 **Delphi-Style Target Manager**: Dockable window featuring **automatic USB phone detection (Plug & Play)**, dynamic display of connected devices under the `Target` node, comprehensive hardware/OS inspection (battery, screen resolution, ABI, Android version), and direct deployment to the active target!
-- 🎨 **Native On-Screen LCL Components**: Design user interfaces using the **Lazarus Form Designer** with `TForm`, `TButton`, `TLabel`, `TPanel`, `TPageControl`, `TEdit`, `TCheckBox`, and more, rendered via LCL CustomDrawn (`customdrawn_android`).
-- 📁 **1-Click New Project Wizard**: Registered under `File -> New... -> Android Application (LazDroid)`, pre-configuring JNI library templates, LCLWidgetType, compiler flags, and the initial form.
-- 📱 **Smart ABI & Device Detection**: Scans USB-connected devices (`adb devices -l`) and automatically selects the appropriate target architecture (`arm64-v8a` or `armeabi-v7a`).
-- 🔧 **High-Performance Native FPC Compilation**: Drives the Free Pascal cross-compiler (`ppcrossa64`) generating direct ARM64 machine code (`liblazapp.so`), matching native C/C++ speed and efficiency.
-- 🗄️ **Embedded SQLite Database**: Built-in support with pre-packaged native `libsqlite.so`, enabling lightning-fast offline SQLite operations out of the box.
-- 📦 **Robust Android Scaffold**: Lightweight Java host (`com.pascal.lclproject.LCLActivity`) managing lifecycle, fullscreen mode, display orientation, DPI scaling, and touch event dispatching.
-- 💬 **Real-Time Log Streaming**: Captures build `stdout`/`stderr` and streams Logcat output (`__android_log_print` / `tag: lclapp`) directly to Lazarus' **Messages** window.
-- ⚙️ **Integrated Settings Panel**: SDK, NDK, ADB, JDK, and FPC path manager embedded into `Tools -> Options` with one-click automatic detection.
-
----
-
-## 📂 Project Structure
-
-```
-LazAndroid/
-├── package/                                # Lazarus Open Tools Package (IDE Integration)
-│   ├── LazDroidDeploy.lpk                 # Main package to install into the IDE
-│   ├── LazDroidDeploy_Reg.pas             # IDE menu, shortcut, and action registration
-│   ├── LazDroidConfig.pas                 # Configuration persistence (XML)
-│   ├── LazDroidConfigFrame.pas/.lfm       # Configuration frame in Tools -> Options
-│   ├── LazDroidDeviceManager.pas          # ADB device detection and status inspection
-│   ├── LazDroidDeviceSelectDlg.pas/.lfm   # USB device modal selection dialog
-│   ├── LazDroidProcessRunner.pas          # Async multithreaded process runner with pipes
-│   ├── LazDroidProjectDescriptor.pas      # Android New Project Wizard in the IDE
-│   └── LazDroidPipeline.pas               # Master 6-stage build orchestrator
-│
-├── scaffold/                              # Ready-to-package Android template
-│   ├── build.gradle                       # Root Gradle build script
-│   ├── gradlew.bat                        # Gradle Wrapper for Windows
-│   └── app/                               # Main Android application module
-│       ├── build.gradle                   # SDK settings (minSdk 21, targetSdk 34)
-│       └── src/main/
-│           ├── AndroidManifest.xml        # Configured for com.pascal.lclproject.LCLActivity
-│           ├── java/.../LCLActivity.java  # Java Host: LCL Canvas, Touch, JNI bridge
-│           └── jniLibs/                   # Injected compiled native shared libraries
-│               └── arm64-v8a/             # liblazapp.so and libsqlite.so (AArch64)
-│
-├── demo/                                  # Full Sales Force Application (SQLite)
-│   ├── LazAndroidDemo.lpr                 # JNI entry point
-│   ├── FormLogin.pas/.lfm                 # LCL Login Form
-│   ├── FormVendas.pas/.lfm                # LCL Dashboard and Sales Form
-│   ├── SalesDatabase.pas                  # SQLite connection and queries
-│   └── vendas.db                          # Sample SQLite database
-│
-├── demo2/                                 # Minimalist "Hello World" LCL Example
-│   ├── project1.lpr                       # LCL initialization
-│   └── unit1.pas/.lfm                     # TForm1 with TButton and modal dialog
-│
-├── demo3/                                 # Advanced Multi-Tab Demo (CRUD Mock)
-│   ├── demo3.lpr                          # LCL initialization with Activity
-│   └── unit1.pas/.lfm                     # TPageControl, TTabSheet, TPanel, TEdit, TLabel
-│
-├── demo4/                                 # LazDroid Mobile Palette Showcase
-│   ├── demo4.lpr                          # JNI entry point
-│   └── unit1.pas/.lfm                     # AppBar, BottomNav, Card, Badge, Edit, Button, ListView
-│
-├── demo5/                                 # Complete Commercial App (Login + SQLite + BottomNav)
-│   ├── project1.lpr                       # JNI entry point with Activity
-│   ├── unit1.pas/.lfm                     # Login screen authenticating against SQLite
-│   ├── unit3.pas/.lfm                     # Main screen with BottomNav (Products, Orders, Clients, Settings)
-│   ├── unit4.pas/.lfm                     # DataModule with TSQLite3Connection and queries
-│   ├── database/app.db                    # SQLite database with 5 tables and sample data
-│   └── imagens/                           # Catalog of PNG images and icons
-│
-├── tools/                                 # Utilities, SQLite binaries, scripts, and installer
-└── docs/                                  # Technical Documentation and Guides
-    ├── ARCHITECTURE.md                    # Detailed architecture and Mermaid diagrams
-    ├── INSTALL_GUIDE.md                   # Step-by-step installation and usage guide
-    └── manual_componentes_lazdroid.html   # Interactive Mobile Component Palette Manual
-```
-
----
-
-## 📱 Complete "LazDroid" Mobile Component Suite (30 Components)
-
-**LazDroid** delivers a comprehensive library of **30 touch-first mobile components**, engineered specifically for Android touchscreens (Material Design & iOS look-and-feel), breaking past the limitations of traditional desktop controls in Lazarus.
-
-All components are instantly available in the **`LazDroid`** palette within the Form Designer:
-
-### 🧭 Navigation & Layout
-| Component | Type / Icon | Description & Mobile Features |
-| :--- | :---: | :--- |
-| **`TLazDroidAppBar`** | 🧭 Top Bar | Mobile top app bar with title, dynamic subtitle, Back button (`OnBackClick`), and action buttons (`OnActionClick`). |
-| **`TLazDroidBottomNav`** | 📌 Tab Bar | Touch bottom navigation bar with automatic vector icons, numeric badges, and `OnTabSelected` event. |
-| **`TLazDroidBottomSheet`** | 📥 Modal Drawer | Bottom sliding panel (modal drawer) with grab handle, ideal for advanced filters, share options, and action sheets. |
-| **`TLazDroidSpeedDial`** | ⚡ Floating Menu | Expandable Floating Action Button that unfolds into multiple circular action buttons with touch icon rotation. |
-| **`TLazDroidLayout`** | 📐 Responsive Box | Responsive screen container supporting smart padding, rounded corners, and smooth vertical scrolling. |
-
-### ✏️ Data Input & Forms
-| Component | Type / Icon | Description & Mobile Features |
-| :--- | :---: | :--- |
-| **`TLazDroidEdit`** | ✏️ Input Field | Modern text field with placeholder, rounded corners, and **automatic native Android virtual keyboard invocation**. |
-| **`TLazDroidSearchBar`** | 🔍 Search Bar | Search bar featuring magnifying glass icon, quick-clear button (`X`), pill shape, and live typing event (`OnSearch`). |
-| **`TLazDroidOtpBox`** | 🔢 PIN / OTP Input | Verification code input (4 to 6-digit PIN/SMS) in separate boxes with automatic focus advancement between digits. |
-| **`TLazDroidDatePicker`** | 📅 Date Picker | Modern mobile date picker with a touch-friendly popup calendar and regional formatting. |
-| **`TLazDroidTimePicker`** | ⏰ Time Picker | Hour and minute selector with 12h/24h toggle and touch carousel controls. |
-| **`TLazDroidCheckBox`** | ☑️ CheckBox | Enlarged touch checkbox with animated fill, checkmark icon, and descriptive label. |
-| **`TLazDroidSwitch`** | 🎚️ Toggle Switch | Modern iOS/Material-style on/off toggle switch with smooth animated transitions and custom active/inactive colors. |
-| **`TLazDroidRadioGroup`** | 🔘 Radio Group | Mutually exclusive option group with vertical/horizontal layouts and comfortable touch targets. |
-| **`TLazDroidSegmentedControl`** | 📑 Segments | Horizontal segmented selector with sliding indicator, ideal for quick view switching or status filters. |
-| **`TLazDroidChipGroup`** | 🏷️ Filter Chips | Dynamic collection of tags/chips with single or multi-selection for fast categorization and catalog filtering. |
-
-### 📋 Lists & Data Display
-| Component | Type / Icon | Description & Mobile Features |
-| :--- | :---: | :--- |
-| **`TLazDroidListView`** | 📋 Card List | Touch record list with title, subtitle, badges, 32-bit images, right-aligned currency amounts, and **drag-to-scroll**. |
-| **`TLazDroidCard`** | 🃏 Surface Card | Card container with elevation, soft shadow, header, and rounded corners for grouping content blocks. |
-| **`TLazDroidMetricCard`** | 📊 KPI Card | Specialized card for sales dashboards and KPI summaries featuring numeric value, label, and percentage variance badge. |
-| **`TLazDroidSectionHeader`** | 📑 Section Header | Visual section divider with emphasized title and right-aligned action button (*e.g., "See all"*). |
-| **`TLazDroidImageList`** | 🖼️ Image Manager | Mobile icon and photo manager with full 32-bit alpha transparency (PNG) support without quality degradation. |
-
-### 🔘 Actions, Buttons & Feedback
-| Component | Type / Icon | Description & Mobile Features |
-| :--- | :---: | :--- |
-| **`TLazDroidButton`** | 🔘 Action Button | Button with a minimum 48px touch target, semantic styles (*Primary, Success, Danger, Outline*), and vector icons. |
-| **`TLazDroidFAB`** | ➕ Action Button | Elevated circular Floating Action Button with drop shadow, ideal for the primary screen action (*e.g., New Order*). |
-| **`TLazDroidBadge`** | 🏷️ Status Pill | Semantic pill badge for statuses (*Pending, Completed, Cancelled*) or notification counters (*e.g., 3*). |
-| **`TLazDroidProgressBar`** | ⏳ Progress Bar | Progress bar with smooth animations, centered percentage label, and state-specific colors. |
-| **`TLazDroidSlider`** | 🎚️ Value Slider | Touch slider control with floating numeric value callout for continuous adjustments of quantities, volumes, or price ranges. |
-| **`TLazDroidActivityIndicator`** | 🔄 Spinner | Asynchronous loading indicator with a modern spinning ring, ideal for SQLite queries or network activity. |
-
-### 📱 Special Mobile Features
-| Component | Type / Icon | Description & Mobile Features |
-| :--- | :---: | :--- |
-| **`TLazDroidRatingBar`** | ⭐ Star Rating | Touch star rating (1 to 5 stars) with half-star support and direct touch selection. |
-| **`TLazDroidKeypad`** | ⌨️ Numeric Keypad | Dedicated virtual numeric keypad for POS, cashier checkout, order tickets, and rapid number entry. |
-| **`TLazDroidSignaturePad`** | ✍️ Signature Pad | Digital touch signature capture canvas with smooth strokes and direct export to bitmap/image. |
-| **`TLazDroidAvatar`** | 👤 Avatar | Circular profile picture with automatic initial fallback and connection status badge (*Online / Away*). |
-
-> 📖 **Palette Quick Reference Manual:**  
-> To view interactive documentation for every property, event, and Pascal code example across all 30 components, open in your browser:  
-> [`docs/manual_componentes_lazdroid.html`](docs/manual_componentes_lazdroid.html) (or run the shortcut `Abrir-Manual-Componentes.cmd`).
-
-> 📚 **Complete Official Book (HTML & PDF Export):**  
-> We have created a comprehensive, formatted technical book covering everything from environment setup and hardening to building a commercial **Sales Force application with SQLite**:  
-> - **File:** [`docs/livro_lazdroid_desenvolvimento_mobile.html`](docs/livro_lazdroid_desenvolvimento_mobile.html) (or run the shortcut `Abrir-Livro-LazDroid.cmd`).  
-> - **PDF Export:** The book features a built-in top button to instantly generate/print an A4-format PDF with a professional cover, table of contents, page numbers, and clean chapter breaks.
-
----
-
-## 🛠️ Step-by-Step Installation Guide (For GitHub Users)
-
-If you have just cloned or downloaded the repository from GitHub, follow the steps below to set up your environment in minutes:
-
-### 1. System Prerequisites
-Before running the installer, ensure you have installed on Windows:
-* **Lazarus IDE (v2.2, 3.x, or 4.x)**: installed (e.g., `C:\lazarus`).
-* **Android SDK & ADB**: installed via Android Studio or standalone at `%LOCALAPPDATA%\Android\Sdk` (with `platform-tools` containing `adb.exe`).
-* **Android NDK**: versions r21 through r26 (installed via Android Studio under *SDK Tools* -> *NDK (Side by side)*).
-* **Java JDK 17 or higher**: installed (e.g., Eclipse Adoptium JDK or Android Studio's bundled `jbr`).
-* **Android Device**: connected via USB cable with **USB Debugging** enabled in *Developer Options*.
-
----
-
-### 2. 1-Click Automatic Installation
-
-1. Open the cloned project directory:
-   ```cmd
-   git clone https://github.com/mabreu2022/LazAndroid.git
-   cd LazAndroid
-   ```
-2. Double-click the file:
-   ```cmd
-   Instalar-LazDroid.cmd
-   ```
-3. Windows will request Administrator privileges (UAC). Click **Yes**.
-4. The installer automatically performs all setup steps:
-   - ✅ Locates the installed Lazarus IDE (`C:\lazarus`).
-   - ✅ Automatically downloads and extracts the FPC AArch64 cross-compiler and Android RTL units.
-   - ✅ Copies `ppcrossa64.exe` binaries and `aarch64-android` / `arm-android` units to FPC.
-   - ✅ Applies the mobile patch for virtual keyboard activation in LCL CustomDrawn.
-   - ✅ Compiles LCL CustomDrawn and packages for Android AArch64.
-   - ✅ Registers the packages **`LazDroidControls.lpk`** (29 mobile components) and **`LazDroidDeploy.lpk`** (Deploy & Target Manager) in Lazarus.
-   - ✅ Autodetects Android SDK, NDK, ADB, JDK and writes the `lazdroiddeploy.xml` configuration file.
-5. When prompted at the end, type **`S`** (or press Enter) to authorize rebuilding the IDE. Lazarus will be recompiled with LazDroid built-in!
-
----
-
-### 3. Organize the IDE in Delphi Style (Optional, Recommended)
-
-If Lazarus' windows are floating or disorganized, double-click the file:
-```cmd
-Restaurar-Layout-Lazarus.cmd
-```
-This arranges the interface into a professional docked layout (*AnchorDocking*) identical to Delphi:
-* **Left:** Object Inspector (components, properties, and events).
-* **Center:** Code Editor and Form Designer at the top, Messages and Debugging at the bottom.
-* **Right:** Project Inspector at the top, LazDroid Mobile Target Manager in the middle, and Component Palette at the bottom.
-* *(The layout is locked as read-only to prevent accidental rearrangement).*
-
----
-
-### 4. How to Test and Run Your First Deployment
-
-1. Open **Lazarus IDE**.
-2. Connect your mobile phone via USB (with *USB Debugging* enabled).
-3. Open any of the included ready-to-run demo projects:
-   * **`demo5/project1.lpi`**: Full sales application with **Login**, local **SQLite database (`database/app.db`)**, and tab navigation (**`TLazDroidBottomNav`**).
-   * **`demo4/demo4.lpi`**: Showcase of touch-first buttons, cards, badges, inputs, and list views.
-   * **`demo/LazAndroidDemo.lpi`**: Sales force demo with LCL visual forms.
-4. Press the shortcut:
-   ```
-   Ctrl + Shift + F9
-   ```
-   *(Or click the menu `Run -> Deploy & Run on Android Device`)*.
-5. LazDroid compiles the native ARM64 library (`liblazapp.so`), packages the APK with Gradle, and installs/launches the app on your phone in seconds!
-
----
-
-## 📊 LCL Component Status on Android
-
-| LCL Component | Status on Android | Notes |
-| :--- | :---: | :--- |
-| **LazDroid Palette** | ✅ 100% Mobile | AppBar, BottomNav, Card, Badge, Button, Edit, ListView optimized for touch |
-| **TForm** | ✅ Ready | Maximized, dynamic resizing on screen rotation |
-| **TLabel** | ✅ Ready | Font rendering, word wrap, colors, and alignment |
-| **TButton** | ✅ Ready | Touch click, pressed/released visual states |
-| **TPanel** | ✅ Ready | Containers, styled cards, borders, and colors |
-| **TPageControl / TTabSheet** | ✅ Ready | Multiple tabs with dynamic switching |
-| **TCheckBox** | ✅ Ready | Selection and visual toggle state |
-| **TImage / TCanvas** | ✅ Ready | Canvas drawing, bitmaps, and primitive shapes |
-| **TEdit / TMemo** | ✅ Ready | Android virtual keyboard via `csRequiresKeyboardInput` and `adjustResize` |
-| **TComboBox** | 🔄 In Adaptation | Native selection dialog (Spinner) recommended |
-| **TStringGrid / TDBGrid** | 🔄 In Adaptation | Grid display; touch scrolling requires smooth inertia |
-| **Dialogs (ShowMessage)** | ✅ Ready | Mapped to native Android `AlertDialog` |
-| **SQLite Database** | ✅ Ready | Direct access via native compiled `libsqlite.so` |
-
-For architectural details, refer to [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). For step-by-step installation instructions, see [`docs/INSTALL_GUIDE.md`](docs/INSTALL_GUIDE.md).
-
----
-
-## 🤝 How to Contribute
-
-Contributions from the entire Delphi, Lazarus, and Free Pascal community are warmly welcomed! If you would like to suggest an improvement, report or fix a bug, or create a new mobile component:
-
-1. **Fork** the repository ([github.com/mabreu2022/LazAndroid](https://github.com/mabreu2022/LazAndroid)).
-2. Create a branch for your feature (`git checkout -b feat/my-improvement`).
-3. Develop your changes and verify compilation in Lazarus and the AArch64 cross-compiler.
-4. Open a **Pull Request (PR)** detailing the changes made.
-
-> 🛡️ **Governance & Approval Policy:**  
-> The main branch (`main`) has protection enabled. No commits are merged directly into production without **explicit review and approval by the maintainer (@mabreu2022)**.
-> 
-> Please read our [Full Contribution Guide (`CONTRIBUTING.md`)](CONTRIBUTING.md) and [Code of Conduct (`CODE_OF_CONDUCT.md`)](CODE_OF_CONDUCT.md).
-
-
-
----
-<br/>
-
 <a id="readme-pt"></a>
 # LazDroid-Deploy — IDE Plugin & Pipeline de Deploy Android para Lazarus
 
 <p align="center">
-  <a href="#readme-en">🇺🇸 English</a> &nbsp;|&nbsp; <b>🇧🇷 Português</b>
+  <b>🇧🇷 Português</b> &nbsp;|&nbsp; <a href="#readme-en">🇺🇸 English</a>
 </p>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -429,47 +159,62 @@ Todos os componentes ficam disponíveis na paleta **`LazDroid`** do Form Designe
 
 ---
 
-## 🛠️ Guia de Instalação Passo a Passo (Para quem baixou do GitHub)
+## 🛠️ Guia de Instalação e Configuração
 
-Se você acabou de clonar ou baixar o repositório do GitHub, siga o passo a passo abaixo para configurar o ambiente em poucos minutos:
+O **LazDroid** oferece três formas práticas de instalação e configuração para atender desde usuários finais e iniciantes até ambientes corporativos e integração contínua (CI):
 
-### 1. Pré-Requisitos do Sistema
-Antes de rodar o instalador, certifique-se de possuir instalado no Windows:
-* **Lazarus IDE (v2.2, 3.x ou 4.x)**: instalado (ex: `C:\lazarus`).
-* **Android SDK & ADB**: instalado via Android Studio ou standalone em `%LOCALAPPDATA%\Android\Sdk` (com a pasta `platform-tools` contendo o `adb.exe`).
-* **Android NDK**: versões r21 a r26 (instalado pelo Android Studio em *SDK Tools* -> *NDK (Side by side)*).
-* **Java JDK 17 ou superior**: instalado (ex: Eclipse Adoptium JDK ou o `jbr` do Android Studio).
-* **Celular Android**: conectado via cabo USB com a **Depuração USB** ativada nas *Opções do Desenvolvedor*.
+### 📦 Opção 1: Instalador Windows para Clientes (`Setup-LazAndroid.exe`)
+Ideal para distribuição para clientes, novos desenvolvedores ou quem prefere o padrão tradicional de instalação do Windows:
+1. Baixe ou execute o instalador `dist\Setup-LazAndroid.exe` (ou da aba *Releases* do GitHub).
+2. Execute o instalador como Administrador.
+3. Escolha o diretório de destino (padrão recomendado: `C:\LazAndroid`).
+4. O instalador descompacta o projeto, inclui a toolchain FPC Android offline, cria atalhos no Menu Iniciar para todas as demos, manuais e ferramentas.
+5. Na última tela, marque a opção para executar o **Assistente Visual LazDroid** e concluir a configuração do Lazarus com 1 clique!
 
 ---
 
-### 2. Instalação Automática em 1-Clique
-
-1. Abra a pasta do projeto clonado:
+### ⚡ Opção 2: Assistente Visual Nativo 1-Clique (`Instalar-LazDroid.exe`)
+Ideal para quem clonou o repositório ou baixou o `.zip`:
+1. Abra a raiz do projeto clonado:
    ```cmd
    git clone https://github.com/mabreu2022/LazAndroid.git
    cd LazAndroid
    ```
-2. Dê um duplo-clique no arquivo:
+2. Dê um duplo clique em:
    ```cmd
-   Instalar-LazDroid.cmd
+   Instalar-LazDroid.exe
    ```
-3. O Windows solicitará privilégios de Administrador (UAC). Clique em **Sim**.
-4. O instalador executará automaticamente todas as etapas:
-   - ✅ Localiza o Lazarus IDE instalado (`C:\lazarus`).
-   - ✅ Baixa e extrai automaticamente o compilador cruzado FPC AArch64 e as units da RTL Android.
-   - ✅ Copia os binários `ppcrossa64.exe` e units `aarch64-android` e `arm-android` para o FPC.
-   - ✅ Aplica o patch móvel para acionamento do teclado virtual na LCL CustomDrawn.
-   - ✅ Compila a LCL CustomDrawn e os pacotes para Android AArch64.
-   - ✅ Registra os pacotes **`LazDroidControls.lpk`** (29 componentes mobile) e **`LazDroidDeploy.lpk`** (Deploy e Target Manager) no Lazarus.
-   - ✅ Autodetecta o Android SDK, NDK, ADB, JDK e grava o arquivo de configuração `lazdroiddeploy.xml`.
-5. Ao final, digite **`S`** para autorizar a reconstrução da IDE. O Lazarus será compilado com o LazDroid integrado!
+   *(ou execute `Instalar-LazDroid.cmd`, que solicita elevação de administrador automaticamente).*
+3. Uma interface gráfica nativa desenvolvida em Pascal/LCL é aberta:
+   - Exibe em tempo real o status de detecção do **Lazarus IDE**, **Java JDK**, **Android SDK/NDK** e compilador cruzado **FPC AArch64**.
+   - Permite verificar o ambiente a qualquer momento pelo botão **"🔍 Verificar"**.
+   - Clique no botão principal **"⚡ Instalar Tudo (1-Clique)"** para executar automaticamente:
+     - ✅ Instalação dos compiladores cruzados FPC (`ppcrossa64.exe` e `ppcrossarm.exe`).
+     - ✅ Cópia das units da RTL Android (`aarch64-android` e `arm-android`).
+     - ✅ Aplicação dos patches LCL CustomDrawn (teclado virtual móvel e compatibilidade de fontes).
+     - ✅ Compilação da LCL CustomDrawn para `aarch64-android`.
+     - ✅ Registro dos pacotes `LazDroidControls.lpk` (29 componentes) e `LazDroidDeploy.lpk` (pipeline IDE).
+     - ✅ Autodetecção das ferramentas Android e gravação de `lazdroiddeploy.xml` e `local.properties`.
+     - ✅ Reconstrução da IDE Lazarus com o LazDroid integrado.
+   - Oferece botões auxiliares para **"🎨 Layout Delphi"** (acopla as janelas da IDE em abas) e **"🚀 Abrir IDE"**.
 
 ---
 
-### 3. Organizar a IDE no Estilo Delphi (Opcional, porém Recomendado)
+### 💻 Opção 3: Modo Linha de Comando / CI (`Instalar-LazDroid.cmd --cli`)
+Para scripts automatizados, DevOps ou quem prefere terminal:
+```cmd
+Instalar-LazDroid.cmd --cli
+```
+Ou diretamente pelo PowerShell:
+```powershell
+.\tools\installer\install.ps1 -NonInteractive -RebuildIDE
+```
 
-Se as janelas do Lazarus estiverem desorganizadas ou flutuantes, dê um duplo clique no arquivo:
+---
+
+### 🎨 Organizar a IDE no Estilo Delphi (Opcional, porém Recomendado)
+
+Se as janelas do Lazarus estiverem desorganizadas ou flutuantes, você pode aplicar o layout docado estilo Delphi diretamente pelo assistente visual (botão **"🎨 Layout Delphi"**) ou executando:
 ```cmd
 Restaurar-Layout-Lazarus.cmd
 ```
@@ -535,3 +280,286 @@ Contribuições de toda a comunidade Delphi, Lazarus e Free Pascal são muito be
 > Consulte nosso [Guia de Contribuição Completo (`CONTRIBUTING.md`)](CONTRIBUTING.md) e o [Código de Conduta (`CODE_OF_CONDUCT.md`)](CODE_OF_CONDUCT.md).
 
 ---
+<br/>
+
+<a id="readme-en"></a>
+# LazDroid-Deploy — IDE Plugin & Android Deployment Pipeline for Lazarus
+
+<p align="center">
+  <a href="#readme-pt">🇧🇷 Português</a> &nbsp;|&nbsp; <b>🇺🇸 English</b>
+</p>
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Lazarus: 2.2+](https://img.shields.io/badge/Lazarus-2.2%2B-blue.svg)](https://www.lazarus-ide.org/)
+[![Target: Android](https://img.shields.io/badge/Target-Android%205.0%2B%20(API%2021%2B)-green.svg)](https://developer.android.com)
+[![Architecture: AArch64](https://img.shields.io/badge/Arch-ARM64%20%7C%20ARMv7-orange.svg)](https://developer.android.com/ndk)
+
+**LazDroid-Deploy** is a professional automation suite (Open Tools Package) for **Lazarus IDE / Free Pascal (FPC)** that provides a *"1-Click Deploy & Run (Ctrl+Shift+F9)"* experience with support for real **LCL Visual Forms (CustomDrawn Android)**, identical to the Delphi and Android Studio ecosystems.
+
+---
+
+## 🎯 Key Features
+
+- ⚡ **1-Click IDE Deployment**: Trigger compilation, packaging, installation, and execution with a single shortcut (`Ctrl+Shift+F9`) or via the `Run` menu.
+- 🎯 **Delphi-Style Target Manager**: Dockable window featuring **automatic USB phone detection (Plug & Play)**, dynamic display of connected devices under the `Target` node, comprehensive hardware/OS inspection (battery, screen resolution, ABI, Android version), and direct deployment to the active target!
+- 🎨 **Native On-Screen LCL Components**: Design user interfaces using the **Lazarus Form Designer** with `TForm`, `TButton`, `TLabel`, `TPanel`, `TPageControl`, `TEdit`, `TCheckBox`, and more, rendered via LCL CustomDrawn (`customdrawn_android`).
+- 📁 **1-Click New Project Wizard**: Registered under `File -> New... -> Android Application (LazDroid)`, pre-configuring JNI library templates, LCLWidgetType, compiler flags, and the initial form.
+- 📱 **Smart ABI & Device Detection**: Scans USB-connected devices (`adb devices -l`) and automatically selects the appropriate target architecture (`arm64-v8a` or `armeabi-v7a`).
+- 🔧 **High-Performance Native FPC Compilation**: Drives the Free Pascal cross-compiler (`ppcrossa64`) generating direct ARM64 machine code (`liblazapp.so`), matching native C/C++ speed and efficiency.
+- 🗄️ **Embedded SQLite Database**: Built-in support with pre-packaged native `libsqlite.so`, enabling lightning-fast offline SQLite operations out of the box.
+- 📦 **Robust Android Scaffold**: Lightweight Java host (`com.pascal.lclproject.LCLActivity`) managing lifecycle, fullscreen mode, display orientation, DPI scaling, and touch event dispatching.
+- 💬 **Real-Time Log Streaming**: Captures build `stdout`/`stderr` and streams Logcat output (`__android_log_print` / `tag: lclapp`) directly to Lazarus' **Messages** window.
+- ⚙️ **Integrated Settings Panel**: SDK, NDK, ADB, JDK, and FPC path manager embedded into `Tools -> Options` with one-click automatic detection.
+
+---
+
+## 📂 Project Structure
+
+```
+LazAndroid/
+├── package/                                # Lazarus Open Tools Package (IDE Integration)
+│   ├── LazDroidDeploy.lpk                 # Main package to install into the IDE
+│   ├── LazDroidDeploy_Reg.pas             # IDE menu, shortcut, and action registration
+│   ├── LazDroidConfig.pas                 # Configuration persistence (XML)
+│   ├── LazDroidConfigFrame.pas/.lfm       # Configuration frame in Tools -> Options
+│   ├── LazDroidDeviceManager.pas          # ADB device detection and status inspection
+│   ├── LazDroidDeviceSelectDlg.pas/.lfm   # USB device modal selection dialog
+│   ├── LazDroidProcessRunner.pas          # Async multithreaded process runner with pipes
+│   ├── LazDroidProjectDescriptor.pas      # Android New Project Wizard in the IDE
+│   └── LazDroidPipeline.pas               # Master 6-stage build orchestrator
+│
+├── scaffold/                              # Ready-to-package Android template
+│   ├── build.gradle                       # Root Gradle build script
+│   ├── gradlew.bat                        # Gradle Wrapper for Windows
+│   └── app/                               # Main Android application module
+│       ├── build.gradle                   # SDK settings (minSdk 21, targetSdk 34)
+│       └── src/main/
+│           ├── AndroidManifest.xml        # Configured for com.pascal.lclproject.LCLActivity
+│           ├── java/.../LCLActivity.java  # Java Host: LCL Canvas, Touch, JNI bridge
+│           └── jniLibs/                   # Injected compiled native shared libraries
+│               └── arm64-v8a/             # liblazapp.so and libsqlite.so (AArch64)
+│
+├── demo/                                  # Full Sales Force Application (SQLite)
+│   ├── LazAndroidDemo.lpr                 # JNI entry point
+│   ├── FormLogin.pas/.lfm                 # LCL Login Form
+│   ├── FormVendas.pas/.lfm                # LCL Dashboard and Sales Form
+│   ├── SalesDatabase.pas                  # SQLite connection and queries
+│   └── vendas.db                          # Sample SQLite database
+│
+├── demo2/                                 # Minimalist "Hello World" LCL Example
+│   ├── project1.lpr                       # LCL initialization
+│   └── unit1.pas/.lfm                     # TForm1 with TButton and modal dialog
+│
+├── demo3/                                 # Advanced Multi-Tab Demo (CRUD Mock)
+│   ├── demo3.lpr                          # LCL initialization with Activity
+│   └── unit1.pas/.lfm                     # TPageControl, TTabSheet, TPanel, TEdit, TLabel
+│
+├── demo4/                                 # LazDroid Mobile Palette Showcase
+│   ├── demo4.lpr                          # JNI entry point
+│   └── unit1.pas/.lfm                     # AppBar, BottomNav, Card, Badge, Edit, Button, ListView
+│
+├── demo5/                                 # Complete Commercial App (Login + SQLite + BottomNav)
+│   ├── project1.lpr                       # JNI entry point with Activity
+│   ├── unit1.pas/.lfm                     # Login screen authenticating against SQLite
+│   ├── unit3.pas/.lfm                     # Main screen with BottomNav (Products, Orders, Clients, Settings)
+│   ├── unit4.pas/.lfm                     # DataModule with TSQLite3Connection and queries
+│   ├── database/app.db                    # SQLite database with 5 tables and sample data
+│   └── imagens/                           # Catalog of PNG images and icons
+│
+├── tools/                                 # Utilities, SQLite binaries, scripts, and installer
+└── docs/                                  # Technical Documentation and Guides
+    ├── ARCHITECTURE.md                    # Detailed architecture and Mermaid diagrams
+    ├── INSTALL_GUIDE.md                   # Step-by-step installation and usage guide
+    └── manual_componentes_lazdroid.html   # Interactive Mobile Component Palette Manual
+```
+
+---
+
+## 📱 Complete "LazDroid" Mobile Component Suite (30 Components)
+
+**LazDroid** delivers a comprehensive library of **30 touch-first mobile components**, engineered specifically for Android touchscreens (Material Design & iOS look-and-feel), breaking past the limitations of traditional desktop controls in Lazarus.
+
+All components are instantly available in the **`LazDroid`** palette within the Form Designer:
+
+### 🧭 Navigation & Layout
+| Component | Type / Icon | Description & Mobile Features |
+| :--- | :---: | :--- |
+| **`TLazDroidAppBar`** | 🧭 Top Bar | Mobile top app bar with title, dynamic subtitle, Back button (`OnBackClick`), and action buttons (`OnActionClick`). |
+| **`TLazDroidBottomNav`** | 📌 Tab Bar | Touch bottom navigation bar with automatic vector icons, numeric badges, and `OnTabSelected` event. |
+| **`TLazDroidBottomSheet`** | 📥 Modal Drawer | Bottom sliding panel (modal drawer) with grab handle, ideal for advanced filters, share options, and action sheets. |
+| **`TLazDroidSpeedDial`** | ⚡ Floating Menu | Expandable Floating Action Button that unfolds into multiple circular action buttons with touch icon rotation. |
+| **`TLazDroidLayout`** | 📐 Responsive Box | Responsive screen container supporting smart padding, rounded corners, and smooth vertical scrolling. |
+
+### ✏️ Data Input & Forms
+| Component | Type / Icon | Description & Mobile Features |
+| :--- | :---: | :--- |
+| **`TLazDroidEdit`** | ✏️ Input Field | Modern text field with placeholder, rounded corners, and **automatic native Android virtual keyboard invocation**. |
+| **`TLazDroidSearchBar`** | 🔍 Search Bar | Search bar featuring magnifying glass icon, quick-clear button (`X`), pill shape, and live typing event (`OnSearch`). |
+| **`TLazDroidOtpBox`** | 🔢 PIN / OTP Input | Verification code input (4 to 6-digit PIN/SMS) in separate boxes with automatic focus advancement between digits. |
+| **`TLazDroidDatePicker`** | 📅 Date Picker | Modern mobile date picker with a touch-friendly popup calendar and regional formatting. |
+| **`TLazDroidTimePicker`** | ⏰ Time Picker | Hour and minute selector with 12h/24h toggle and touch carousel controls. |
+| **`TLazDroidCheckBox`** | ☑️ CheckBox | Enlarged touch checkbox with animated fill, checkmark icon, and descriptive label. |
+| **`TLazDroidSwitch`** | 🎚️ Toggle Switch | Modern iOS/Material-style on/off toggle switch with smooth animated transitions and custom active/inactive colors. |
+| **`TLazDroidRadioGroup`** | 🔘 Radio Group | Mutually exclusive option group with vertical/horizontal layouts and comfortable touch targets. |
+| **`TLazDroidSegmentedControl`** | 📑 Segments | Horizontal segmented selector with sliding indicator, ideal for quick view switching or status filters. |
+| **`TLazDroidChipGroup`** | 🏷️ Filter Chips | Dynamic collection of tags/chips with single or multi-selection for fast categorization and catalog filtering. |
+
+### 📋 Lists & Data Display
+| Component | Type / Icon | Description & Mobile Features |
+| :--- | :---: | :--- |
+| **`TLazDroidListView`** | 📋 Card List | Touch record list with title, subtitle, badges, 32-bit images, right-aligned currency amounts, and **drag-to-scroll**. |
+| **`TLazDroidCard`** | 🃏 Surface Card | Card container with elevation, soft shadow, header, and rounded corners for grouping content blocks. |
+| **`TLazDroidMetricCard`** | 📊 KPI Card | Specialized card for sales dashboards and KPI summaries featuring numeric value, label, and percentage variance badge. |
+| **`TLazDroidSectionHeader`** | 📑 Section Header | Visual section divider with emphasized title and right-aligned action button (*e.g., "See all"*). |
+| **`TLazDroidImageList`** | 🖼️ Image Manager | Mobile icon and photo manager with full 32-bit alpha transparency (PNG) support without quality degradation. |
+
+### 🔘 Actions, Buttons & Feedback
+| Component | Type / Icon | Description & Mobile Features |
+| :--- | :---: | :--- |
+| **`TLazDroidButton`** | 🔘 Action Button | Button with a minimum 48px touch target, semantic styles (*Primary, Success, Danger, Outline*), and vector icons. |
+| **`TLazDroidFAB`** | ➕ Action Button | Elevated circular Floating Action Button with drop shadow, ideal for the primary screen action (*e.g., New Order*). |
+| **`TLazDroidBadge`** | 🏷️ Status Pill | Semantic pill badge for statuses (*Pending, Completed, Cancelled*) or notification counters (*e.g., 3*). |
+| **`TLazDroidProgressBar`** | ⏳ Progress Bar | Progress bar with smooth animations, centered percentage label, and state-specific colors. |
+| **`TLazDroidSlider`** | 🎚️ Value Slider | Touch slider control with floating numeric value callout for continuous adjustments of quantities, volumes, or price ranges. |
+| **`TLazDroidActivityIndicator`** | 🔄 Spinner | Asynchronous loading indicator with a modern spinning ring, ideal for SQLite queries or network activity. |
+
+### 📱 Special Mobile Features
+| Component | Type / Icon | Description & Mobile Features |
+| :--- | :---: | :--- |
+| **`TLazDroidRatingBar`** | ⭐ Star Rating | Touch star rating (1 to 5 stars) with half-star support and direct touch selection. |
+| **`TLazDroidKeypad`** | ⌨️ Numeric Keypad | Dedicated virtual numeric keypad for POS, cashier checkout, order tickets, and rapid number entry. |
+| **`TLazDroidSignaturePad`** | ✍️ Signature Pad | Digital touch signature capture canvas with smooth strokes and direct export to bitmap/image. |
+| **`TLazDroidAvatar`** | 👤 Avatar | Circular profile picture with automatic initial fallback and connection status badge (*Online / Away*). |
+
+> 📖 **Palette Quick Reference Manual:**  
+> To view interactive documentation for every property, event, and Pascal code example across all 30 components, open in your browser:  
+> [`docs/manual_componentes_lazdroid.html`](docs/manual_componentes_lazdroid.html) (or run the shortcut `Abrir-Manual-Componentes.cmd`).
+
+> 📚 **Complete Official Book (HTML & PDF Export):**  
+> We have created a comprehensive, formatted technical book covering everything from environment setup and hardening to building a commercial **Sales Force application with SQLite**:  
+> - **File:** [`docs/livro_lazdroid_desenvolvimento_mobile.html`](docs/livro_lazdroid_desenvolvimento_mobile.html) (or run the shortcut `Abrir-Livro-LazDroid.cmd`).  
+> - **PDF Export:** The book features a built-in top button to instantly generate/print an A4-format PDF with a professional cover, table of contents, page numbers, and clean chapter breaks.
+
+---
+
+## 🛠️ Installation & Setup Guide
+
+**LazDroid** offers three convenient installation options to support everyone from end users and beginners to enterprise CI/CD pipelines:
+
+### 📦 Option 1: Windows Client Setup Installer (`Setup-LazAndroid.exe`)
+Ideal for clients, new team members, and developers who prefer a standard Windows installer experience (Inno Setup wizard):
+1. Download or run `dist\Setup-LazAndroid.exe` (or from GitHub Releases).
+2. Run the installer as Administrator.
+3. Choose the destination directory (recommended default: `C:\LazAndroid`).
+4. The installer unpacks the suite, includes the offline FPC Android toolchain, and creates Start Menu shortcuts for all demos, manuals, and tools.
+5. On the final step, check the box to launch the **LazDroid Visual Setup Assistant** to finish Lazarus configuration in 1 click!
+
+---
+
+### ⚡ Option 2: Native 1-Click GUI Assistant (`Instalar-LazDroid.exe`)
+Ideal for developers cloning the repository or downloading the `.zip`:
+1. Open the cloned repository directory:
+   ```cmd
+   git clone https://github.com/mabreu2022/LazAndroid.git
+   cd LazAndroid
+   ```
+2. Double-click:
+   ```cmd
+   Instalar-LazDroid.exe
+   ```
+   *(or run `Instalar-LazDroid.cmd`, which automatically requests UAC Administrator privileges).*
+3. A sleek, native Free Pascal / LCL GUI window opens:
+   - Displays real-time detection status of **Lazarus IDE**, **Java JDK**, **Android SDK/NDK**, and **FPC AArch64 Cross-Compiler**.
+   - Lets you re-verify paths and status anytime with the **"🔍 Verify"** button.
+   - Click the bold **"⚡ Install Everything (1-Click)"** button to run all configuration steps automatically:
+     - ✅ Installs FPC cross-compilers (`ppcrossa64.exe` and `ppcrossarm.exe`).
+     - ✅ Installs Android RTL units (`aarch64-android` and `arm-android`).
+     - ✅ Applies LCL CustomDrawn patches (virtual keyboard activation and font compatibility).
+     - ✅ Compiles LCL CustomDrawn for `aarch64-android`.
+     - ✅ Registers `LazDroidControls.lpk` (29 mobile controls) and `LazDroidDeploy.lpk` (IDE integration).
+     - ✅ Autodetects Android tools and generates `lazdroiddeploy.xml` and `local.properties`.
+     - ✅ Rebuilds the Lazarus IDE with LazDroid fully integrated.
+   - Provides quick action buttons for **"🎨 Delphi Layout"** (docks IDE windows into modern tabs) and **"🚀 Open IDE"**.
+
+---
+
+### 💻 Option 3: Command-Line / CI Mode (`Instalar-LazDroid.cmd --cli`)
+For automated scripts, DevOps, or developers who prefer the command line:
+```cmd
+Instalar-LazDroid.cmd --cli
+```
+Or directly in PowerShell:
+```powershell
+.\tools\installer\install.ps1 -NonInteractive -RebuildIDE
+```
+
+---
+
+### 🎨 Organize the IDE in Delphi Style (Optional, Recommended)
+
+If Lazarus' windows are floating or disorganized, you can apply the docked Delphi-style layout directly from the GUI Assistant (**"🎨 Delphi Layout"** button) or by double-clicking:
+```cmd
+Restaurar-Layout-Lazarus.cmd
+```
+This arranges the interface into a professional docked layout (*AnchorDocking*) identical to Delphi:
+* **Left:** Object Inspector (components, properties, and events).
+* **Center:** Code Editor and Form Designer at the top, Messages and Debugging at the bottom.
+* **Right:** Project Inspector at the top, LazDroid Mobile Target Manager in the middle, and Component Palette at the bottom.
+* *(The layout is locked as read-only to prevent accidental rearrangement).*
+
+---
+
+### 4. How to Test and Run Your First Deployment
+
+1. Open **Lazarus IDE**.
+2. Connect your mobile phone via USB (with *USB Debugging* enabled).
+3. Open any of the included ready-to-run demo projects:
+   * **`demo5/project1.lpi`**: Full sales application with **Login**, local **SQLite database (`database/app.db`)**, and tab navigation (**`TLazDroidBottomNav`**).
+   * **`demo4/demo4.lpi`**: Showcase of touch-first buttons, cards, badges, inputs, and list views.
+   * **`demo/LazAndroidDemo.lpi`**: Sales force demo with LCL visual forms.
+4. Press the shortcut:
+   ```
+   Ctrl + Shift + F9
+   ```
+   *(Or click the menu `Run -> Deploy & Run on Android Device`)*.
+5. LazDroid compiles the native ARM64 library (`liblazapp.so`), packages the APK with Gradle, and installs/launches the app on your phone in seconds!
+
+---
+
+## 📊 LCL Component Status on Android
+
+| LCL Component | Status on Android | Notes |
+| :--- | :---: | :--- |
+| **LazDroid Palette** | ✅ 100% Mobile | AppBar, BottomNav, Card, Badge, Button, Edit, ListView optimized for touch |
+| **TForm** | ✅ Ready | Maximized, dynamic resizing on screen rotation |
+| **TLabel** | ✅ Ready | Font rendering, word wrap, colors, and alignment |
+| **TButton** | ✅ Ready | Touch click, pressed/released visual states |
+| **TPanel** | ✅ Ready | Containers, styled cards, borders, and colors |
+| **TPageControl / TTabSheet** | ✅ Ready | Multiple tabs with dynamic switching |
+| **TCheckBox** | ✅ Ready | Selection and visual toggle state |
+| **TImage / TCanvas** | ✅ Ready | Canvas drawing, bitmaps, and primitive shapes |
+| **TEdit / TMemo** | ✅ Ready | Android virtual keyboard via `csRequiresKeyboardInput` and `adjustResize` |
+| **TComboBox** | 🔄 In Adaptation | Native selection dialog (Spinner) recommended |
+| **TStringGrid / TDBGrid** | 🔄 In Adaptation | Grid display; touch scrolling requires smooth inertia |
+| **Dialogs (ShowMessage)** | ✅ Ready | Mapped to native Android `AlertDialog` |
+| **SQLite Database** | ✅ Ready | Direct access via native compiled `libsqlite.so` |
+
+For architectural details, refer to [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). For step-by-step installation instructions, see [`docs/INSTALL_GUIDE.md`](docs/INSTALL_GUIDE.md).
+
+---
+
+## 🤝 How to Contribute
+
+Contributions from the entire Delphi, Lazarus, and Free Pascal community are warmly welcomed! If you would like to suggest an improvement, report or fix a bug, or create a new mobile component:
+
+1. **Fork** the repository ([github.com/mabreu2022/LazAndroid](https://github.com/mabreu2022/LazAndroid)).
+2. Create a branch for your feature (`git checkout -b feat/my-improvement`).
+3. Develop your changes and verify compilation in Lazarus and the AArch64 cross-compiler.
+4. Open a **Pull Request (PR)** detailing the changes made.
+
+> 🛡️ **Governance & Approval Policy:**  
+> The main branch (`main`) has protection enabled. No commits are merged directly into production without **explicit review and approval by the maintainer (@mabreu2022)**.
+> 
+> Please read our [Full Contribution Guide (`CONTRIBUTING.md`)](CONTRIBUTING.md) and [Code of Conduct (`CODE_OF_CONDUCT.md`)](CODE_OF_CONDUCT.md).
+
+

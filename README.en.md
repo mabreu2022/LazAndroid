@@ -1,7 +1,7 @@
 # LazDroid-Deploy — IDE Plugin & Android Deployment Pipeline for Lazarus
 
 <p align="center">
-  <b>🇺🇸 English</b> &nbsp;|&nbsp; <a href="README.md#readme-pt">🇧🇷 Português</a>
+  <a href="README.md">🇧🇷 Português</a> &nbsp;|&nbsp; <b>🇺🇸 English</b>
 </p>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -157,47 +157,62 @@ All components are instantly available in the **`LazDroid`** palette within the 
 
 ---
 
-## 🛠️ Step-by-Step Installation Guide (For GitHub Users)
+## 🛠️ Installation & Setup Guide
 
-If you have just cloned or downloaded the repository from GitHub, follow the steps below to set up your environment in minutes:
+**LazDroid** offers three convenient installation options to support everyone from end users and beginners to enterprise CI/CD pipelines:
 
-### 1. System Prerequisites
-Before running the installer, ensure you have installed on Windows:
-* **Lazarus IDE (v2.2, 3.x, or 4.x)**: installed (e.g., `C:\lazarus`).
-* **Android SDK & ADB**: installed via Android Studio or standalone at `%LOCALAPPDATA%\Android\Sdk` (with `platform-tools` containing `adb.exe`).
-* **Android NDK**: versions r21 through r26 (installed via Android Studio under *SDK Tools* -> *NDK (Side by side)*).
-* **Java JDK 17 or higher**: installed (e.g., Eclipse Adoptium JDK or Android Studio's bundled `jbr`).
-* **Android Device**: connected via USB cable with **USB Debugging** enabled in *Developer Options*.
+### 📦 Option 1: Windows Client Setup Installer (`Setup-LazAndroid.exe`)
+Ideal for clients, new team members, and developers who prefer a standard Windows installer experience (Inno Setup wizard):
+1. Download or run `dist\Setup-LazAndroid.exe` (or from GitHub Releases).
+2. Run the installer as Administrator.
+3. Choose the destination directory (recommended default: `C:\LazAndroid`).
+4. The installer unpacks the suite, includes the offline FPC Android toolchain, and creates Start Menu shortcuts for all demos, manuals, and tools.
+5. On the final step, check the box to launch the **LazDroid Visual Setup Assistant** to finish Lazarus configuration in 1 click!
 
 ---
 
-### 2. 1-Click Automatic Installation
-
-1. Open the cloned project directory:
+### ⚡ Option 2: Native 1-Click GUI Assistant (`Instalar-LazDroid.exe`)
+Ideal for developers cloning the repository or downloading the `.zip`:
+1. Open the cloned repository directory:
    ```cmd
    git clone https://github.com/mabreu2022/LazAndroid.git
    cd LazAndroid
    ```
-2. Double-click the file:
+2. Double-click:
    ```cmd
-   Instalar-LazDroid.cmd
+   Instalar-LazDroid.exe
    ```
-3. Windows will request Administrator privileges (UAC). Click **Yes**.
-4. The installer automatically performs all setup steps:
-   - ✅ Locates the installed Lazarus IDE (`C:\lazarus`).
-   - ✅ Automatically downloads and extracts the FPC AArch64 cross-compiler and Android RTL units.
-   - ✅ Copies `ppcrossa64.exe` binaries and `aarch64-android` / `arm-android` units to FPC.
-   - ✅ Applies the mobile patch for virtual keyboard activation in LCL CustomDrawn.
-   - ✅ Compiles LCL CustomDrawn and packages for Android AArch64.
-   - ✅ Registers the packages **`LazDroidControls.lpk`** (29 mobile components) and **`LazDroidDeploy.lpk`** (Deploy & Target Manager) in Lazarus.
-   - ✅ Autodetects Android SDK, NDK, ADB, JDK and writes the `lazdroiddeploy.xml` configuration file.
-5. When prompted at the end, type **`S`** (or press Enter) to authorize rebuilding the IDE. Lazarus will be recompiled with LazDroid built-in!
+   *(or run `Instalar-LazDroid.cmd`, which automatically requests UAC Administrator privileges).*
+3. A sleek, native Free Pascal / LCL GUI window opens:
+   - Displays real-time detection status of **Lazarus IDE**, **Java JDK**, **Android SDK/NDK**, and **FPC AArch64 Cross-Compiler**.
+   - Lets you re-verify paths and status anytime with the **"🔍 Verify"** button.
+   - Click the bold **"⚡ Install Everything (1-Click)"** button to run all configuration steps automatically:
+     - ✅ Installs FPC cross-compilers (`ppcrossa64.exe` and `ppcrossarm.exe`).
+     - ✅ Installs Android RTL units (`aarch64-android` and `arm-android`).
+     - ✅ Applies LCL CustomDrawn patches (virtual keyboard activation and font compatibility).
+     - ✅ Compiles LCL CustomDrawn for `aarch64-android`.
+     - ✅ Registers `LazDroidControls.lpk` (29 mobile controls) and `LazDroidDeploy.lpk` (IDE integration).
+     - ✅ Autodetects Android tools and generates `lazdroiddeploy.xml` and `local.properties`.
+     - ✅ Rebuilds the Lazarus IDE with LazDroid fully integrated.
+   - Provides quick action buttons for **"🎨 Delphi Layout"** (docks IDE windows into modern tabs) and **"🚀 Open IDE"**.
 
 ---
 
-### 3. Organize the IDE in Delphi Style (Optional, Recommended)
+### 💻 Option 3: Command-Line / CI Mode (`Instalar-LazDroid.cmd --cli`)
+For automated scripts, DevOps, or developers who prefer the command line:
+```cmd
+Instalar-LazDroid.cmd --cli
+```
+Or directly in PowerShell:
+```powershell
+.\tools\installer\install.ps1 -NonInteractive -RebuildIDE
+```
 
-If Lazarus' windows are floating or disorganized, double-click the file:
+---
+
+### 🎨 Organize the IDE in Delphi Style (Optional, Recommended)
+
+If Lazarus' windows are floating or disorganized, you can apply the docked Delphi-style layout directly from the GUI Assistant (**"🎨 Delphi Layout"** button) or by double-clicking:
 ```cmd
 Restaurar-Layout-Lazarus.cmd
 ```

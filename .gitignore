@@ -47,3 +47,7 @@ tools/innoextract/
 Thumbs.db
 desktop.ini
 **/packagefiles.xml
+
+# Distribution output packages
+dist/
+*.exe.tmp
